@@ -12,4 +12,9 @@ public class Avatar {
     public String capitalize(String str) {
         return str.toUpperCase();
     }
+
+    public void foo() {
+        System.out.println("test");
+    }
+
 }
