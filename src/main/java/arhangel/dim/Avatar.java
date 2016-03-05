@@ -10,11 +10,6 @@ public class Avatar {
     }
 
     public String capitalize(String str) {
-        return str.toUpperCase();
+        return str;
     }
-
-    public void foo() {
-        System.out.println("test");
-    }
-
 }
