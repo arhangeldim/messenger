@@ -1,0 +1,15 @@
+<root>
+
+    <bean id="a" class="arhangel.dim.ioc.beans.A">
+        <property name="power" val="200"/>
+    </bean>
+
+    <bean id="b" class="arhangel.dim.ioc.beans.B">
+        <property name="count" val="6"/>
+    </bean>
+
+    <bean id="c" class="arhangel.dim.ioc.beans.C">
+        <property name="aref" ref="a"/>
+    </bean>
+
+</root>

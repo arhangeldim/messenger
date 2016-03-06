@@ -2,8 +2,6 @@ package arhangel.dim;
 
 import org.junit.Test;
 
-import sun.security.x509.AVA;
-
 import static org.junit.Assert.*;
 
 /**
