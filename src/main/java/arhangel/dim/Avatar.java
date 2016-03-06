@@ -7,7 +7,6 @@ public class Avatar {
     }
 
     public String capitalize(String str) {
-        //return str.toUpperCase();
-	return str;
+    	return str.toUpperCase();
     }
 }
