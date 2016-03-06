@@ -4,20 +4,26 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Каждый проект под maven  имеет уникальный идентификатор-->
     <groupId>tehnotrack-mail</groupId>
     <artifactId>messenger</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!-- Настройки jvm и общие properties-->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
+        <checkstyle.config.location>src/main/resources/google_checkstyle.xml</checkstyle.config.location>
     </properties>
 
+    <!-- В этом блоке описывается процесс сборки и запуска. Действия запускаются с помощью плагинов -
+    подпрограмм maven-->
     <build>
         <plugins>
             <plugin>
+                <!-- Данный плагин описывает, какой класс мы хотим стартовать по умолчанию (должен содержать main())-->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.4.0</version>
@@ -29,6 +35,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.17</version>
+                <configuration>
+                    <consoleOutput>true</consoleOutput>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
@@ -44,8 +53,9 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <configLocation>src/main/resources/google_checkstyle.xml</configLocation>
+                            <!--<configLocation>src/main/resources/google_checkstyle.xml</configLocation>-->
                             <failOnViolation>true</failOnViolation>
+                            <consoleOutput>true</consoleOutput>
                         </configuration>
                     </execution>
                 </executions>
@@ -53,14 +63,18 @@
         </plugins>
     </build>
 
+    <!-- Maven умеет автоматически вытягивать необходимые библиотеки из глобального репозитория, не придется
+    устанавливать их руками. Достаточно указать имя либы и версию. -->
     <dependencies>
         <dependency>
+            <!-- Либа юнит тестов-->
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- Либа для логирования-->
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.12</version>
