@@ -3,10 +3,15 @@ package arhangel.dim.lections.objects;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  */
 public class Polimorf {
+
+    private static Logger log = LoggerFactory.getLogger(Polimorf.class);
 
     static class Parent {
         void test() {
