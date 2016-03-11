@@ -44,7 +44,6 @@
             <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|throw"/>
         </module>
         <module name="AvoidStarImport"/>
-        <module name="OneTopLevelClass"/>
         <module name="NoLineWrap"/>
         <module name="EmptyBlock">
             <property name="option" value="TEXT"/>

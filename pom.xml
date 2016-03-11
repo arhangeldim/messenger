@@ -28,7 +28,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.4.0</version>
                 <configuration>
-                    <mainClass>arhangel.dim.ioc.Context</mainClass>
+                    <mainClass>arhangel.dim.container.Context</mainClass>
                 </configuration>
             </plugin>
             <plugin>

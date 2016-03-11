@@ -1,4 +1,4 @@
-package arhangel.dim.ioc.dag;
+package arhangel.dim.container.dag;
 
 import java.util.ArrayList;
 import java.util.HashMap;

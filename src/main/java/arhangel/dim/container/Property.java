@@ -1,12 +1,13 @@
-package arhangel.dim.ioc;
+package arhangel.dim.container;
 
 /**
  * Описание тега property в xml конфигурации.
+ * Тег описывает поля определенного бина
  */
 public class Property {
-    private String name;
-    private String value;
-    private ValueType type;
+    private String name; // Имя поля
+    private String value; // Значение поля
+    private ValueType type; // Метка ссылочное значение или примитив
 
     public Property(String name, String value, ValueType type) {
         this.name = name;

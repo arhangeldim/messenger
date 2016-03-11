@@ -1,15 +1,15 @@
-package arhangel.dim.ioc;
+package arhangel.dim.container;
 
 import java.util.Map;
 
 /**
- *
+ * Представляет тег bean из конфига
  */
 public class Bean {
 
-    private String name; // bean id
-    private String className; // bean class
-    private Map<String, Property> properties; // bean property
+    private String name; // Уникально имя бина
+    private String className; // Класс бина
+    private Map<String, Property> properties; // Набор полей бина ИмяПоля-Значение
 
     public Bean(String name, String className, Map<String, Property> properties) {
         this.name = name;

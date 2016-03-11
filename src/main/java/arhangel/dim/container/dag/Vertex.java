@@ -1,4 +1,4 @@
-package arhangel.dim.ioc.dag;
+package arhangel.dim.container.dag;
 
 /**
  * Представление вершины графа

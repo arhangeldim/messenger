@@ -1,4 +1,4 @@
-package arhangel.dim.ioc;
+package arhangel.dim.container;
 
 /**
  *

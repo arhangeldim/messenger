@@ -1,9 +1,7 @@
-package arhangel.dim.ioc;
+package arhangel.dim.container;
 
 import java.io.File;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
