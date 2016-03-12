@@ -1,4 +1,4 @@
-package UPML.container;
+package upml.container;
 
 import arhangel.dim.container.Bean;
 
@@ -15,11 +15,12 @@ public class BeanGraph {
 
     /**
      * Добавить вершину в граф
+     *
      * @param value - объект, привязанный к вершине
      */
     public BeanVertex addVertex(Bean value) {
         BeanVertex beanVertex = new BeanVertex(value);
-        if(vertices.containsKey(beanVertex)) {
+        if (vertices.containsKey(beanVertex)) {
             return beanVertex;
         }
         //Непонятно пока, как понормальному добавить вершины=(
@@ -29,13 +30,14 @@ public class BeanGraph {
 
     /**
      * Соединить вершины ребром
+     *
      * @param from из какой вершины
-     * @param to в какую вершину
+     * @param to   в какую вершину
      */
-    public void addEdge(BeanVertex from ,BeanVertex to) {
+    public void addEdge(BeanVertex from, BeanVertex to) {
         //можно ли просто добавлять в лист не перезаписывая?
         List<BeanVertex> beanVertexes = getLinked(from);
-        if(beanVertexes.contains(to)) {
+        if (beanVertexes.contains(to)) {
             return;
         }
         beanVertexes.add(to);

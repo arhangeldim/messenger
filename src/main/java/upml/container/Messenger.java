@@ -1,4 +1,4 @@
-package UPML.container;
+package upml.container;
 
 import arhangel.dim.container.Bean;
 import org.xml.sax.SAXException;
@@ -14,7 +14,7 @@ public class Messenger {
         List<Bean> beans;
 
         try {
-            beans = xmlReader.parseBeans("/home/kagudkov/tehnotrek/java/messenger/src/main/java/UPML/container/test");
+            beans = xmlReader.parseBeans("/home/kagudkov/tehnotrek/java/messenger/src/main/java/upml/container/test");
         } catch (IOException e) {
             System.out.println(e.getMessage());
             return;

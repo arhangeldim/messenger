@@ -1,4 +1,4 @@
-package UPML.container;
+package upml.container;
 
 import arhangel.dim.container.Bean;
 import arhangel.dim.container.Property;
