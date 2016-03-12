@@ -101,7 +101,12 @@ public class BeanGraph {
                 dfs(tmp);
             }
         }
-        return answerForSort;
+        ArrayList<BeanVertex> reverseAnswer = new ArrayList<>();
+        for (int i = 0; i < size(); ++i) {
+            reverseAnswer.add(answerForSort.get(i));
+        }
+
+        return reverseAnswer;
     }
 
     private void dfs(BeanVertex tmp) {
