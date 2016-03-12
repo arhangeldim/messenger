@@ -19,7 +19,7 @@ public class Messenger {
             System.out.println(e.getMessage());
             return;
         } catch (ParserConfigurationException e) {
-            System.out.println("in parse xmlFile" +  e.getMessage());
+            System.out.println("in parse xmlFile" + e.getMessage());
             return;
         } catch (SAXException e) {
             e.printStackTrace();
@@ -29,7 +29,7 @@ public class Messenger {
             return;
         }
 
-        for (Bean bean : beans){
+        for (Bean bean : beans) {
             System.out.println(bean.toString());
         }
 
