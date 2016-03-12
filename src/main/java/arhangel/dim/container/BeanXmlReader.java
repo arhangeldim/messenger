@@ -122,12 +122,12 @@ public class BeanXmlReader {
             setColor(bean, Color.GREY);
             Collection<Property> values = bean.getProperties().values();
             for (Property property : values) {
-                if (property.getType().equals(ValueType.REF)){
+                if (property.getType().equals(ValueType.REF)) {
                     Bean child = getBeanByName(property.getValue());
-                    if (getColor(child).equals(Color.GREY)){
+                    if (getColor(child).equals(Color.GREY)) {
                         throw new LoopInTheBeansException();
                     }
-                    if (getColor(child).equals(Color.WHITE)){
+                    if (getColor(child).equals(Color.WHITE)) {
                         innerGetSorted(child, forResult);
                     }
                 }
@@ -142,6 +142,7 @@ public class BeanXmlReader {
         WHITE, GREY, BLACK
     }
 
-    public class LoopInTheBeansException extends RuntimeException{}
+    public class LoopInTheBeansException extends RuntimeException {
+    }
 
 }
