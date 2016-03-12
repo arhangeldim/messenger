@@ -16,6 +16,7 @@ public class BeanGraph {
     // Граф представлен в виде списка связности для каждой вершины
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
     private Map<BeanVertex, Boolean> used;
+    private Map<BeanVertex, Boolean> left;  //вершины из которых мы вышли в dfs
     private List<BeanVertex> answerForSort;
 
     /**
@@ -90,6 +91,23 @@ public class BeanGraph {
         return vertices.size();
     }
 
+    public boolean checkCycle(){
+        used = new HashMap<>();
+        left = new HashMap<>();
+        for (BeanVertex tmp : vertices.keySet()) {
+            used.put(tmp, false);
+            left.put(tmp, false);
+        }
+        for (BeanVertex tmp : vertices.keySet()) {
+            if (!used.get(tmp)) {
+                if(dfsCheck(tmp)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public List<BeanVertex> topSort(BeanVertex start) {
         answerForSort = new ArrayList<>();
         used = new HashMap<>();
@@ -117,5 +135,20 @@ public class BeanGraph {
             }
         }
         answerForSort.add(tmp);
+    }
+
+
+    private boolean dfsCheck(BeanVertex tmp) {
+        used.put(tmp, true);
+        for (BeanVertex nextBean : getLinked(tmp)) {
+            if(used.get(nextBean) && !left.get(nextBean)){
+                return true;
+            }
+            if (!used.get(nextBean) && dfsCheck(nextBean)) {
+                return true;
+            }
+        }
+        left.put(tmp, true);
+        return false;
     }
 }
