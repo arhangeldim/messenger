@@ -91,7 +91,7 @@ public class BeanGraph {
         return vertices.size();
     }
 
-    public boolean checkCycle(){
+    public boolean checkCycle() {
         used = new HashMap<>();
         left = new HashMap<>();
         for (BeanVertex tmp : vertices.keySet()) {
@@ -100,7 +100,7 @@ public class BeanGraph {
         }
         for (BeanVertex tmp : vertices.keySet()) {
             if (!used.get(tmp)) {
-                if(dfsCheck(tmp)){
+                if (dfsCheck(tmp)) {
                     return false;
                 }
             }
@@ -141,7 +141,7 @@ public class BeanGraph {
     private boolean dfsCheck(BeanVertex tmp) {
         used.put(tmp, true);
         for (BeanVertex nextBean : getLinked(tmp)) {
-            if(used.get(nextBean) && !left.get(nextBean)){
+            if (used.get(nextBean) && !left.get(nextBean)) {
                 return true;
             }
             if (!used.get(nextBean) && dfsCheck(nextBean)) {
