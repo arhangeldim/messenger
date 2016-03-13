@@ -24,11 +24,6 @@ public class BeanGraph {
         BeanVertex vertex = new BeanVertex(value);
         vertices.put(vertex, new ArrayList<>());
         names.put(value.getName(), vertex);
-        for (Property p: vertex.getBean().getProperties().values()) {
-            if (p.getType() == ValueType.REF) {
-                addEdge(vertex, names.get(p.getValue()));
-            }
-        }
         return vertex;
     }
 
@@ -66,6 +61,13 @@ public class BeanGraph {
     }
 
     public List<BeanVertex> sort() {
+        for (BeanVertex vertex: vertices.keySet()) {
+            for (Property p: vertex.getBean().getProperties().values()) {
+                if (p.getType() == ValueType.REF) {
+                    addEdge(vertex, names.get(p.getValue()));
+                }
+            }
+        }
         used.clear();
         for (BeanVertex vertex: vertices.keySet()) {
             used.put(vertex, 0);
@@ -75,13 +77,13 @@ public class BeanGraph {
                 dfs(vertex);
             }
         }
-        Collections.reverse(sorted);
         return sorted;
     }
 
     private void dfs(BeanVertex vertex) {
         used.put(vertex, 1);
         for (BeanVertex u: getLinked(vertex)) {
+            System.out.println("dfs for " + vertex.getBean().getName());
             if (used.get(u) == 0) {
                 dfs(u);
             }
