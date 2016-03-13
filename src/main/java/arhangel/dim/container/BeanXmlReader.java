@@ -1,6 +1,9 @@
 package arhangel.dim.container;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -8,7 +11,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
+import java.util.Collection;
 
 /**
  * Created by olegchuikin on 12/03/16.
@@ -26,9 +34,7 @@ public class BeanXmlReader {
         try {
             File file = new File(pathToFile);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = null;
-
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            DocumentBuilder documentBuilder = documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document doc = documentBuilder.parse(file);
 
             Node root = doc.getFirstChild();
@@ -43,8 +49,8 @@ public class BeanXmlReader {
             }
             return sortBeans(result);
 
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -65,13 +71,13 @@ public class BeanXmlReader {
         return new Bean(id, clazz, propertyMap);
     }
 
-    private Property parseProperty(Node pNode) {
-        Element pElement = (Element) pNode;
-        String name = pElement.getAttribute(ATTR_NAME);
-        if (pElement.hasAttribute(ATTR_REF)) {
-            return new Property(name, pElement.getAttribute(ATTR_REF), ValueType.REF);
+    private Property parseProperty(Node parentNode) {
+        Element parentElement = (Element) parentNode;
+        String name = parentElement.getAttribute(ATTR_NAME);
+        if (parentElement.hasAttribute(ATTR_REF)) {
+            return new Property(name, parentElement.getAttribute(ATTR_REF), ValueType.REF);
         } else {
-            return new Property(name, pElement.getAttribute(ATTR_VALUE), ValueType.VAL);
+            return new Property(name, parentElement.getAttribute(ATTR_VALUE), ValueType.VAL);
         }
     }
 
@@ -102,17 +108,20 @@ public class BeanXmlReader {
         }
 
         private Bean getBeanByName(String name) {
-            for (Bean bean : beans)
-                if (bean.getName().equals(name))
+            for (Bean bean : beans) {
+                if (bean.getName().equals(name)) {
                     return bean;
+                }
+            }
             return null;
         }
 
         public List<Bean> getSorted() {
             List<Bean> result = new ArrayList<>();
             for (Bean bean : beans) {
-                if (getColor(bean) == Color.WHITE)
+                if (getColor(bean) == Color.WHITE) {
                     innerGetSorted(bean, result);
+                }
             }
             Collections.reverse(result);
             return result;
@@ -125,7 +134,7 @@ public class BeanXmlReader {
                 if (property.getType().equals(ValueType.REF)) {
                     Bean child = getBeanByName(property.getValue());
                     if (getColor(child).equals(Color.GREY)) {
-                        throw new LoopInTheBeansException();
+                        throw new CycleReferenceException();
                     }
                     if (getColor(child).equals(Color.WHITE)) {
                         innerGetSorted(child, forResult);
@@ -142,7 +151,7 @@ public class BeanXmlReader {
         WHITE, GREY, BLACK
     }
 
-    public class LoopInTheBeansException extends RuntimeException {
+    public class CycleReferenceException extends RuntimeException {
     }
 
 }
