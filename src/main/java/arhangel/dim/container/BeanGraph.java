@@ -80,15 +80,22 @@ public class BeanGraph {
         return sorted;
     }
 
-    private void dfs(BeanVertex vertex) {
+    private boolean dfs(BeanVertex vertex) {
+        boolean result = false;
         used.put(vertex, 1);
         for (BeanVertex u: getLinked(vertex)) {
-            System.out.println("dfs for " + vertex.getBean().getName());
             if (used.get(u) == 0) {
-                dfs(u);
+                if (dfs(u)) {
+                    result = true;
+                }
+            }
+            if (used.get(u) == 1) {
+                result = true;
             }
         }
+        used.put(vertex, 2);
         sorted.add(vertex);
+        return result;
     }
 
     public List<Bean> getSortedBeans() {
@@ -100,4 +107,19 @@ public class BeanGraph {
         return result;
     }
 
+    public boolean isAcyclic() {
+        boolean result = true;
+        used.clear();
+        for (BeanVertex vertex: vertices.keySet()) {
+            used.put(vertex, 0);
+        }
+        for (BeanVertex vertex: vertices.keySet()) {
+            if (used.get(vertex) == 0) {
+                if (dfs(vertex)) {
+                    result = false;
+                }
+            }
+        }
+        return result;
+    }
 }
