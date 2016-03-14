@@ -17,4 +17,17 @@ public class BeanVertex {
     public void setBean(Bean bean) {
         this.bean = bean;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BeanVertex) {
+            return bean.getName().equals(((BeanVertex) obj).getBean().getName());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return bean.hashCode();
+    }
 }
