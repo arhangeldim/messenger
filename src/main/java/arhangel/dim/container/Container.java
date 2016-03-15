@@ -4,7 +4,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ public class Container {
     private List<BeanVertex> beans;
     private Map<String, Object> objByName;
     private Map<String, Object> objByClassName;
-    private Map<String, Bean> beanByName;
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
@@ -34,7 +32,6 @@ public class Container {
 
         objByName = new HashMap<>();
         objByClassName = new HashMap<>();
-        beanByName = new HashMap<>();
         instantiateBeans();
     }
 
@@ -58,7 +55,6 @@ public class Container {
     private void instantiateBeans() throws InvalidConfigurationException {
         for (BeanVertex beanVertex: beans) {
             Bean bean = beanVertex.getBean();
-            beanByName.put(bean.getName(), bean);
             String className = bean.getClassName();
             try {
                 Class clazz = Class.forName(className);
@@ -73,11 +69,11 @@ public class Container {
 
 
                     if (property.getType() == ValueType.REF) {
-                        Class subClazz = Class.forName(beanByName
-                                .get(property.getValue()).getClassName());
-                        Method method = clazz.getMethod(methodName, subClazz);
+                        Object parameter = getByName(property.getValue());
+                        Method method = clazz.getMethod(methodName,
+                                parameter.getClass());
 
-                        method.invoke(ob, getByName(property.getValue()));
+                        method.invoke(ob, parameter);
                     } else {
                         Method method = clazz.getMethod(methodName,
                                 int.class);
