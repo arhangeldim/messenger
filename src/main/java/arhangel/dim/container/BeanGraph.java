@@ -57,23 +57,31 @@ public class BeanGraph {
         return vertices.size();
     }
 
-    private final void dfs(BeanVertex vertex, Stack<BeanVertex> result, ArrayList<BeanVertex> used) {
-        used.add(vertex); //посетили эту вершину
-        for (BeanVertex toVertex: vertices.get(vertex)) { //получаем вершины в которые есть путь
-            if (!used.contains(toVertex)) {
-                dfs(toVertex, result, used);
-            }
-        }
+    private final void dfs(BeanVertex vertex, Stack<BeanVertex> result, Map<BeanVertex, Boolean> used) {
+        try {
+            used.put(vertex, false); //посетили эту вершину
 
-        result.push(vertex);
+            for (BeanVertex toVertex : vertices.get(vertex)) { //получаем вершины в которые есть путь
+                if (!used.containsKey(toVertex)) {
+                    dfs(toVertex, result, used);
+                } else {
+                    if (used.get(toVertex) == true) {
+                        throw  new Exception("Found cycle in graph!");
+                    }
+                }
+            }
+            used.replace(vertex, false, true);
+            result.push(vertex);
+        } catch (Exception exc) {
+            exc.printStackTrace(System.err);
+        }
     }
 
     public List<BeanVertex> sort() {
         Stack<BeanVertex> result = new Stack<>();
-        ArrayList<BeanVertex> used = new ArrayList<BeanVertex>(); //сюда складываем уже посещенные вершины
-
+        Map<BeanVertex, Boolean> used = new HashMap<>();
         for (BeanVertex vertex:vertices.keySet()) {
-            if (!used.contains(vertex)) {
+            if (!used.containsKey(vertex)) {
                 dfs(vertex, result, used);
             }
         }

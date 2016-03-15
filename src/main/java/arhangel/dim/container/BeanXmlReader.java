@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * Created by dmitriy on 11.03.16.
+ * Рассчитывается, что файл config.xml строго типизирован, например, с помощью .xsd
  */
 public class BeanXmlReader {
 
