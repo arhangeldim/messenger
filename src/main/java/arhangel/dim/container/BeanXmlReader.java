@@ -32,9 +32,9 @@ class BeanXmlReader {
         org.jsoup.nodes.Document htmlFile = null;
         try {
             htmlFile = Jsoup.parse(new File(pathToFile), "ISO-8859-1");
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException exept) {
             System.out.print("wrong path");
-            e.printStackTrace();
+            exept.printStackTrace();
         }
 
         List<org.jsoup.nodes.Element> classList = htmlFile.getElementsByTag(TAG_BEAN);
