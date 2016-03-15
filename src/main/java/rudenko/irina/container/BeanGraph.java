@@ -1,5 +1,6 @@
-package arhangel.dim.container;
+package rudenko.irina.container;
 
+import rudenko.irina.container.BeanVertex;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -9,16 +10,16 @@ import java.util.*;
  */
 public class BeanGraph {
     // Граф представлен в виде списка связности для каждой вершины
-    private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
-    private List<BeanVertex> sortedVertexes = new ArrayList<>();
+    private Map<rudenko.irina.container.BeanVertex, List<rudenko.irina.container.BeanVertex>> vertices = new HashMap<>();
+    private List<rudenko.irina.container.BeanVertex> sortedVertexes = new ArrayList<>();
 
     /**
      * Добавить вершину в граф
      * @param value - объект, привязанный к вершине
      */
-    public BeanVertex addVertex(Bean value)
+    public rudenko.irina.container.BeanVertex addVertex(rudenko.irina.container.Bean value)
     {
-        BeanVertex vertex = new BeanVertex(value);
+        rudenko.irina.container.BeanVertex vertex = new rudenko.irina.container.BeanVertex(value);
         vertices.get(vertex);
         return vertex;
     }
@@ -28,21 +29,21 @@ public class BeanGraph {
      * @param from из какой вершины
      * @param to в какую вершину
      */
-    public void addEdge(BeanVertex from ,BeanVertex to) {
+    public void addEdge(rudenko.irina.container.BeanVertex from , rudenko.irina.container.BeanVertex to) {
         vertices.get(from).add(to);
     }
 
     /**
      * Проверяем, связаны ли вершины
      */
-    public boolean isConnected(BeanVertex v1, BeanVertex v2) {
+    public boolean isConnected(rudenko.irina.container.BeanVertex v1, rudenko.irina.container.BeanVertex v2) {
         return vertices.get(v1).contains(v2);
     }
 
     /**
      * Получить список вершин, с которыми связана vertex
      */
-    public List<BeanVertex> getLinked(BeanVertex vertex) {
+    public List<rudenko.irina.container.BeanVertex> getLinked(rudenko.irina.container.BeanVertex vertex) {
         return vertices.get(vertex);
     }
 
@@ -54,15 +55,15 @@ public class BeanGraph {
     }
 
     // проверка на зацикливание
-    Map<BeanVertex, Boolean> used = new HashMap<>();
-    Map<BeanVertex, Boolean> left = new HashMap<>();
+    Map<rudenko.irina.container.BeanVertex, Boolean> used = new HashMap<>();
+    Map<rudenko.irina.container.BeanVertex, Boolean> left = new HashMap<>();
 
     public boolean isCirculed() {
-        for (BeanVertex bv : vertices.keySet()) {
+        for (rudenko.irina.container.BeanVertex bv : vertices.keySet()) {
             used.put(bv, false);
             left.put(bv, false);
         }
-        for (BeanVertex bv : vertices.keySet()) {
+        for (rudenko.irina.container.BeanVertex bv : vertices.keySet()) {
             if (!used.get(bv)) {
                 if (dfsCheck(bv)) {
                     return false;
@@ -86,9 +87,9 @@ public class BeanGraph {
         left.put(bv, true);
         return false;
     }
-    private void dfs(BeanVertex tmp) {
+    private void dfs(rudenko.irina.container.BeanVertex tmp) {
         used.put(tmp, true);
-        for (BeanVertex nextBean : getLinked(tmp)) {
+        for (rudenko.irina.container.BeanVertex nextBean : getLinked(tmp)) {
             if (!used.get(nextBean)) {
                 dfs(nextBean);
             }
@@ -96,13 +97,13 @@ public class BeanGraph {
         sortedVertexes.add(tmp);
     }
 
-    public List<BeanVertex> topSort(BeanVertex start) {
+    public List<BeanVertex> topSort(rudenko.irina.container.BeanVertex start) {
         sortedVertexes.clear();
         used.clear();
-        for (BeanVertex bv : vertices.keySet()) {
+        for (rudenko.irina.container.BeanVertex bv : vertices.keySet()) {
             used.put(bv, false);
         }
-        for (BeanVertex bv : vertices.keySet()) {
+        for (rudenko.irina.container.BeanVertex bv : vertices.keySet()) {
             if (!used.get(bv)) {
                 dfs(bv);
             }

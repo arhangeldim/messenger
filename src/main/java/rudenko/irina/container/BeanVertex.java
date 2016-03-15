@@ -1,15 +1,14 @@
-package arhangel.dim.container;
+package rudenko.irina.container;
+
 
 /**
  * Вершина графа, которая содержит бин
  */
 public class BeanVertex {
     private Bean bean;
-//    private boolean isVisited;
 
     public BeanVertex(Bean bean) {
         this.bean = bean;
-//        this.isVisited = false;
     }
 
     public Bean getBean() {
@@ -19,12 +18,4 @@ public class BeanVertex {
     public void setBean(Bean bean) {
         this.bean = bean;
     }
-
-//    public void visit(){
-//        this.isVisited = true;
-//    }
-//    public void notVisit(){
-//        this.isVisited = true;
-//    }
-
 }

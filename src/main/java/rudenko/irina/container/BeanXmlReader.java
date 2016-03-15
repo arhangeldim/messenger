@@ -1,5 +1,8 @@
-package arhangel.dim.container;
+package rudenko.irina.container;
 
+import rudenko.irina.container.*;
+import rudenko.irina.container.Bean;
+import rudenko.irina.container.ValueType;
 import org.jsoup.*;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -26,8 +29,8 @@ class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) throws IOException, ClassNotFoundException {
-        List<Bean> result = new ArrayList<>();
+    public List<rudenko.irina.container.Bean> parseBeans(String pathToFile) throws IOException, ClassNotFoundException {
+        List<rudenko.irina.container.Bean> result = new ArrayList<>();
         org.jsoup.nodes.Document htmlFile = null;
         try {
             htmlFile = Jsoup.parse(new File(pathToFile), "ISO-8859-1");
@@ -38,13 +41,13 @@ class BeanXmlReader {
 
         List<org.jsoup.nodes.Element> classList = htmlFile.getElementsByTag(TAG_BEAN);
         for (org.jsoup.nodes.Element el: classList) {
-            Map<String, Property> properties = new HashMap<>();
+            Map<String, rudenko.irina.container.Property> properties = new HashMap<>();
             for (org.jsoup.nodes.Element pr: el.getElementsByTag(TAG_PROPERTY)) {
                 String name = pr.attr(ATTR_NAME);
                 if (pr.attr(ATTR_REF) != null) {
-                    properties.put(name, new Property(name, pr.attr(ATTR_REF), ValueType.REF));
+                    properties.put(name, new rudenko.irina.container.Property(name, pr.attr(ATTR_REF), rudenko.irina.container.ValueType.REF));
                 } else if (pr.attr(ATTR_VALUE) != null) {
-                    properties.put(name, new Property(name, pr.attr(ATTR_VALUE), ValueType.VAL));
+                    properties.put(name, new rudenko.irina.container.Property(name, pr.attr(ATTR_VALUE), ValueType.VAL));
                 } else {
                     throw new ClassNotFoundException("incorrect attribute");
                 }
