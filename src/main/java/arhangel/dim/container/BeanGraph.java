@@ -99,15 +99,15 @@ public class BeanGraph {
     public List<BeanVertex> topSort(BeanVertex start) {
         sortedVertexes.clear();
         used.clear();
-        for (BeanVertex bv : vertices.keySet()) {
-            used.put(bv, false);
+        for (BeanVertex tmp : vertices.keySet()) {
+            used.put(tmp, false);
         }
-        for (BeanVertex bv : vertices.keySet()) {
-            if (!used.get(bv)) {
-                dfs(bv);
+        for (BeanVertex tmp : vertices.keySet()) {
+            if (!used.get(tmp)) {
+                dfs(tmp);
             }
         }
-        List<BeanVertex> reverseAnswer = new ArrayList<>();
+        ArrayList<BeanVertex> reverseAnswer = new ArrayList<>();
         for (int i = 0; i < size(); ++i) {
             reverseAnswer.add(sortedVertexes.get(i));
         }
