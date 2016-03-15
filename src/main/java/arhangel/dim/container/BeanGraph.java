@@ -1,7 +1,5 @@
 package arhangel.dim.container;
 
-import sun.security.provider.certpath.Vertex;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +12,8 @@ import java.util.ArrayList;
 public class BeanGraph {
     // Граф представлен в виде списка связности для каждой вершины
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
-    private Stack<BeanVertex> stackBean = new Stack<>();
-//    private Stack<BeanVertex> stackBean = new Stack<>();
+    private List<BeanVertex> grayBeans = new ArrayList<>();
+    private List<BeanVertex> blackBeans = new ArrayList<>();
 
     /**
      * Добавить вершину в граф
@@ -41,8 +39,17 @@ public class BeanGraph {
     /**
      * Проверяем, связаны ли вершины
      */
-    public boolean isConnected(BeanVertex v1, BeanVertex v2) {
-        return this.vertices.containsKey(v1) && this.vertices.get(v1).contains(v2);
+    public boolean isConnected(BeanVertex parent, BeanVertex child) {
+        Map<String, Property> properties = parent.getBean().getProperties();
+        if (properties.size() > 0) {
+            for (String propertyName : properties.keySet()) {
+                Property property = properties.get(propertyName);
+                if (property.getType() == ValueType.REF && property.getValue() == child.getBean().getName()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -62,23 +69,41 @@ public class BeanGraph {
         return this.vertices.size();
     }
 
+    /**
+     * мой личный метод
+     */
     public List<BeanVertex> sort() {
-        List<BeanVertex> sortedBeanVertexes = new ArrayList<>();
-        for (BeanVertex v : this.vertices.keySet()) {
-            this.sortStage(v);
+        try {
+            List<BeanVertex> sortedBeanVertexes = new ArrayList<>();
+            for (BeanVertex v : this.vertices.keySet()) {
+                if (!this.blackBeans.contains(v)) {
+                    this.sortStage(v);
+                    this.blackBeans.add(v);
+                }
+            }
+            for (BeanVertex bean : blackBeans) {
+                sortedBeanVertexes.add(bean);
+            }
+            return sortedBeanVertexes;
+        } catch (Exception e) {
+            return null;
         }
-        while (!this.stackBean.isEmpty()) {
-            sortedBeanVertexes.add(this.stackBean.pop());
-        }
-        return sortedBeanVertexes;
     }
 
-    private void sortStage(BeanVertex vertex) {
+    private void sortStage(BeanVertex vertex) throws Exception {
+        this.grayBeans.add(vertex);
         if (!this.vertices.get(vertex).isEmpty()) {
             for (BeanVertex v : this.vertices.get(vertex)) {
-                this.sortStage(v);
+                if (this.grayBeans.contains(v)) {
+                    throw new Exception("cycle detected!");
+                }
+                if (!this.blackBeans.contains(v)) {
+                    this.sortStage(v);
+                    this.grayBeans.remove(v);
+                    this.blackBeans.add(v);
+                }
             }
         }
-        this.stackBean.push(vertex);
     }
+
 }
