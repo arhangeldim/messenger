@@ -12,7 +12,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.*
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,7 +40,7 @@ public class BeanXmlReader {
     private static final boolean createEntityRefs = false;
 
 
-    public List<Bean> parseBeans(String filename) throws Exception {
+    public static List<Bean> parseBeans(String filename) throws Exception {
         List<Bean> result = new ArrayList<Bean>();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setIgnoringComments(ignoreComments);
@@ -83,6 +82,7 @@ public class BeanXmlReader {
             }
             result.add(temp);
         }
+        return result;
     }
 
     private static class MyErrorHandler implements ErrorHandler {
