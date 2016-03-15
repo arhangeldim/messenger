@@ -1,6 +1,7 @@
 package arhangel.dim.container;
 
 import org.jsoup.*;
+
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import java.io.File;
@@ -37,9 +38,9 @@ class BeanXmlReader {
         }
 
         List<org.jsoup.nodes.Element> classList = htmlFile.getElementsByTag(TAG_BEAN);
-        for (org.jsoup.nodes.Element el: classList) {
+        for (org.jsoup.nodes.Element el : classList) {
             Map<String, Property> properties = new HashMap<>();
-            for (org.jsoup.nodes.Element pr: el.getElementsByTag(TAG_PROPERTY)) {
+            for (org.jsoup.nodes.Element pr : el.getElementsByTag(TAG_PROPERTY)) {
                 String name = pr.attr(ATTR_NAME);
                 if (pr.attr(ATTR_REF) != null) {
                     properties.put(name, new Property(name, pr.attr(ATTR_REF), ValueType.REF));

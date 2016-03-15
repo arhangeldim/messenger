@@ -14,10 +14,10 @@ public class BeanGraph {
 
     /**
      * Добавить вершину в граф
+     *
      * @param value - объект, привязанный к вершине
      */
-    public BeanVertex addVertex(Bean value)
-    {
+    public BeanVertex addVertex(Bean value) {
         BeanVertex vertex = new BeanVertex(value);
         vertices.get(vertex);
         return vertex;
@@ -25,10 +25,11 @@ public class BeanGraph {
 
     /**
      * Соединить вершины ребром
+     *
      * @param from из какой вершины
-     * @param to в какую вершину
+     * @param to   в какую вершину
      */
-    public void addEdge(BeanVertex from ,BeanVertex to) {
+    public void addEdge(BeanVertex from, BeanVertex to) {
         vertices.get(from).add(to);
     }
 
@@ -86,6 +87,7 @@ public class BeanGraph {
         left.put(bv, true);
         return false;
     }
+
     private void dfs(BeanVertex tmp) {
         used.put(tmp, true);
         for (BeanVertex nextBean : getLinked(tmp)) {
