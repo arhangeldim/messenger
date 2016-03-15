@@ -46,12 +46,22 @@ class BeanXmlReader {
         return propertyMap;
     }
 
-    public List<Bean> parseBeans(String pathToFile) throws ParserConfigurationException, IOException, SAXException {
+    public List<Bean> parseBeans(String pathToFile) throws InvalidConfigurationException {
         List<Bean> result = new ArrayList<>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setValidating(false);
-        DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-        Document doc = builder.parse(new File(pathToFile));
+        DocumentBuilder builder;
+        Document doc;
+        try {
+            builder = documentBuilderFactory.newDocumentBuilder();
+            doc = builder.parse(new File(pathToFile));
+        } catch (SAXException e) {
+            throw new InvalidConfigurationException("SAXException");
+        } catch (ParserConfigurationException e) {
+            throw new InvalidConfigurationException("ParserConfigurationException");
+        } catch (IOException e) {
+            throw new InvalidConfigurationException("IOException");
+        }
         NodeList beanList = doc.getElementsByTagName(TAG_BEAN);
         for (int i = 0; i < beanList.getLength(); i++) {
             String name = beanList.item(i).getAttributes().getNamedItem(ATTR_BEAN_ID).getNodeValue();

@@ -15,6 +15,17 @@ public class BeanGraph {
     // Граф представлен в виде списка связности для каждой вершины
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
 
+
+    public BeanGraph(){
+
+    }
+
+    public BeanGraph(List<Bean> beans) {
+        for (Bean bean: beans) {
+            this.addVertex(bean);
+        }
+    }
+
     /**
      * Добавить вершину в граф
      * @param value - объект, привязанный к вершине
@@ -79,24 +90,29 @@ public class BeanGraph {
         return vertices.size()  ;
     }
 
-    private void dfs(BeanVertex beanVertex, Map<BeanVertex, Boolean> used, Queue<BeanVertex> sorted) {
-        used.put(beanVertex, true);
+    private void dfs(BeanVertex beanVertex, Map<BeanVertex, Integer> used, Queue<BeanVertex> sorted) throws
+            CycleReferenceException {
+        used.put(beanVertex, 1);
         for (BeanVertex mate: vertices.get(beanVertex)) {
-            if (!used.get(mate)) {
+            if (used.get(mate).equals(0)) {
                 dfs(mate, used, sorted);
+            } else if (used.get(mate).equals(1)) {
+                throw new CycleReferenceException("Graph has cycle");
             }
         }
+        used.put(beanVertex, 2);
         sorted.add(beanVertex);
     }
 
-    public List<BeanVertex> getSortedList() {
+    // return sorted list of vertices
+    private List<BeanVertex> getSortedVertices() throws CycleReferenceException {
         Queue<BeanVertex> sorted = new LinkedList<>();
-        Map<BeanVertex, Boolean> used = new HashMap<>();
+        Map<BeanVertex, Integer> used = new HashMap<>();
         for (BeanVertex beanVertex: vertices.keySet()) {
-            used.put(beanVertex, false);
+            used.put(beanVertex, 0);
         }
         for (BeanVertex beanVertex: vertices.keySet()) {
-            if (!used.get(beanVertex)) {
+            if (used.get(beanVertex).equals(0)) {
                 dfs(beanVertex, used, sorted);
             }
         }
@@ -107,27 +123,13 @@ public class BeanGraph {
         return result;
     }
 
-    public boolean isAcyclic() {
-        Map<BeanVertex, Boolean> used;
-        for (BeanVertex beanVertex: vertices.keySet()) {
-            used = new HashMap<>();
-            for (BeanVertex bv: vertices.keySet()) {
-                used.put(bv, false);
-            }
-            if (!isAcyclic(beanVertex, used)) {
-                return false;
-            }
+    //return sorted beans
+    public List<Bean> getSortedBeans() throws CycleReferenceException {
+        List<BeanVertex> sortedVertices = this.getSortedVertices();
+        List<Bean> result = new ArrayList<>();
+        for (BeanVertex beanVertex: sortedVertices) {
+            result.add(beanVertex.getBean());
         }
-        return true;
-    }
-
-    private boolean isAcyclic(BeanVertex beanVertex, Map<BeanVertex, Boolean> used) {
-        used.put(beanVertex, true);
-        for (BeanVertex mate: vertices.get(beanVertex)) {
-            if (used.get(mate) || (!isAcyclic(mate, used))) {
-                return false;
-            }
-        }
-        return true;
+        return result;
     }
 }

@@ -1,21 +1,30 @@
 package arhangel.dim.container;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
  */
 public class Container {
     private List<Bean> beans;
+    private Map<String, Object> objByName = new HashMap<>();
+    private Map<String, Object> objByClassName = new HashMap<>();
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException {
-
-        // вызываем BeanXmlReader
+    public Container(String pathToConfig) throws InvalidConfigurationException, CycleReferenceException {
+        beans = new BeanGraph(new BeanXmlReader().parseBeans(pathToConfig)).getSortedBeans();
+        for (Bean bean: beans) {
+            instantiateBean(bean);
+        }
     }
 
     /**
@@ -23,7 +32,7 @@ public class Container {
      *  Например, Car car = (Car) container.getByName("carBean")
      */
     public Object getByName(String name) {
-        return null;
+        return objByName.get(name);
     }
 
     /**
@@ -31,35 +40,41 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
-        return null;
+        return objByClassName.get(className);
     }
 
-    private void instantiateBean(Bean bean) {
-
-        /*
-        // Примерный ход работы
-
+    private void instantiateBean(Bean bean) throws InvalidConfigurationException {
         String className = bean.getClassName();
-        Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
-
-
-        for (String name : bean.getProperties().keySet()) {
-            // ищем поле с таким именен внутри класса
-            // учитывая приватные
-            Field field = clazz.getDeclaredField(name);
-            // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
-
-            // Делаем приватные поля доступными
-            field.setAccessible(true);
-
-            // Далее определяем тип поля и заполняем его
-            // Если поле - примитив, то все просто
-            // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
-
-            */
+        Object ob;
+        try {
+            Class clazz = Class.forName(className);
+            ob = clazz.newInstance();
+            for (String name : bean.getProperties().keySet()) {
+                Property property = bean.getProperties().get(name);
+                String methodName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                if (property.getType() == ValueType.REF) {
+                    Object ref = getByName(property.getValue());
+                    Method method = clazz.getMethod(methodName, ref.getClass());
+                    method.invoke(ob, ref);
+                } else {
+                    Method method = clazz.getMethod(methodName, int.class);
+                    method.invoke(ob, Integer.parseInt(property.getValue()));
+                }
+            }
+        } catch (InstantiationException e) {
+            throw new InvalidConfigurationException("InstantiationException");
+        } catch (InvocationTargetException e) {
+            throw new InvalidConfigurationException("InvocationTargetException");
+        } catch (NoSuchMethodException e) {
+            throw new InvalidConfigurationException("NoSuchMethodException");
+        } catch (IllegalAccessException e) {
+            throw new InvalidConfigurationException("IllegalAccessException");
+        } catch (ClassNotFoundException e) {
+            System.out.println(bean.getClassName());
+            throw new InvalidConfigurationException("ClassNotFoundException");
+        }
+        objByName.put(bean.getName(), ob);
+        objByClassName.put(bean.getClassName(), ob);
 
     }
-
 }
