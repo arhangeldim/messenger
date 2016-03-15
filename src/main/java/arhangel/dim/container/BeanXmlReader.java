@@ -1,6 +1,6 @@
 package arhangel.dim.container;
 
-import org.jsoup.*;
+import org.jsoup.Jsoup;
 
 import javax.swing.text.Document;
 import javax.swing.text.Element;
