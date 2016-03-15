@@ -31,6 +31,7 @@ public class StaticDemo {
         // А так можно
         Account.idCounter = 10;
 
+
     }
 }
 
