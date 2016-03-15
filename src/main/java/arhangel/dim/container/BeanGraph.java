@@ -84,7 +84,7 @@ public class BeanGraph {
      * Топологическая сортировка графа
      * @throws IllegalStateException если в графе есть цикл
      */
-    public List<BeanVertex> getTopSort() {
+    public List<BeanVertex> getTopSort() throws InvalidConfigurationException {
         List<BeanVertex> result = new ArrayList<>();
         cycleFound = false;
         color = new HashMap<>();
@@ -94,7 +94,7 @@ public class BeanGraph {
                 .forEach(v -> dfs(v, result));
 
         if (cycleFound) {
-            throw new IllegalStateException("Cycle Found");
+            throw new InvalidConfigurationException("Cycle Found");
         }
         return result;
     }
