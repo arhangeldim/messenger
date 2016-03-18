@@ -1,21 +1,33 @@
 package arhangel.dim.container;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
  */
 public class Container {
     private List<Bean> beans;
-
+    private Map<String, Object> objByName = new HashMap<>();
+    private Map<String, Object> objByClassName = new HashMap<>();
     /**
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException {
 
-        // вызываем BeanXmlReader
+    public Container(String pathToConfig) throws InvalidConfigurationException {
+        BeanXmlReader reader = new BeanXmlReader();
+        try {
+            this.beans = reader.parseBeans(pathToConfig); // вызываем BeanXmlReader
+            for (Bean elem : this.beans) {
+                instantiateBean(elem); //instance
+            }
+        } catch (Exception exc) {
+            throw new InvalidConfigurationException(exc.getMessage());
+        }
     }
 
     /**
@@ -23,7 +35,7 @@ public class Container {
      *  Например, Car car = (Car) container.getByName("carBean")
      */
     public Object getByName(String name) {
-        return null;
+        return objByName.get(name);
     }
 
     /**
@@ -31,11 +43,37 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
-        return null;
+        return objByClassName.get(className);
     }
 
-    private void instantiateBean(Bean bean) {
+    private void instantiateBean(Bean bean) throws InvalidConfigurationException {
+        String className = bean.getClassName();
+        try {
+            Class clazz = Class.forName(className);
+            Object obj = clazz.newInstance();
+            for (String name : bean.getProperties().keySet()) {
+                Field field = clazz.getDeclaredField(name);
+                field.setAccessible(true);
+                if (bean.getProperties().get(name).getType() == ValueType.VAL) {
+                    field.set(obj, bean.getProperties().get(name).getValue());
+                } else {
+                    field.set(obj, objByName.get(bean.getName()));
+                }
+                field.setAccessible(false);
 
+            }
+            objByName.put(bean.getName(), obj);
+            objByClassName.put(bean.getClassName(), obj);
+
+        } catch (ClassNotFoundException exc) {
+            exc.printStackTrace();
+        } catch (InstantiationException exc) {
+            exc.printStackTrace();
+        } catch (IllegalAccessException exc) {
+            exc.printStackTrace();
+        } catch (NoSuchFieldException exc) {
+            throw new InvalidConfigurationException(exc.getMessage());
+        }
         /*
         // Примерный ход работы
 

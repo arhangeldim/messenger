@@ -44,13 +44,15 @@ public class BeanXmlReader {
     private static final boolean createEntityRefs = false;
 
 
-    public static List<Bean> parseBeans(String filename) throws ParserConfigurationException, IOException, SAXException {
+    public List<Bean> parseBeans(String filename) throws Exception {
         List<Bean> result = new ArrayList<Bean>();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
         dbf.setIgnoringComments(ignoreComments);
         dbf.setIgnoringElementContentWhitespace(ignoreWhitespace);
         dbf.setCoalescing(putCDATAIntoText);
         dbf.setExpandEntityReferences(createEntityRefs);
+
         DocumentBuilder db = dbf.newDocumentBuilder();
         FileOutputStream errorWriter = new FileOutputStream(new File("../../err.log")); //write errors to log file
         db.setErrorHandler(new MyErrorHandler(new PrintWriter(errorWriter, true)));
@@ -60,25 +62,36 @@ public class BeanXmlReader {
         for (int i = 0; i < nodes.getLength(); i++) {
             Node beanNode = nodes.item(i);
             Bean temp = new Bean(null, null,null);
+
             if (beanNode.getNodeType() == Node.ELEMENT_NODE) {
                 NamedNodeMap attrs = beanNode.getAttributes();
                 temp.setName(attrs.getNamedItem(ATTR_BEAN_ID).getNodeValue());
                 temp.setName(attrs.getNamedItem(ATTR_BEAN_CLASS).getNodeValue());
+
                 if (beanNode.hasChildNodes()) {
                     NodeList propertiesNodes = beanNode.getChildNodes();
                     Map<String, Property> properties = new HashMap<String, Property>();
+
                     for (int j = 0; j < propertiesNodes.getLength(); j++) {
                         Node propertyNode = propertiesNodes.item(j);
+
                         if (propertyNode.getNodeName().equals(TAG_PROPERTY)) {
                             NamedNodeMap propertyAttrs = propertyNode.getAttributes();
                             ValueType type = ValueType.VAL;
-                            if (!propertyAttrs.getNamedItem(ATTR_REF).getNodeValue().isEmpty()) {
+                            String fieldType;
+
+                            if (propertyAttrs.getNamedItem(ATTR_REF) != null) {
                                 type = ValueType.REF;
+                                fieldType = propertyAttrs.getNamedItem(ATTR_REF).getNodeValue();
+                            } else {
+                                fieldType = propertyAttrs.getNamedItem(ATTR_VALUE).getNodeValue();
                             }
+
                             properties.put(propertyAttrs.getNamedItem(ATTR_NAME).getNodeValue(),
                                     new Property(propertyAttrs.getNamedItem(ATTR_NAME).getNodeValue(),
-                                            propertyAttrs.getNamedItem(ATTR_VALUE).getNodeValue(),
+                                            fieldType,
                                             type));
+
                             temp.setProperties(properties);
                         }
                     }
