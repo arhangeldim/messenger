@@ -1,5 +1,7 @@
 package arhangel.dim.container;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ public class BeanGraph {
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
     private List<BeanVertex> grayBeans = new ArrayList<>();
     private List<BeanVertex> blackBeans = new ArrayList<>();
+    private Stack<BeanVertex> stackBeans = new Stack<>();
 
     /**
      * Добавить вершину в граф
@@ -44,7 +47,7 @@ public class BeanGraph {
         if (properties.size() > 0) {
             for (String propertyName : properties.keySet()) {
                 Property property = properties.get(propertyName);
-                if (property.getType() == ValueType.REF && property.getValue() == child.getBean().getName()) {
+                if (property.getType() == ValueType.REF && property.getValue().equals(child.getBean().getName())) {
                     return true;
                 }
             }
@@ -72,38 +75,38 @@ public class BeanGraph {
     /**
      * мой личный метод
      */
-    public List<BeanVertex> sort() {
-        try {
-            List<BeanVertex> sortedBeanVertexes = new ArrayList<>();
-            for (BeanVertex v : this.vertices.keySet()) {
-                if (!this.blackBeans.contains(v)) {
-                    this.sortStage(v);
-                    this.blackBeans.add(v);
-                }
+    public List<BeanVertex> sort() throws CycleReferenceException {
+        List<BeanVertex> sortedBeanVertexes = new ArrayList<>();
+        for (BeanVertex v : this.vertices.keySet()) {
+            this.grayBeans.add(v);
+            if (!this.blackBeans.contains(v)) {
+                this.grayBeans.remove(v);
+                this.sortStage(v);
+                this.stackBeans.push(v);
+                this.blackBeans.add(v);
+            } else {
+                throw new CycleReferenceException("cycle detected!");
             }
-            for (BeanVertex bean : blackBeans) {
-                sortedBeanVertexes.add(bean);
-            }
-            return sortedBeanVertexes;
-        } catch (Exception e) {
-            return null;
         }
+        while (!this.stackBeans.isEmpty()) {
+            sortedBeanVertexes.add(this.stackBeans.pop());
+        }
+        return sortedBeanVertexes;
     }
 
-    private void sortStage(BeanVertex vertex) throws Exception {
+    private void sortStage(BeanVertex vertex) throws CycleReferenceException {
         this.grayBeans.add(vertex);
         if (!this.vertices.get(vertex).isEmpty()) {
             for (BeanVertex v : this.vertices.get(vertex)) {
-                if (this.grayBeans.contains(v)) {
-                    throw new Exception("cycle detected!");
-                }
                 if (!this.blackBeans.contains(v)) {
                     this.sortStage(v);
                     this.grayBeans.remove(v);
+                    this.stackBeans.push(v);
                     this.blackBeans.add(v);
+                } else {
+                    throw new CycleReferenceException("cycle detected!");
                 }
             }
         }
     }
-
 }
