@@ -1,7 +1,8 @@
 package arhangel.dim.container;
 
 import org.jsoup.Jsoup;
-
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Document;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,7 +28,7 @@ class BeanXmlReader {
 
     public List<Bean> parseBeans(String pathToFile) throws IOException, ClassNotFoundException {
         List<Bean> result = new ArrayList<>();
-        org.jsoup.nodes.Document htmlFile = null;
+        Document htmlFile = null;
         try {
             htmlFile = Jsoup.parse(new File(pathToFile), "ISO-8859-1");
         } catch (FileNotFoundException exept) {
@@ -35,10 +36,10 @@ class BeanXmlReader {
             exept.printStackTrace();
         }
 
-        List<org.jsoup.nodes.Element> classList = htmlFile.getElementsByTag(TAG_BEAN);
-        for (org.jsoup.nodes.Element el : classList) {
+        List<Element> classList = htmlFile.getElementsByTag(TAG_BEAN);
+        for (Element el : classList) {
             Map<String, Property> properties = new HashMap<>();
-            for (org.jsoup.nodes.Element pr : el.getElementsByTag(TAG_PROPERTY)) {
+            for (Element pr : el.getElementsByTag(TAG_PROPERTY)) {
                 String name = pr.attr(ATTR_NAME);
                 if (pr.attr(ATTR_REF) != null) {
                     properties.put(name, new Property(name, pr.attr(ATTR_REF), ValueType.REF));
