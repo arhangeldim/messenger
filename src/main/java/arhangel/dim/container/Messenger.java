@@ -13,7 +13,8 @@ public class Messenger {
         List<Bean> beans;
 
         try {
-            beans = xmlReader.parseBeans("/home/kagudkov/tehnotrek/java/messenger/src/main/java/arhangel/dim/container/test");
+            beans = xmlReader.parseBeans
+                    ("/home/kagudkov/tehnotrek/java/messenger/src/main/java/arhangel/dim/container/test");
         } catch (IOException e) {
             System.out.println(e.getMessage());
             return;
