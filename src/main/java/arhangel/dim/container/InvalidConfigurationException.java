@@ -6,7 +6,7 @@ package arhangel.dim.container;
  * InvalidConfigurationException неверный конфиг
  */
 public class InvalidConfigurationException extends Exception {
-    public InvalidConfigurationException(String message){
+    public InvalidConfigurationException(String message) {
         super(message);
     }
 }
