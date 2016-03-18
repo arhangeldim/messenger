@@ -1,7 +1,5 @@
 package arhangel.dim.container;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +10,9 @@ import java.util.Map;
  *
  */
 public class BeanGraph {
+    // проверка на зацикливание
+    Map<BeanVertex, Boolean> used = new HashMap<>();
+    Map<BeanVertex, Boolean> left = new HashMap<>();
     // Граф представлен в виде списка связности для каждой вершины
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
     private List<BeanVertex> sortedVertexes = new ArrayList<>();
@@ -23,7 +24,7 @@ public class BeanGraph {
      */
     public BeanVertex addVertex(Bean value) {
         BeanVertex vertex = new BeanVertex(value);
-        vertices.get(vertex);
+        vertices.put(vertex, new ArrayList<>()) ;
         return vertex;
     }
 
@@ -57,10 +58,6 @@ public class BeanGraph {
     public int size() {
         return vertices.size();
     }
-
-    // проверка на зацикливание
-    Map<BeanVertex, Boolean> used = new HashMap<>();
-    Map<BeanVertex, Boolean> left = new HashMap<>();
 
     public boolean isCirculed() {
         for (BeanVertex bv : vertices.keySet()) {

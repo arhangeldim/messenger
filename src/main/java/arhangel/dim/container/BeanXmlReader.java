@@ -2,8 +2,6 @@ package arhangel.dim.container;
 
 import org.jsoup.Jsoup;
 
-import javax.swing.text.Document;
-import javax.swing.text.Element;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
