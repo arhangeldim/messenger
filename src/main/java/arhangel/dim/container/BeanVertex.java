@@ -16,7 +16,6 @@ public class BeanVertex {
         BeanVertex that = (BeanVertex) other;
 
         return bean.equals(that.bean);
-
     }
 
     @Override
