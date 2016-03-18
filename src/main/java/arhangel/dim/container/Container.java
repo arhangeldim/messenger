@@ -87,7 +87,7 @@ public class Container {
             }
         }
         objectByClassName.put(bean.getClassName(), object);
-        objectByClassName.put(bean.getName(), object);
+        objectByName.put(bean.getName(), object);
 
     }
 

@@ -48,7 +48,7 @@ public class BeanGraph {
         for (Property property : value.getProperties().values()) {
             if (property.getType() == ValueType.REF) {
                 for (BeanVertex tmp : vertices.keySet()) {
-                    if (tmp.getBean().getName().equals(property.getName())) {
+                    if (tmp.getBean().getName().equals(property.getValue())) {
                         addEdge(beanVertex, tmp);
                     }
                 }
@@ -70,7 +70,7 @@ public class BeanGraph {
             return;
         }
         beanVertexes.add(to);
-        vertices.replace(from, beanVertexes);
+        //       vertices.replace(from, beanVertexes);
     }
 
     /**

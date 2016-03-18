@@ -31,7 +31,7 @@ public class BeanXmlReader {
     public static List<Bean> parseBeans(String pathToFile) throws IOException, ParserConfigurationException, SAXException,
             NameNotFoundException {
         List<Bean> parseResult = new ArrayList<>();
-        File inputXmlFile = new File(pathToFile);
+        File inputXmlFile = Utils.initFile(pathToFile);
         if (!inputXmlFile.exists()) {
             throw new FileNotFoundException("Incorrect input file");
         }
