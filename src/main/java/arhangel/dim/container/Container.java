@@ -7,6 +7,7 @@ import org.jdom2.JDOMException;
 import javax.naming.NameNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -76,20 +77,23 @@ public class Container {
             for (Property property: bean.getProperties().values()) {
 
                 String propertyName = property.getName();
-                Field field;
+                String methodName = "set" + this.getMethodName(property.getName());
                 try {
-                    field = clazz.getDeclaredField(propertyName);
+                    if (property.getType() == ValueType.VAL) {
+                        Class fieldType = clazz.getDeclaredField(propertyName).getType();
+                        Method method = clazz.getMethod(methodName, fieldType);
+                        method.invoke(ob, convert(fieldType.getTypeName(), property.getValue()));
+                    } else if (property.getType() == ValueType.REF) {
+                        Object parameter = getByName(property.getValue());
+                        Method method = clazz.getMethod(methodName, parameter.getClass());
+                        method.invoke(ob, parameter);
+                    }
+                } catch (NoSuchMethodException | InvocationTargetException e) {
+                    throw new InvalidConfigurationException("ERROR: method " + methodName +
+                            "doesn't exist or can't invoke");
                 } catch (NoSuchFieldException e) {
                     throw new InvalidConfigurationException("ERROR: filed " + propertyName +
                             " doesn't exist" + e.getMessage());
-                }
-                field.setAccessible(true);
-                Class fieldType = field.getType();
-                if (property.getType() == ValueType.VAL) {
-                    field.set(ob, convert(fieldType.getTypeName(), property.getValue()));
-                } else if (property.getType() == ValueType.REF) {
-                    Object parameter = getByName(property.getValue());
-                    field.set(ob, parameter);
                 }
             }
             objByClassName.put(bean.getClassName(), ob);
@@ -98,11 +102,13 @@ public class Container {
         } catch (ClassNotFoundException e) {
             throw new InvalidConfigurationException("ERROR: class " + className +
                     " doesn't implement " + e.getMessage());
-        } catch (InstantiationException e) {
-            throw new InvalidConfigurationException("INSTANCE ERROR: " + className + e.getMessage());
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new InvalidConfigurationException("INSTANCE ERROR: " + className + e.getMessage());
         }
+    }
+
+    private String getMethodName(String str) {
+        return Character.toString(str.charAt(0)).toUpperCase() + str.substring(1);
     }
 
     private Object convert(String type, String str) throws InvalidConfigurationException {
