@@ -17,15 +17,16 @@ public class Container {
     private List<Bean> beans;
     private Map<String, Object> objectByName;
     private Map<String, Object> objectByClassName;
+
     /**
      * @throws arhangel.dim.container.InvalidConfigurationException - неверный конфиг
      */
     public Container(String pathToConfig) throws InvalidConfigurationException {
         objectByClassName = new HashMap<>();
         objectByName = new HashMap<>();
-        List<Bean> beansFromXML;
+        List<Bean> beansFromXml;
         try {
-            beansFromXML = BeanXmlReader.parseBeans(pathToConfig);
+            beansFromXml = BeanXmlReader.parseBeans(pathToConfig);
         } catch (IOException e) {
             throw new InvalidConfigurationException(e.getMessage());
         } catch (ParserConfigurationException e) {
@@ -35,7 +36,7 @@ public class Container {
         } catch (NameNotFoundException e) {
             throw new InvalidConfigurationException("Input file does not exist. " + e.getMessage());
         }
-        List<BeanVertex> tmp = (new BeanGraph(beansFromXML).topSort());
+        List<BeanVertex> tmp = (new BeanGraph(beansFromXml).topSort());
         beans = new ArrayList<>();
         for (BeanVertex beanVertex : tmp) {
             beans.add(beanVertex.getBean());

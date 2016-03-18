@@ -15,9 +15,10 @@ public class BeanGraph {
     private Map<BeanVertex, Boolean> left;  //вершины из которых мы вышли в dfs
     private List<BeanVertex> answerForSort;
 
-    public BeanGraph(List<Bean> beans){
+    public BeanGraph(List<Bean> beans) {
         beans.forEach(this::addVertex);
     }
+
     /**
      * Добавить вершину в граф
      *
@@ -108,7 +109,7 @@ public class BeanGraph {
     }
 
     //topSort from any element
-    public List<BeanVertex> topSort(){
+    public List<BeanVertex> topSort() {
         return topSort(vertices.keySet().iterator().next());
     }
 
