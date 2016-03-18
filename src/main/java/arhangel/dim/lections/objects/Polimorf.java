@@ -42,7 +42,7 @@ public class Polimorf {
         item.test();
         item.testParent();
         // No such method in Parent
-        // item.testChild();
+        //item.testChild();
 
         System.out.println("===Child -> Child===");
         Child other = new Child();
@@ -56,16 +56,15 @@ public class Polimorf {
         list.add(new Parent());
 
         // Using for loop (old!)
-//        for (Parent p : list) {
-//            p.test();
-//        }
+        for (Parent p : list) {
+            p.test();
+        }
 
         // Using stream
-        list.stream().forEach(p -> p.test());
+        //list.stream().forEach(p -> p.test());
 
         // Using method references
         // list.stream().forEach(Parent::test);
-
 
 
     }
