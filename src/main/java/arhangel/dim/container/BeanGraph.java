@@ -15,6 +15,8 @@ public class BeanGraph {
     private Map<BeanVertex, Boolean> left;  //вершины из которых мы вышли в dfs
     private List<BeanVertex> answerForSort;
 
+    public BeanGraph(){
+    }
     public BeanGraph(List<Bean> beans) {
         beans.forEach(this::addVertex);
     }
