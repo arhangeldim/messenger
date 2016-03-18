@@ -12,9 +12,9 @@ public class Messenger {
         BeanXmlReader xmlReader = new BeanXmlReader();
         List<Bean> beans;
 
+        String path = "/home/kagudkov/tehnotrek/java/messenger/src/main/java/arhangel/dim/container/test";
         try {
-            beans = xmlReader.parseBeans
-                    ("/home/kagudkov/tehnotrek/java/messenger/src/main/java/arhangel/dim/container/test");
+            beans = xmlReader.parseBeans(path);
         } catch (IOException e) {
             System.out.println(e.getMessage());
             return;
