@@ -6,6 +6,24 @@ import java.util.Map;
  * Представляет тег bean из конфига
  */
 public class Bean {
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        Bean bean = (Bean) other;
+
+        return name.equals(bean.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 
     private String name; // Уникально имя бина
     private String className; // Класс бина

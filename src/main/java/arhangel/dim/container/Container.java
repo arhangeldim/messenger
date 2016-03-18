@@ -16,6 +16,8 @@ public class Container {
     public Container(String pathToConfig) throws InvalidConfigurationException {
 
         // вызываем BeanXmlReader
+        BeanXmlReader xmlReader = new BeanXmlReader();
+        beans = xmlReader.parseBeans(pathToConfig);
     }
 
     /**
