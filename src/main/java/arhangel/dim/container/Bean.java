@@ -43,10 +43,6 @@ public class Bean {
 
     @Override
     public String toString() {
-        return "Bean{" +
-                "name='" + name + '\'' +
-                ", className='" + className + '\'' +
-                ", properties=" + properties +
-                '}';
+        return this.getProperties().toString();
     }
 }
