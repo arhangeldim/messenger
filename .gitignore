@@ -3,4 +3,4 @@ classes/
 *.class
 *.iml
 .idea
-
+.DS_Store

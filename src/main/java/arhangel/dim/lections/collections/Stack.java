@@ -11,7 +11,7 @@ public interface Stack<E> extends Iterable<E> {
 
     E pop() throws StackException;
 
-    E peek();
+    E peek() throws StackException;
 
     int getSize();
 
