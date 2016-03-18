@@ -1,8 +1,5 @@
-package upml.container;
+package arhangel.dim.container;
 
-import arhangel.dim.container.Bean;
-import arhangel.dim.container.Property;
-import arhangel.dim.container.ValueType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,7 +28,7 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) throws IOException, ParserConfigurationException, SAXException,
+    public static List<Bean> parseBeans(String pathToFile) throws IOException, ParserConfigurationException, SAXException,
             NameNotFoundException {
         List<Bean> parseResult = new ArrayList<>();
         File inputXmlFile = new File(pathToFile);
