@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Collections;
 import java.util.Collection;
 
 /**
@@ -30,11 +29,11 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) {
+    public List<Bean> parseBeans(String pathToFile) throws InvalidConfigurationException {
         try {
             File file = new File(pathToFile);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document doc = documentBuilder.parse(file);
 
             Node root = doc.getFirstChild();
@@ -50,9 +49,10 @@ public class BeanXmlReader {
             return sortBeans(result);
 
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            ex.printStackTrace();
+            InvalidConfigurationException exception = new InvalidConfigurationException();
+            exception.setStackTrace(ex.getStackTrace());
+            throw exception;
         }
-        return null;
     }
 
     private Bean parseBean(Node beanNode) {
@@ -123,7 +123,6 @@ public class BeanXmlReader {
                     innerGetSorted(bean, result);
                 }
             }
-            Collections.reverse(result);
             return result;
         }
 
