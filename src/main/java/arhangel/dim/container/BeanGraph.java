@@ -16,6 +16,13 @@ public class BeanGraph {
     private List<BeanVertex> sorted = new ArrayList<>();
     private Map<BeanVertex, Integer> used = new HashMap<>();
 
+    public BeanGraph(List<Bean> beans) {
+        beans.forEach(this::addVertex);
+    }
+
+    public BeanGraph() {
+    }
+
     /**
      * Добавить вершину в граф
      * @param value - объект, привязанный к вершине
