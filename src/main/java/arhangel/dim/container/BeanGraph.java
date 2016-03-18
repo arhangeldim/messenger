@@ -66,7 +66,7 @@ public class BeanGraph {
                     dfs(toVertex, result, used);
                 } else {
                     if (used.get(toVertex) == true) {
-                        throw  new Exception("Found cycle in graph!");
+                        throw new Exception("Found cycle in graph!");
                     }
                 }
             }

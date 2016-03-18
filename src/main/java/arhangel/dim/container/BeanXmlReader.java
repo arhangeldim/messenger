@@ -4,6 +4,7 @@ package arhangel.dim.container;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -13,9 +14,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,7 @@ public class BeanXmlReader {
     private static final boolean createEntityRefs = false;
 
 
-    public static List<Bean> parseBeans(String filename) throws Exception {
+    public static List<Bean> parseBeans(String filename) throws ParserConfigurationException, IOException, SAXException {
         List<Bean> result = new ArrayList<Bean>();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setIgnoringComments(ignoreComments);
