@@ -49,4 +49,17 @@ public class Bean {
                 ", properties=" + properties +
                 '}';
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Bean) {
+            return name.equals(((Bean) obj).name);
+        }
+        return super.equals(obj);
+    }
 }
