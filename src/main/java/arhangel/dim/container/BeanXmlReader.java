@@ -25,38 +25,32 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) {
+    public List<Bean> parseBeans(String pathToFile) throws JDOMException, IOException {
 
         SAXBuilder saxBuilder = new SAXBuilder();
         File inputFile = new File(pathToFile);
         List<Bean> result = new ArrayList<>();
-        try {
-            saxBuilder = new SAXBuilder();
-            Document document = saxBuilder.build(inputFile);
-            Element rootElement = document.getRootElement();
-            List<Element> elements = rootElement.getChildren(TAG_BEAN);
-            String name;
-            String className;
-            Map<String, Property> properties;
-            for (Element el:
-                     elements) {
-                name = el.getAttributeValue(ATTR_BEAN_ID);
-                className = el.getAttributeValue(ATTR_BEAN_CLASS);
-                properties = new HashMap<>();
-                for (Element p :
-                        el.getChildren(TAG_PROPERTY)) {
-                    String propertieName = p.getAttributeValue(ATTR_NAME);
-                    String propertieValue = (p.getAttributeValue(ATTR_REF) != null ? p.getAttributeValue(ATTR_REF) :
-                            p.getAttributeValue(ATTR_VALUE));
-                    ValueType propertieType = (p.getAttributeValue(ATTR_REF) != null ? ValueType.VAL : ValueType.REF);
-                    properties.put(propertieName, new Property(propertieName, propertieValue, propertieType));
-                }
-                result.add(new Bean(name, className, properties));
+        saxBuilder = new SAXBuilder();
+        Document document = saxBuilder.build(inputFile);
+        Element rootElement = document.getRootElement();
+        List<Element> elements = rootElement.getChildren(TAG_BEAN);
+        String name;
+        String className;
+        Map<String, Property> properties;
+        for (Element el:
+                 elements) {
+            name = el.getAttributeValue(ATTR_BEAN_ID);
+            className = el.getAttributeValue(ATTR_BEAN_CLASS);
+            properties = new HashMap<>();
+            for (Element p :
+                    el.getChildren(TAG_PROPERTY)) {
+                String propertieName = p.getAttributeValue(ATTR_NAME);
+                String propertieValue = (p.getAttributeValue(ATTR_REF) != null ? p.getAttributeValue(ATTR_REF) :
+                        p.getAttributeValue(ATTR_VALUE));
+                ValueType propertieType = (p.getAttributeValue(ATTR_REF) != null ? ValueType.REF : ValueType.VAL);
+                properties.put(propertieName, new Property(propertieName, propertieValue, propertieType));
             }
-        } catch (JDOMException e1) {
-            e1.printStackTrace();
-        } catch (IOException e2) {
-            e2.printStackTrace();
+            result.add(new Bean(name, className, properties));
         }
         return result;
     }

@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+import org.jgap.InvalidConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

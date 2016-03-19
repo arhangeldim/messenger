@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  *
@@ -24,11 +23,25 @@ public class BeanGraph {
     // This array will needed for topsort. Contains vertices in reversed out time order
     private ArrayList<BeanVertex> answer = new ArrayList<>();
 
+    public BeanGraph() {
+
+    }
+
+    public BeanGraph(List<Bean> beans) {
+        for (Bean bean :
+                beans) {
+            addVertex(bean);
+        }
+    }
+
     /**
      * Добавить вершину в граф
      * @param value - объект, привязанный к вершине
      */
-    public BeanVertex addVertex(Bean value) {
+    public BeanVertex addVertex(Bean value) throws NullPointerException {
+        if (value == null) {
+            throw new NullPointerException("addVertex(Bean value): value is null");
+        }
         BeanVertex beanVertex = new BeanVertex(value);
         vertices.put(beanVertex, new ArrayList<>());
         vertexNames.put(value.getName(), beanVertex);
@@ -40,7 +53,7 @@ public class BeanGraph {
      * @param from из какой вершины
      * @param to в какую вершину
      */
-    public void addEdge(BeanVertex from ,BeanVertex to) {
+    public void addEdge(BeanVertex from, BeanVertex to) {
         vertices.get(from).add(to);
     }
 
@@ -76,7 +89,7 @@ public class BeanGraph {
      * Connects all vertices stored in this.vertices.
      * To work properly for this method all graph vertices need to be stored in this.vertices.
      */
-    private void createGraph() {
+    public void buildGraph() {
         for (BeanVertex vertex :
                 vertices.keySet()) {
             vertices.get(vertex).clear();
@@ -97,7 +110,7 @@ public class BeanGraph {
      */
     private boolean dfs(BeanVertex vertex) {
         boolean res = false;
-        used.put(vertex,0);
+        used.put(vertex,-1);
         for (BeanVertex next :
                 vertices.get(vertex)) {
             if (used.get(next) == 0) {
@@ -109,6 +122,7 @@ public class BeanGraph {
                 res = true;
             }
         }
+        used.put(vertex,1);
         answer.add(vertex);
         return res;
     }
@@ -119,7 +133,7 @@ public class BeanGraph {
      */
     public boolean checkForCycle() {
         boolean contains = false;
-        createGraph();
+        buildGraph();
         used.clear();
         for (BeanVertex vertex :
                 vertices.keySet()) {
@@ -140,7 +154,7 @@ public class BeanGraph {
      * @return List of ordered vertices.
      */
     public List<BeanVertex> sort() {
-        createGraph();
+        buildGraph();
         used.clear();
         for (BeanVertex vertex :
                 vertices.keySet()) {
@@ -154,7 +168,6 @@ public class BeanGraph {
                 dfs(vertex);
             }
         }
-        Collections.reverse(answer);
         return answer;
     }
 }
