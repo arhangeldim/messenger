@@ -30,8 +30,8 @@ public class BeanXmlReader {
         List<Bean> beans = null;
         try {
             File file = new File(pathToFile);
-            DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = dBuilder.parse(file);
+            DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = docBuilder.parse(file);
 //            System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
             if (doc.hasChildNodes()) {
                 beans = getBeans(doc.getChildNodes());
@@ -74,6 +74,8 @@ public class BeanXmlReader {
                                     case ATTR_BEAN_CLASS:
                                         beanClassName = new String(node.getNodeValue());
                                         break;
+                                    default:
+                                        break;
                                 }
                             }
                         }
@@ -106,6 +108,8 @@ public class BeanXmlReader {
                                                     propValue = new String(node.getNodeValue());
                                                     propValueType = ValueType.VAL;
                                                     break;
+                                                default:
+                                                    break;
                                             }
                                         }
                                         beanProperty = new Property(propName, propValue, propValueType);
@@ -114,7 +118,7 @@ public class BeanXmlReader {
                                 }
                             }
                         }
-                    beans.add(new Bean(beanName, beanClassName, beanProperties));
+                        beans.add(new Bean(beanName, beanClassName, beanProperties));
                     }
                 }
             }

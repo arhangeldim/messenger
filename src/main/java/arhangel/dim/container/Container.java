@@ -81,7 +81,9 @@ public class Container {
             // учитывая приватные
             Field field = clazz.getDeclaredField(name);
             // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
-            if (field == null) throw new InvalidConfigurationException("doesn't exist class");
+            if (field == null) {
+                throw new InvalidConfigurationException("doesn't exist class");
+            }
             // Делаем приватные поля доступными
             field.setAccessible(true);
 
@@ -95,6 +97,8 @@ public class Container {
                     break;
                 case REF:
                     field.set(ob, getByName(bean.getProperties().get(name).getValue()));
+                    break;
+                default:
                     break;
             }
 

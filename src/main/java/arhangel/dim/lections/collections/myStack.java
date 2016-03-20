@@ -1,39 +1,46 @@
 package arhangel.dim.lections.collections;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Created by vital on 18.03.16.
  */
-public class myStack<E> implements Stack<E> {
+public class MyStack<E> implements Stack<E> {
     private Object[] objects;
     private int currentSize;
     // Objectc[] ob = new Object[];
     // T item = (T) ob[10];
 
-    myStack(int size) {
+    MyStack(int size) {
         objects = new Object[size];
         currentSize = 0;
     }
 
     @Override
     public void push(E element) throws StackException {
-        if (isFull()) throw new StackException("push error");
+        if (isFull()) {
+            throw new StackException("push error");
+        }
         objects[currentSize++] = element;
 //        currentSize++;
     }
 
     @Override
     public E pop() throws StackException {
-        if(isEmpty()) throw new StackException("pop error");
+        if (isEmpty()) {
+            throw new StackException("pop error");
+        }
         currentSize--;
         return (E) objects[currentSize];
     }
 
     @Override
     public E peek() throws StackException {
-        if(isEmpty()) throw new StackException("peek error");
-        return (E) objects[currentSize-1];
+        if (isEmpty()) {
+            throw new StackException("peek error");
+        }
+        return (E) objects[currentSize - 1];
     }
 
     @Override
@@ -59,7 +66,9 @@ public class myStack<E> implements Stack<E> {
 
     @Override
     public void pushAll(Collection<E> src) throws StackException {
-        for (E elem : src) push(elem);
+        for (E elem : src) {
+            push(elem);
+        }
     }
 
     @Override
