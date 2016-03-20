@@ -54,8 +54,7 @@ public class BeanXmlReader {
         dbf.setExpandEntityReferences(createEntityRefs);
 
         DocumentBuilder db = dbf.newDocumentBuilder();
-        FileOutputStream errorWriter = new FileOutputStream(new File("../../err.log")); //write errors to log file
-        db.setErrorHandler(new MyErrorHandler(new PrintWriter(errorWriter, true)));
+        db.setErrorHandler(new MyErrorHandler(new PrintWriter(System.err, true)));
         Document doc = db.parse(new File(filename));
 
         NodeList nodes = doc.getElementsByTagName(TAG_BEAN);
