@@ -66,7 +66,8 @@ public class Container {
         return objByClassName.get(className);
     }
 
-    private void instantiateBeans(List<Bean> beans) throws InvalidConfigurationException, CycleReferenceException {
+    private void instantiateBeans(List<Bean> beans)
+            throws InvalidConfigurationException, CycleReferenceException {
         GraphBuilder grBuilder = new GraphBuilder();
         BeanGraph gr = grBuilder.buildGraph(beans);
         try {
@@ -83,7 +84,8 @@ public class Container {
         }
     }
 
-    private void instantiateBean(Bean bean)   throws IllegalArgumentException, InvalidConfigurationException {
+    private void instantiateBean(Bean bean)
+            throws IllegalArgumentException, InvalidConfigurationException {
         String className = bean.getClassName();
         String beanName = bean.getName();
         try {
@@ -102,7 +104,8 @@ public class Container {
                                 throw new InvalidConfigurationException("invalid reference");
                             } else {
                                 Object value = getByName(bean.getProperties().get(name).getValue());
-                                String nameCapitalized = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
+                                String nameCapitalized =
+                                        name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
                                 try {
                                     Method method = clazz.getDeclaredMethod("set" + nameCapitalized, value.getClass());
                                     try {
