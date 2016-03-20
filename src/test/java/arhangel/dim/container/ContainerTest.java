@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+import arhangel.dim.container.exceptions.InvalidConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class ContainerTest {
     @BeforeClass
     public static void init() {
         try {
-            container = new Container("config.xml");
+            container = new Container("/home/tatiana/technotrack/messenger/config.xml");
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
         }
