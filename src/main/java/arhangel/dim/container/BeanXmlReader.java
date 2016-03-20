@@ -32,7 +32,7 @@ public class BeanXmlReader {
             File file = new File(pathToFile);
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = dBuilder.parse(file);
-            System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+//            System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
             if (doc.hasChildNodes()) {
                 beans = getBeans(doc.getChildNodes());
             }
@@ -40,10 +40,14 @@ public class BeanXmlReader {
             System.out.println(e.getMessage());
         }
 
+//        System.out.println(beans.toString());
         return beans;
     }
 
     private List<Bean> getBeans(NodeList nodeList) {
+//        if (nodeList == null) {
+//            throw NullPointerException;
+//        }
         List<Bean> beans = new ArrayList<>();
 
         Node rootNode = nodeList.item(0);
@@ -114,8 +118,6 @@ public class BeanXmlReader {
                     }
                 }
             }
-            System.out.println("Node Name =" + rootNode.getNodeName() + " [CLOSE]");
-
         }
 
         return beans;
