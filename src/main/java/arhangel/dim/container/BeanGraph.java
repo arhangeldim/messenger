@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -39,11 +40,17 @@ public class BeanGraph {
         }
     }
 
+    public void removeEdge(BeanVertex from, BeanVertex to) {
+        if (vertices.get(from).contains(to)) {
+            vertices.get(from).remove(to);
+        }
+    }
     /**
      * Проверяем, связаны ли вершины
      */
-    public boolean isConnected(BeanVertex v1, BeanVertex v2) {
-        return vertices.get(v1).contains(v2);
+    
+    public boolean isConnected(BeanVertex from, BeanVertex to) {
+        return vertices.get(from).contains(to);
     }
 
     /**

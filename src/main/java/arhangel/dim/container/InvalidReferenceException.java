@@ -3,8 +3,8 @@ package arhangel.dim.container;
 /**
  * Обнаружена циклическая зависимость
  */
-public class CycleReferenceException extends InvalidConfigurationException {
-    public CycleReferenceException(String message) {
+public class InvalidReferenceException extends InvalidConfigurationException {
+    public InvalidReferenceException(String message) {
         super(message);
     }
 }

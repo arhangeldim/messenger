@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,7 +19,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.util.Map;
 
 class BeanXmlReader {
 
@@ -68,12 +71,18 @@ class BeanXmlReader {
                             } else {
                                 throw new InvalidConfigurationException("Bean property missing either value or ref");
                             }
+                            if (properties.containsKey(property.getName())) {
+                                throw new InvalidConfigurationException("Bean contains properties with same name");
+                            }
                             properties.put(property.getName(), property);
                         } else {
                             throw new InvalidConfigurationException("Invalid configuration");
                         }
                     }
                     Bean bean = new Bean(beanId, beanClass, properties);
+                    if (beanList.contains(bean)) {
+                        throw new InvalidConfigurationException("Beans with same name");
+                    }
                     beanList.add(bean);
                 } else {
                     throw new InvalidConfigurationException("Invalid configuration");
@@ -91,5 +100,48 @@ class BeanXmlReader {
         } catch (Exception e) {
             throw new InvalidConfigurationException("Unknown exception: " + e.getMessage());
         }
+    }
+
+    public List<Bean> sortBeans(List<Bean> unsortedBeans) throws CycleReferenceException, InvalidReferenceException {
+        BeanGraph graph = new BeanGraph();
+        Set<BeanVertex> vertices = unsortedBeans.stream().map(graph::addVertex).collect(Collectors.toSet());
+
+        for (BeanVertex vertex : vertices) {
+            for (Property property : vertex.getBean().getProperties().values()) {
+                if (property.getType() == ValueType.REF) {
+                    String referencedBeanName = property.getValue();
+                    List<BeanVertex> verticesList = vertices
+                            .stream()
+                            .filter(beanVertex -> (beanVertex.getBean().getName().equals(referencedBeanName)))
+                            .collect(Collectors.toList());
+                    if (verticesList.size() != 1) {
+                        throw new InvalidReferenceException("Bean " + vertex.getBean().getName() + " referenced unknown bean " + referencedBeanName);
+                    }
+                    graph.addEdge(vertex, verticesList.get(0));
+                }
+            }
+        }
+
+        List<Bean> sortedBeans = new ArrayList<>();
+        int previousSize;
+        do {
+            previousSize = vertices.size();
+            for (Iterator<BeanVertex> i = vertices.iterator(); i.hasNext(); ) {
+                BeanVertex vertex = i.next();
+                if (graph.getLinked(vertex).size() == 0) {
+                    sortedBeans.add(vertex.getBean());
+                    i.remove();
+                    for (BeanVertex vertex1 : vertices) {
+                        if (graph.isConnected(vertex1, vertex)) {
+                            graph.removeEdge(vertex1, vertex);
+                        }
+                    }
+                }
+            }
+        } while (vertices.size() != previousSize);
+        if (vertices.size() != 0) {
+            throw new CycleReferenceException("Cycle reference");
+        }
+        return sortedBeans;
     }
 }
