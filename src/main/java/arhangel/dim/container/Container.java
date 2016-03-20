@@ -6,6 +6,8 @@ import arhangel.dim.container.beans.Gear;
 import jdk.internal.org.objectweb.asm.tree.analysis.Value;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,11 @@ public class Container {
         try {
             BeanXmlReader xmlReader = new BeanXmlReader();
             parsedBeans = xmlReader.parseBeans(pathToConfig);
-            instantiateBeans(parsedBeans);
+            try {
+                instantiateBeans(parsedBeans);
+            } catch (CycleReferenceException | InvalidConfigurationException e) {
+                throw new InvalidConfigurationException(e.getMessage());
+            }
         } catch (InvalidConfigurationException e) {
             throw e;
         }
@@ -57,19 +63,23 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
-        return objByName.get(className);
+        return objByClassName.get(className);
     }
 
-    private void instantiateBeans(List<Bean> beans) throws InvalidConfigurationException {
+    private void instantiateBeans(List<Bean> beans) throws InvalidConfigurationException, CycleReferenceException {
         GraphBuilder grBuilder = new GraphBuilder();
         BeanGraph gr = grBuilder.buildGraph(beans);
-        List<BeanVertex> sortedBeanVertices = gr.sort();
-        for (BeanVertex beanVertex: sortedBeanVertices) {
-            try {
-                instantiateBean(beanVertex.getBean());
-            } catch (InvalidConfigurationException | IllegalArgumentException e) {
-                throw new InvalidConfigurationException(e.getMessage());
+        try {
+            List<BeanVertex> sortedBeanVertices = gr.sort();
+            for (BeanVertex beanVertex : sortedBeanVertices) {
+                try {
+                    instantiateBean(beanVertex.getBean());
+                } catch (InvalidConfigurationException | IllegalArgumentException e) {
+                    throw new InvalidConfigurationException(e.getMessage());
+                }
             }
+        } catch (CycleReferenceException e) {
+            throw new InvalidConfigurationException(e.getMessage());
         }
     }
 
@@ -92,7 +102,17 @@ public class Container {
                                 throw new InvalidConfigurationException("invalid reference");
                             } else {
                                 Object value = getByName(bean.getProperties().get(name).getValue());
-                                field.set(ob, value);
+                                String nameCapitalized = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
+                                try {
+                                    Method method = clazz.getDeclaredMethod("set" + nameCapitalized, value.getClass());
+                                    try {
+                                        method.invoke(ob, value);
+                                    } catch (InvocationTargetException e) {
+                                        throw new IllegalArgumentException(e.getMessage());
+                                    }
+                                } catch (NoSuchMethodException e) {
+                                    throw new IllegalArgumentException(e.getMessage());
+                                }
                             }
                         }
                     } catch (NoSuchFieldException e) {

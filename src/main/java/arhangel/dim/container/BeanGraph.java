@@ -62,23 +62,44 @@ public class BeanGraph {
         return vertices.size();
     }
 
-    public void dfs(BeanVertex start,  List<BeanVertex> sortedVertices) {
+    public void dfs(BeanVertex start,  List<BeanVertex> sortedVertices, Map<BeanVertex, Integer> colouredVertices)
+            throws CycleReferenceException {
         List<BeanVertex> edges = vertices.get(start);
         for (BeanVertex child : edges) {
+            if (colouredVertices.containsKey(child) && colouredVertices.get(child) == 0) {
+                throw new CycleReferenceException("cycle found");
+            }
             if (!sortedVertices.contains(child)) {
-                dfs(child, sortedVertices);
+                sortedVertices.add(child);
+                try {
+                    colouredVertices.put(child, 0);
+                    dfs(child, sortedVertices, colouredVertices);
+                    colouredVertices.put(child, 1);
+                } catch (CycleReferenceException e) {
+                    throw e;
+                }
             }
         }
     }
 
-    public List<BeanVertex> sort() {
+    public List<BeanVertex> sort() throws CycleReferenceException {
         List<BeanVertex> sortedVertices = new LinkedList<>();
+        Map<BeanVertex, Integer> colouredVertices = new HashMap<>();
         Iterator it = vertices.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry vertex = (Map.Entry) it.next();
             BeanVertex beanVertex = (BeanVertex) (vertex.getKey());
+            if (colouredVertices.containsKey(beanVertex) && colouredVertices.get(beanVertex) == 0) {
+                throw new CycleReferenceException("cycle found");
+            }
             if (!sortedVertices.contains(beanVertex)) {
-                dfs(beanVertex, sortedVertices);
+                try {
+                    colouredVertices.put(beanVertex, 0);
+                    dfs(beanVertex, sortedVertices, colouredVertices);
+                    colouredVertices.put(beanVertex, 1);
+                } catch (CycleReferenceException e) {
+                    throw e;
+                }
             }
             sortedVertices.add(beanVertex);
         }

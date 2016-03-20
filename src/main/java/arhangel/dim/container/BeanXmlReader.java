@@ -34,7 +34,7 @@ public class BeanXmlReader {
 
         try {
             File inputFile = new File(pathToFile);
-            System.out.println(pathToFile);
+            //System.out.println(pathToFile);
             DocumentBuilderFactory dbFactory
                     = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
@@ -48,12 +48,12 @@ public class BeanXmlReader {
                     Node bean = beans.item(i);
                     NamedNodeMap attributes = bean.getAttributes();
                     Node idAttrib = attributes.getNamedItem(ATTR_BEAN_ID);
-                    System.out.printf(idAttrib.toString());
+                   // System.out.printf(idAttrib.toString());
                     Node classAttrib = attributes.getNamedItem(ATTR_BEAN_CLASS);
-                    System.out.printf(classAttrib.toString());
+                    //System.out.printf(classAttrib.toString());
                     NodeList properties = ((Element)bean).getElementsByTagName(TAG_PROPERTY);
                     HashMap<String, Property> propertyHashMap = new HashMap<>();
-                    System.out.println(properties.getLength());
+                    //System.out.println(properties.getLength());
 
                     for (int j = 0; j < properties.getLength(); j++) {
                         Node property = properties.item(j);
@@ -62,16 +62,16 @@ public class BeanXmlReader {
                         String propertyType = nameAttrib.getNodeValue();
                         Property newProp;
                         if (propertyAttributes.getNamedItem(ATTR_REF) != null) {
-                            System.out.println(propertyType);
+                            //System.out.println(propertyType);
                             Node refAttrib = propertyAttributes.getNamedItem(ATTR_REF);
                             String refAttrString = refAttrib.getNodeValue();
-                            System.out.println("REFEERENCE" + refAttrString);
+                            //System.out.println("REFEERENCE" + refAttrString);
                             newProp = new Property(propertyType, refAttrString, ValueType.REF);
                         } else {
-                            System.out.println(propertyType);
+                            //System.out.println(propertyType);
                             Node valAttrib = propertyAttributes.getNamedItem(ATTR_VALUE);
                             String valAttrString = valAttrib.getNodeValue();
-                            System.out.println(valAttrString);
+                            //System.out.println(valAttrString);
                             newProp = new Property(propertyType, valAttrString, ValueType.VAL);
                         }
                         propertyHashMap.put(nameAttrib.getNodeValue(), newProp);
