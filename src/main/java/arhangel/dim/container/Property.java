@@ -14,6 +14,10 @@ import java.util.Map;
 @XmlRootElement
 public class Property {
     private String name; // Имя поля
+
+    // Я решил разделить поля для разных типов,
+    // чтобы jaxb подставил их автоматически
+    // и оставил старые методы getType, getValue для расчета toString
     private String val; // Примитивное значение
     private String ref; // ссылочное значение
 
