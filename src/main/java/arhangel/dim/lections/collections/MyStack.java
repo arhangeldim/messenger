@@ -17,8 +17,7 @@ public class MyStack<E> implements Stack {
     public void push(Object element) throws StackException {
         if (size == capacity) {
             throw new StackException("capacity reached");
-        }
-        else {
+        } else {
             data[size] = (E)element;
             size++;
         }
