@@ -36,14 +36,12 @@ public class BeanGraphTest {
     }
 
     @Test
-    @Ignore
     public void testIsConnected() throws Exception {
         Assert.assertTrue(graph.isConnected(vertices.get(0), vertices.get(1)));
         Assert.assertFalse(graph.isConnected(vertices.get(0), vertices.get(3)));
     }
 
     @Test
-    @Ignore
     public void testGetLinked() throws Exception {
         BeanVertex[] linked = new BeanVertex[]{vertices.get(1), vertices.get(2)};
         int counter = 0;
@@ -53,8 +51,18 @@ public class BeanGraphTest {
     }
 
     @Test
-    @Ignore
     public void testSize() throws Exception {
         Assert.assertEquals(4, graph.size());
+    }
+
+    @Test
+    public void testGetOrderedBeans() throws Exception {
+        List<Bean> beans = graph.getOrderedBeans();
+
+        // bean v0 should be the last initialized bean
+        Assert.assertEquals(beans.get(3), vertices.get(0).getBean());
+
+        // bean v1 can't be in the first place
+        Assert.assertNotEquals(beans.get(0), vertices.get(1).getBean());
     }
 }
