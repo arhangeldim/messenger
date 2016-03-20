@@ -1,11 +1,9 @@
 package arhangel.dim.container;
 
-import java.awt.font.GraphicAttribute;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.XMLFormatter;
 
 /**
  * Created by valeriyasin on 3/15/16.
@@ -13,18 +11,6 @@ import java.util.logging.XMLFormatter;
 
 
 public class GraphBuilder {
-//
-//    public static void main(String[] args) {
-//        GraphBuilder g = new GraphBuilder();
-//        BeanXmlReader bmx = new BeanXmlReader();
-//        try {
-//            List<Bean> beans = bmx.parseBeans("config.xml");
-//            BeanGraph gr = g.buildGraph(beans);
-//        } catch (Exception e) {
-//            System.out.printf(e.getMessage());
-//        }
-//    }
-
     private Map<String, Bean> beanStrings = new HashMap<>();
     private Map<Bean, BeanVertex> beanVertices = new HashMap<>();
 

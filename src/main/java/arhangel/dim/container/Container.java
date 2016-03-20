@@ -3,7 +3,6 @@ package arhangel.dim.container;
 import arhangel.dim.container.beans.Car;
 import arhangel.dim.container.beans.Engine;
 import arhangel.dim.container.beans.Gear;
-import jdk.internal.org.objectweb.asm.tree.analysis.Value;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
