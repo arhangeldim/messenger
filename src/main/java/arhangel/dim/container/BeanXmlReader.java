@@ -66,7 +66,7 @@ public class BeanXmlReader {
             if (beanNode.getNodeType() == Node.ELEMENT_NODE) {
                 NamedNodeMap attrs = beanNode.getAttributes();
                 temp.setName(attrs.getNamedItem(ATTR_BEAN_ID).getNodeValue());
-                temp.setName(attrs.getNamedItem(ATTR_BEAN_CLASS).getNodeValue());
+                temp.setClassName(attrs.getNamedItem(ATTR_BEAN_CLASS).getNodeValue());
 
                 if (beanNode.hasChildNodes()) {
                     NodeList propertiesNodes = beanNode.getChildNodes();

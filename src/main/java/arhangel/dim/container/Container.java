@@ -51,25 +51,21 @@ public class Container {
         try {
             Class clazz = Class.forName(className);
             Object obj = clazz.newInstance();
+
             for (String name : bean.getProperties().keySet()) {
                 Field field = clazz.getDeclaredField(name);
                 field.setAccessible(true);
-                if (bean.getProperties().get(name).getType() == ValueType.VAL) {
-                    field.set(obj, bean.getProperties().get(name).getValue());
-                } else {
-                    field.set(obj, objByName.get(bean.getName()));
-                }
-                field.setAccessible(false);
 
+                if (bean.getProperties().get(name).getType() == ValueType.VAL) {
+                    field.set(obj, Integer.parseInt(bean.getProperties().get(name).getValue()));
+                } else {
+                    field.set(obj, objByName.get(bean.getProperties().get(name).getValue()));
+                }
             }
             objByName.put(bean.getName(), obj);
             objByClassName.put(bean.getClassName(), obj);
 
-        } catch (ClassNotFoundException exc) {
-            exc.printStackTrace();
-        } catch (InstantiationException exc) {
-            exc.printStackTrace();
-        } catch (IllegalAccessException exc) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException exc) {
             exc.printStackTrace();
         } catch (NoSuchFieldException exc) {
             throw new InvalidConfigurationException(exc.getMessage());
