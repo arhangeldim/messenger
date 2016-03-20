@@ -4,6 +4,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import arhangel.dim.container.exceptions.InvalidConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -28,12 +29,12 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) {
+    public List<Bean> parseBeans(String pathToFile) throws InvalidConfigurationException {
         try {
             File xmlFile = new File(pathToFile);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document document = dBuilder.parse(xmlFile);
+            DocumentBuilder dbBuilder = dbFactory.newDocumentBuilder();
+            Document document = dbBuilder.parse(xmlFile);
 
             NodeList beanNodeList = document.getElementsByTagName(TAG_BEAN);
             List<Bean> beanList = new ArrayList<Bean>();
@@ -61,30 +62,22 @@ public class BeanXmlReader {
                     Element propertyElement = (Element) propertyNode;
 
                     String name = propertyElement.getAttribute(ATTR_NAME);
-                    String ref_value = propertyElement.getAttribute(ATTR_REF);
+                    String refValue = propertyElement.getAttribute(ATTR_REF);
 
-                    ValueType ref;
-                    String val;
-                    if (ref_value != null) {
-                        ref = ValueType.REF;
-                        val = ref_value;
-                    } else {
-                        ref = ValueType.VAL;
-                        val = propertyElement.getAttribute(ATTR_VALUE);
-                    }
+                    ValueType ref = refValue.equals("") ? ValueType.VAL : ValueType.REF;
+                    String val = refValue.equals("") ? propertyElement.getAttribute(ATTR_VALUE) : refValue;
 
                     Property property = new Property(name, val, ref);
                     properties.put(name, property);
                 }
-                Bean bean = new Bean(id.substring(0, id.length() - 4), clazz, properties);
+                Bean bean = new Bean(id, clazz, properties);
                 beanList.add(bean);
             }
 
             return beanList;
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
-            return null;
+            throw new InvalidConfigurationException("invalid config file format");
         }
     }
 }
