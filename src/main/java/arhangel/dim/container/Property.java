@@ -1,20 +1,34 @@
 package arhangel.dim.container;
 
+import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.namespace.QName;
+import java.util.Map;
+
 /**
  * Описание тега property в xml конфигурации.
  * Тег описывает поля определенного бина
  */
+@XmlRootElement
 public class Property {
     private String name; // Имя поля
-    private String value; // Значение поля
-    private ValueType type; // Метка ссылочное значение или примитив
+    private String val; // Примитивное значение
+    private String ref; // ссылочное значение
 
     public Property(String name, String value, ValueType type) {
         this.name = name;
-        this.value = value;
-        this.type = type;
+        if (ValueType.REF.equals(type)) {
+            ref = value;
+        } else {
+            val = value;
+        }
     }
 
+    public Property() {}
+
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -23,28 +37,40 @@ public class Property {
         this.name = name;
     }
 
+    @XmlAttribute
+    public String getRef() {
+        return ref;
+    }
+
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+
+    @XmlAttribute
+    public String getVal() {
+        return val;
+    }
+
+    public void setVal(String val) {
+        this.val = val;
+    }
+
+    @XmlTransient
     public String getValue() {
-        return value;
+        return ref == null ? val : ref;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
+    @XmlTransient
     public ValueType getType() {
-        return type;
-    }
-
-    public void setType(ValueType type) {
-        this.type = type;
+        return ref == null ? ValueType.VAL : ValueType.REF;
     }
 
     @Override
     public String toString() {
         return "Property{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
-                ", type=" + type +
+                "name='" + getName() + '\'' +
+                ", value='" + getValue() + '\'' +
+                ", type=" + getType() +
                 '}';
     }
 }

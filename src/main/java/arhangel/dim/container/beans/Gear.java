@@ -13,7 +13,9 @@ public class Gear {
         return count;
     }
 
-    public void setCount(int count) {
+    // changed primitive parameter type of setter to wrapper one because
+    // it is easier to convert String parameter to primitive wrapper
+    public void setCount(Integer count) {
         this.count = count;
     }
 
@@ -35,5 +37,12 @@ public class Gear {
     @Override
     public int hashCode() {
         return count;
+    }
+
+    @Override
+    public String toString() {
+        return "Gear{" +
+                "count=" + count +
+                '}';
     }
 }

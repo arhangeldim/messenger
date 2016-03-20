@@ -13,7 +13,9 @@ public class Engine {
         return power;
     }
 
-    public void setPower(int power) {
+    // changed primitive parameter type of setter to wrapper one because
+    // it is easier to convert String parameter to primitive wrapper
+    public void setPower(Integer power) {
         this.power = power;
     }
 
@@ -35,5 +37,12 @@ public class Engine {
     @Override
     public int hashCode() {
         return power;
+    }
+
+    @Override
+    public String toString() {
+        return "Engine{" +
+                "power=" + power +
+                '}';
     }
 }

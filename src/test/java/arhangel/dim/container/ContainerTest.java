@@ -46,6 +46,10 @@ public class ContainerTest {
         Car car = (Car) container.getByName("carBean");
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
+
+        Gear gear = (Gear) container.getByName("gearBean");
+        Assert.assertTrue(gear != null);
+        Assert.assertEquals(expectedGear, gear);
     }
 
     @Test
@@ -53,5 +57,9 @@ public class ContainerTest {
         Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
+
+        Engine engine = (Engine) container.getByClass("arhangel.dim.container.beans.Engine");
+        Assert.assertTrue(engine != null);
+        Assert.assertEquals(expectedEngine, engine);
     }
 }

@@ -51,4 +51,12 @@ public class Car {
         result = 31 * result + (engine != null ? engine.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "gear=" + gear +
+                ", engine=" + engine +
+                '}';
+    }
 }
