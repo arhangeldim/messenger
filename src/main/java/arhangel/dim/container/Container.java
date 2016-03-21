@@ -18,11 +18,11 @@ public class Container {
      * @throws InvalidConfigurationException неверный конфиг
      */
     public Container(String pathToConfig) throws InvalidConfigurationException, ClassNotFoundException, NoSuchFieldException, InstantiationException, IllegalAccessException {
-           BeanXmlReader reader = new BeanXmlReader();
-           beans = reader.parseBeans(pathToConfig);
-           for (Bean bean : beans) {
-               this.instantiateBean(bean);
-           }
+        BeanXmlReader reader = new BeanXmlReader();
+        beans = reader.parseBeans(pathToConfig);
+        for (Bean bean : beans) {
+            this.instantiateBean(bean);
+        }
     }
 
     /**
@@ -65,7 +65,8 @@ public class Container {
                 Field field = clazz.getDeclaredField(name);
                 field.setAccessible(true);
 
-                if (bean.getProperties().get(name).getType().equals(ValueType.VAL)) {                       // Если поле - значение
+                if (bean.getProperties().get(name).getType()
+                        .equals(ValueType.VAL)) {                       // Если поле - значение
                     switch (field.getType().getName()) {
                         case "int":
                             field.set(ob, Integer.parseInt(bean.getProperties().get(name).getValue()));
@@ -76,7 +77,8 @@ public class Container {
                         default:
                             break;
                     }
-                } else if (bean.getProperties().get(name).getType().equals(ValueType.REF)) {                // Если поле - ссылка
+                } else if (bean.getProperties().get(name).getType()
+                        .equals(ValueType.REF)) {                // Если поле - ссылка
                     Object objToRef = objByClassName.get(bean.getProperties().get(name).getValue());
                     field.set(ob, objToRef);
                 }
