@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,6 +26,14 @@ public class ContainerTest {
         try {
             container = new Container("config.xml");
         } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         Assert.assertTrue(container != null);
@@ -54,4 +63,5 @@ public class ContainerTest {
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
     }
+
 }
