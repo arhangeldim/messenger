@@ -5,7 +5,8 @@ import arhangel.dim.container.beans.Engine;
 import arhangel.dim.container.beans.Gear;
 import sun.security.provider.certpath.Vertex;
 
-import java.util.*;
+import java.util.List;
+
 
 public class Main {
     public static void main(String[] args) throws InvalidConfigurationException, IllegalAccessException, ClassNotFoundException, InstantiationException, NoSuchFieldException {
@@ -16,7 +17,10 @@ public class Main {
         List<Bean> beanListSorted = graph.sortBeans();
 
         Container container = new Container("config.xml");
-        System.out.println(container.objByClassName.toString());
+
+        Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
+        System.out.println(car);
+
     }
 
 }

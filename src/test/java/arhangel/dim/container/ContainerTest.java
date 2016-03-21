@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -62,4 +63,5 @@ public class ContainerTest {
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
     }
+
 }
