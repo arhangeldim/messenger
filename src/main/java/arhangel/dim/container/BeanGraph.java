@@ -25,7 +25,29 @@ public class BeanGraph {
     public BeanVertex addVertex(Bean value) {
         BeanVertex vertex = new BeanVertex(value);
         vertices.put(vertex, new ArrayList<>()) ;
+        updateLinks(value, vertex);
         return vertex;
+    }
+
+    private void updateLinks(Bean value, BeanVertex vertex){
+        for (BeanVertex bv : vertices.keySet()){
+            bv.getBean()
+                    .getProperties()
+                    .values()
+                    .stream()
+                    .filter(property -> property.getType() == ValueType.REF
+                            && property.getValue().equals(value.getName()))
+                                                    .forEach(property ->{addEdge(bv, vertex);});
+        }
+        for (Property pr: value.getProperties().values()){
+            if (pr.getType().equals(ValueType.REF)){
+                for (BeanVertex bv: vertices.keySet()){
+                    if (pr.getValue().equals(bv.getBean().getName())){
+                        addEdge(vertex,bv);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -99,6 +121,10 @@ public class BeanGraph {
         sortedVertexes.add(tmp);
     }
 
+    public List<BeanVertex> topSort() {
+        return topSort(vertices.keySet().iterator().next());
+    }
+
     public List<BeanVertex> topSort(BeanVertex start) {
         sortedVertexes.clear();
         used.clear();
@@ -114,7 +140,6 @@ public class BeanGraph {
         for (int i = 0; i < size(); ++i) {
             reverseAnswer.add(sortedVertexes.get(i));
         }
-
         return reverseAnswer;
     }
 
