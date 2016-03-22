@@ -31,19 +31,21 @@ public class BeanGraph {
 
     private void updateLinks(Bean value, BeanVertex vertex){
         for (BeanVertex bv : vertices.keySet()){
-            bv.getBean()
-                    .getProperties()
-                    .values()
-                    .stream()
-                    .filter(property -> property.getType() == ValueType.REF
-                            && property.getValue().equals(value.getName()))
-                                                    .forEach(property ->{addEdge(bv, vertex);});
+            if (bv.getBean().getProperties() != null) {
+                for (Property pr : bv.getBean().getProperties().values()) {
+                    if (pr.getType().equals(ValueType.REF) && pr.getName().equals(value.getName())) {
+                        addEdge(bv, vertex);
+                    }
+                }
+            }
         }
-        for (Property pr: value.getProperties().values()){
-            if (pr.getType().equals(ValueType.REF)){
-                for (BeanVertex bv: vertices.keySet()){
-                    if (pr.getValue().equals(bv.getBean().getName())){
-                        addEdge(vertex,bv);
+        if (value.getProperties()!=null) {
+            for (Property pr : value.getProperties().values()) {
+                if (pr.getType().equals(ValueType.REF)) {
+                    for (BeanVertex bv : vertices.keySet()) {
+                        if (pr.getValue().equals(bv.getBean().getName())) {
+                            addEdge(vertex, bv);
+                        }
                     }
                 }
             }
@@ -57,7 +59,12 @@ public class BeanGraph {
      * @param to   в какую вершину
      */
     public void addEdge(BeanVertex from, BeanVertex to) {
-        vertices.get(from).add(to);
+        if (!vertices.keySet().contains(from)) {
+            vertices.put(from, new ArrayList<>()) ;
+        }
+        if (!vertices.get(from).contains(to)){
+            vertices.get(from).add(to);
+        }
     }
 
     /**
