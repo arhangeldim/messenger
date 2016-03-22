@@ -22,18 +22,17 @@ class BeanXmlReader {
     private static final String TAG_PROPERTY = "property";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "val";
-    private static final String ATTR_REF = "ref";
+    public static final String ATTR_REF = "ref";
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) throws IOException, ClassNotFoundException {
+    public static List<Bean> parseBeans(String pathToFile) throws IOException, ClassNotFoundException {
         List<Bean> result = new ArrayList<>();
         Document htmlFile = null;
         try {
             htmlFile = Jsoup.parse(new File(pathToFile), "ISO-8859-1");
         } catch (FileNotFoundException exept) {
-            System.out.print("wrong path");
-            exept.printStackTrace();
+            throw new IOException("can not access the file");
         }
 
         List<Element> classList = htmlFile.getElementsByTag(TAG_BEAN);
@@ -41,9 +40,9 @@ class BeanXmlReader {
             Map<String, Property> properties = new HashMap<>();
             for (Element pr : el.getElementsByTag(TAG_PROPERTY)) {
                 String name = pr.attr(ATTR_NAME);
-                if (pr.attr(ATTR_REF) != null) {
+                if (!pr.attr(ATTR_REF).isEmpty()) {
                     properties.put(name, new Property(name, pr.attr(ATTR_REF), ValueType.REF));
-                } else if (pr.attr(ATTR_VALUE) != null) {
+                } else if (!pr.attr(ATTR_VALUE).isEmpty()) {
                     properties.put(name, new Property(name, pr.attr(ATTR_VALUE), ValueType.VAL));
                 } else {
                     throw new ClassNotFoundException("incorrect attribute");
