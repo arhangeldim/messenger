@@ -12,10 +12,10 @@ public class Container {
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException {
-
-        // вызываем BeanXmlReader
-    }
+//    public Container(String pathToConfig) throws InvalidConfigurationException {
+//
+//        // вызываем BeanXmlReader
+//    }
 
     /**
      *  Вернуть объект по имени бина из конфига

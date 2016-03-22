@@ -21,25 +21,25 @@ public class ContainerTest {
     private static Engine expectedEngine;
 
     @BeforeClass
-    public static void init() {
-        try {
-            container = new Container("config.xml");
-        } catch (InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-        Assert.assertTrue(container != null);
-
-        expectedEngine = new Engine();
-        expectedEngine.setPower(200);
-
-        expectedGear = new Gear();
-        expectedGear.setCount(6);
-
-        expectedCar = new Car();
-        expectedCar.setEngine(expectedEngine);
-        expectedCar.setGear(expectedGear);
-
-    }
+//    public static void init() {
+//        try {
+//            container = new Container("config.xml");
+//        } catch (InvalidConfigurationException e) {
+//            e.printStackTrace();
+//        }
+//        Assert.assertTrue(container != null);
+//
+//        expectedEngine = new Engine();
+//        expectedEngine.setPower(200);
+//
+//        expectedGear = new Gear();
+//        expectedGear.setCount(6);
+//
+//        expectedCar = new Car();
+//        expectedCar.setEngine(expectedEngine);
+//        expectedCar.setGear(expectedGear);
+//
+//    }
 
     @Test
     public void testGetByName() throws Exception {
