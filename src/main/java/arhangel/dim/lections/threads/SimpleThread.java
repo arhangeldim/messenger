@@ -48,9 +48,9 @@ public class SimpleThread {
     }
 
     static void join() throws Exception {
-        Thread t = new MyThread("joinThread");
+        Thread thread = new MyThread("joinThread");
         System.out.println("Starting thread...");
-        t.start();
+        thread.start();
         System.out.println("Joining");
         //t.join();
         System.out.println("Joined");

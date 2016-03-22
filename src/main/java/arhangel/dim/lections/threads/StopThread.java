@@ -59,30 +59,30 @@ public class StopThread {
     }
 
     public static void flagThread() {
-        FlagThread t = new FlagThread();
-        t.start();
+        FlagThread flagThread = new FlagThread();
+        flagThread.start();
 
         Scanner scanner = new Scanner(System.in);
         scanner.next();
-        t.stopThread();
+        flagThread.stopThread();
     }
 
     public static void interruptThread() {
-        Thread t = new InterThread();
-        t.start();
+        Thread thread = new InterThread();
+        thread.start();
 
         Scanner scanner = new Scanner(System.in);
         scanner.next();
-        t.interrupt();
+        thread.interrupt();
     }
 
     public static void dummyThread() {
-        Thread t = new DummyThread();
-        t.start();
+        Thread thread = new DummyThread();
+        thread.start();
 
         Scanner scanner = new Scanner(System.in);
         scanner.next();
-        t.interrupt();
+        thread.interrupt();
     }
 
     public static void main(String[] args) throws Exception {

@@ -42,7 +42,8 @@ public class DeadLock {
         }
 
         static void transact(final Account from, final Account to, int amount) {
-            Account lock1, lock2;
+            Account lock1;
+            Account lock2;
 
 //            lock1 = from;
 //            lock2 = to;
@@ -56,7 +57,8 @@ public class DeadLock {
             }
 
             synchronized (lock1) {
-                logger.info("Lock1({}) was acquired by thread {}. Waiting for lock2({}), lock1.id, Thread.currentThread().getName(), lock2.id");
+                logger.info("Lock1({}) was acquired by thread {}. Waiting for lock2({}), " +
+                        "lock1.id, Thread.currentThread().getName(), lock2.id");
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -64,7 +66,8 @@ public class DeadLock {
                 }
 
                 synchronized (lock2) {
-                    logger.info("Lock2({}) was acquired by thread {}. Waiting for lock1({}), lock2.id, Thread.currentThread().getName(), lock1.id");
+                    logger.info("Lock2({}) was acquired by thread {}. Waiting for lock1({}), " +
+                            "lock2.id, Thread.currentThread().getName(), lock1.id");
                     from.sum -= amount;
                     to.sum += amount;
                 }

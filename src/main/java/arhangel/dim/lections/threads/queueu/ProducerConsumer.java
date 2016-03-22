@@ -10,7 +10,7 @@ public class ProducerConsumer {
     static boolean isReady = false;
 
     static class Producer extends Thread {
-        final private Object lock;
+        private final Object lock;
 
         public Producer(Object lock) {
             this.lock = lock;
@@ -27,7 +27,7 @@ public class ProducerConsumer {
             log.info("[PRODUCER] Data prepared. Notify All!");
 
             isReady = true;
-            synchronized(lock) {
+            synchronized (lock) {
                 lock.notifyAll();
             }
         }
@@ -35,11 +35,12 @@ public class ProducerConsumer {
     }
 
     static class Consumer extends Thread {
-        final private Object lock;
+        private final Object lock;
 
         public Consumer(Object lock) {
             this.lock = lock;
         }
+
         @Override
         public void run() {
 

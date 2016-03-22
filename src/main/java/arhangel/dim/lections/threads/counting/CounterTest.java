@@ -47,9 +47,9 @@ public class CounterTest {
         //LockCounter counter = new LockCounter();
         Thread[] threads = new Thread[threadNum];
         for (int i = 0; i < threadNum; i++) {
-            Thread t = new Sequencer(counter);
-            threads[i] = t;
-            t.start();
+            Thread thread = new Sequencer(counter);
+            threads[i] = thread;
+            thread.start();
         }
 
         for (Thread t : threads) {
@@ -67,9 +67,9 @@ public class CounterTest {
         LockCounter counter = new LockCounter();
         Thread[] threads = new Thread[threadNum];
         for (int i = 0; i < threadNum; i++) {
-            Thread t = new Sequencer(counter);
-            threads[i] = t;
-            t.start();
+            Thread thread = new Sequencer(counter);
+            threads[i] = thread;
+            thread.start();
         }
         Thread unsafe = new UnsafeSequencer(counter);
         unsafe.start();

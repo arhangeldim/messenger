@@ -21,7 +21,7 @@ public class ListBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public void put(E e) throws InterruptedException{
+    public void put(E elem) throws InterruptedException {
 
         /*
          Внутри критической секции пытаемся поместить элемент в очередь
@@ -30,7 +30,7 @@ public class ListBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public E take() throws InterruptedException{
+    public E take() throws InterruptedException {
 
         /*
          Внутри критической секции пытаемся достать элемент из очереди
