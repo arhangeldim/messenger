@@ -3,10 +3,7 @@ package arhangel.dim.container;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,7 +39,10 @@ public class Context {
     public static void main(String[] args) throws Exception {
 
         // Dynamic config
-        Context context = new Context("config.xml");
+        //Context context = new Context("config.xml");
+        BeanXmlReader reader = new BeanXmlReader();
+        List<Bean> beans = reader.parseBeans("config.xml");
+        System.out.println(Arrays.toString(beans.toArray()));
     }
 
     public Context(String xmlPath) throws Exception {

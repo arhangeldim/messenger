@@ -36,20 +36,19 @@ public class BeanXmlReader {
                 Element eElement = (Element) nNode;
                 String beanId = eElement.getAttribute(ATTR_BEAN_ID);
                 String beanClass = eElement.getAttribute(ATTR_BEAN_CLASS);
-                NodeList pList = doc.getElementsByTagName(TAG_PROPERTY);
+                NodeList pList = eElement.getElementsByTagName(TAG_PROPERTY);
                 Map<String, Property> properties = new HashMap<String, Property>();
                 for (int temp2 = 0; temp2 < pList.getLength(); temp2++) {
                     Node pNode = pList.item(temp2);
                     Element pElement = (Element) pNode;
-                    HashMap pAttributes = (HashMap) pElement.getAttributes();
-                    String name = (String) pAttributes.get(ATTR_NAME);
+                    String name = pElement.getAttribute(ATTR_NAME);
                     String value;
                     ValueType type = ValueType.REF;
-                    if (pAttributes.containsKey(ATTR_VALUE)){
-                        value = (String) pAttributes.get(ATTR_VALUE);
+                    if (pElement.getAttribute(ATTR_VALUE) != ""){
+                        value = pElement.getAttribute(ATTR_VALUE);
                         type = ValueType.VAL;
                     }
-                    else value = (String) pAttributes.get(ATTR_REF);
+                    else value = pElement.getAttribute(ATTR_REF);
                     Property property = new Property(name,value,type);
                     properties.put(name,property);
                 }
