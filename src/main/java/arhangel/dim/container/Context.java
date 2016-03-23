@@ -8,6 +8,8 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import arhangel.dim.container.dag.Graph;
+import arhangel.dim.container.dag.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -43,6 +45,23 @@ public class Context {
         BeanXmlReader reader = new BeanXmlReader();
         List<Bean> beans = reader.parseBeans("config.xml");
         System.out.println(Arrays.toString(beans.toArray()));
+        Graph<Bean> graph = new Graph<>();
+        List<Vertex> vertices = new ArrayList<>();
+        for(Bean b:beans) vertices.add(graph.addVertex(b));
+        for(Vertex<Bean> b:vertices){
+            for(Property p: b.getValue().getProperties().values()) {
+                if (p.getType() == ValueType.REF){
+                    for(Vertex<Bean> bn:vertices){
+                        if (bn.getValue().getName().equals(p.getValue())){
+                            graph.addEdge(b,bn,true);
+                        }
+                    }
+                }
+            }
+        }
+        List<Vertex<Bean>> sorted = graph.toposort();
+
+
     }
 
     public Context(String xmlPath) throws Exception {
