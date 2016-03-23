@@ -28,13 +28,15 @@ public class Demo {
     public static void main(String[] args) {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
 
-
         // Filter with predicate
         final int skip = 3;
         // skip = 4;
         numbers.stream().filter(new MyPredicate()).forEach(new MyConsumer<>());
 
-        numbers.stream().filter((val) -> val != skip).forEach(System.out::println);
+        numbers
+                .stream()
+                .filter((val) -> val != skip)
+                .forEach(System.out::println);
 
 
         // Map
