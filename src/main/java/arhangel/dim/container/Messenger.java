@@ -12,7 +12,8 @@ public class Messenger {
         BeanXmlReader xmlReader = new BeanXmlReader();
         List<Bean> beans;
 
-        String path = "C:\\Users\\Дмитрий\\Documents\\technotrack\\java\\messenger\\src\\main\\java\\arhangel\\dim\\container\\test";
+        String path = "C:\\Users\\Дмитрий\\Documents\\technotrack\\java\\messenger" +
+                        "\\src\\main\\java\\arhangel\\dim\\container\\test";
         try {
             beans = xmlReader.parseBeans(path);
         } catch (IOException e) {
