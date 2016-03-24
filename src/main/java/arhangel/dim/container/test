@@ -1,0 +1,16 @@
+<root>
+
+    <bean id="engineBean" class="arhangel.dim.ioc.beans.Engine">
+        <property name="power" val="300"/>
+    </bean>
+
+    <bean id="carBean" class="arhangel.dim.ioc.beans.Car">
+        <property name="gear" ref="gearBean"/>
+        <property name="engine" ref="engineBean"/>
+    </bean>
+
+    <bean id="gearBean" class="arhangel.dim.ioc.beans.Gear">
+        <property name="count" val="6"/>
+    </bean>
+
+</root>
