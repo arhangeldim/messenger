@@ -59,16 +59,19 @@ public class Graph<V> {
     }
 
     private LinkedList<Vertex<V>> sorted = new LinkedList<>();
+    private int hasCycle = 0;
 
     public void dfs() {
+        sorted.clear();
+        hasCycle = -1;
         vertices.keySet().stream().filter(vertex -> vertex.getState() != Vertex.State.VISITED).forEach(this::dfs);
     }
 
     public void dfs(Vertex<V> current) {
-
         current.setState(Vertex.State.MARKED);
         for (Vertex<V> vertex : getLinked(current)) {
             if (vertex.getState() == Vertex.State.MARKED) {
+                hasCycle = 1;
                 System.out.println("Cycle: " + current + "->" + vertex);
                 return;
             }
@@ -77,7 +80,7 @@ public class Graph<V> {
             }
         }
         current.setState(Vertex.State.VISITED);
-        sorted.push(current);
+        sorted.addLast(current);
     }
 
     public List<Vertex<V>> toposort() {
@@ -86,4 +89,14 @@ public class Graph<V> {
         return sorted;
     }
 
+    public boolean hasCycle() {
+        if ( hasCycle == 0 ) {
+            dfs();
+        }
+        if ( hasCycle == 1 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
