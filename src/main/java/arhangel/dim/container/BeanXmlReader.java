@@ -56,7 +56,8 @@ public class BeanXmlReader {
                 beans.add(bean);
             }
         } catch (Exception e) {
-            e.printStackTrace();}
+            e.printStackTrace();
+        }
 
         return beans;
     }

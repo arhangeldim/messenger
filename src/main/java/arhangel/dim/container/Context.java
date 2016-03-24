@@ -8,6 +8,7 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import arhangel.dim.container.beans.Car;
 import arhangel.dim.container.dag.Graph;
 import arhangel.dim.container.dag.Vertex;
 import org.slf4j.Logger;
@@ -42,25 +43,10 @@ public class Context {
 
         // Dynamic config
         //Context context = new Context("config.xml");
-        BeanXmlReader reader = new BeanXmlReader();
-        List<Bean> beans = reader.parseBeans("config.xml");
-        System.out.println(Arrays.toString(beans.toArray()));
-        Graph<Bean> graph = new Graph<>();
-        List<Vertex> vertices = new ArrayList<>();
-        for(Bean b:beans) vertices.add(graph.addVertex(b));
-        for(Vertex<Bean> b:vertices){
-            for(Property p: b.getValue().getProperties().values()) {
-                if (p.getType() == ValueType.REF){
-                    for(Vertex<Bean> bn:vertices){
-                        if (bn.getValue().getName().equals(p.getValue())){
-                            graph.addEdge(b,bn,true);
-                        }
-                    }
-                }
-            }
-        }
-        List<Vertex<Bean>> sorted = graph.toposort();
-
+        Container container = new Container("config.xml");
+        Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
+        System.out.println(car.getGear().getCount());
+        System.out.println(car.getEngine().getPower());
 
     }
 
