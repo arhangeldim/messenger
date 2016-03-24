@@ -1,28 +1,106 @@
 package arhangel.dim.container;
 
-import java.util.List;
+import org.xml.sax.SAXException;
 
-/**
- * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
- */
+import javax.naming.NameNotFoundException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
 public class Container {
     private List<Bean> beans;
+    private Map<String, Object> objectByName;
+    private Map<String, Object> objectByClassName;
 
     /**
-     * Если не получается считать конфиг, то бросьте исключение
-     * @throws InvalidConfigurationException неверный конфиг
+     * @throws arhangel.dim.container.InvalidConfigurationException - неверный конфиг
      */
     public Container(String pathToConfig) throws InvalidConfigurationException {
+        objectByClassName = new HashMap<>();
+        objectByName = new HashMap<>();
+        List<Bean> beansFromXml;
+        try {
+            beansFromXml = BeanXmlReader.parseBeans(pathToConfig);
+        } catch (IOException e) {
+            throw new InvalidConfigurationException(e.getMessage());
+        } catch (ParserConfigurationException e) {
+            throw new InvalidConfigurationException("Can't parse configuration." + e.getMessage());
+        } catch (SAXException e) {
+            throw new InvalidConfigurationException("SAX parse exception." + e.getMessage());
+        } catch (NameNotFoundException e) {
+            throw new InvalidConfigurationException("File does not exist." + e.getMessage());
+        }
+        List<BeanVertex> tmp = (new BeanGraph(beansFromXml).topSort());
+        beans = new ArrayList<>();
+        for (BeanVertex beanVertex : tmp) {
+            beans.add(beanVertex.getBean());
+        }
+        init(beans);
+    }
 
-        // вызываем BeanXmlReader
+    private void init(List<Bean> beans) {
+        for (int i = 0; i < beans.size(); ++i) {
+            initBean(beans.get(i));
+        }
+    }
+
+    private void initBean(Bean bean) {
+        String name = bean.getClassName();
+        Class clazz;
+        try {
+            clazz = Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            System.err.println("Incorrect name of class " + e.getMessage());
+            return;
+        }
+
+        // Создаём объект нужного нам класса
+        Object object;
+        try {
+            object = clazz.newInstance();
+        } catch (InstantiationException e) {
+            System.err.println("Can't initialize class " + e.getMessage());
+            return;
+        } catch (IllegalAccessException e) {
+            System.err.print(e.getMessage());
+            return;
+        }
+
+        // Создаём и применяем к нему методы для установки нужных значений
+        for (Property property : bean.getProperties().values()) {
+            String methodName = "set" + Utils.capitalize(property.getName());
+            try {
+                if (property.getType() == ValueType.REF) {
+                    Object parameter = getByName(property.getValue());
+                    Method method = clazz.getMethod(methodName,
+                            parameter.getClass());
+                    method.invoke(object, parameter);
+                } else {
+                    Method method = clazz.getMethod(methodName,
+                            int.class);
+                    method.invoke(object, new Integer(property.getValue()));
+                }
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        objectByClassName.put(bean.getClassName(), object);
+        objectByName.put(bean.getName(), object);
+
     }
 
     /**
-     *  Вернуть объект по имени бина из конфига
-     *  Например, Car car = (Car) container.getByName("carBean")
+     * Вернуть объект по имени бина из конфига
+     * Например, Car car = (Car) container.getByName("carBean")
      */
     public Object getByName(String name) {
-        return null;
+        return objectByName.get(name);
     }
 
     /**
@@ -30,35 +108,7 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
-        return null;
-    }
-
-    private void instantiateBean(Bean bean) {
-
-        /*
-        // Примерный ход работы
-
-        String className = bean.getClassName();
-        Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
-
-
-        for (String name : bean.getProperties().keySet()) {
-            // ищем поле с таким именен внутри класса
-            // учитывая приватные
-            Field field = clazz.getDeclaredField(name);
-            // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
-
-            // Делаем приватные поля доступными
-            field.setAccessible(true);
-
-            // Далее определяем тип поля и заполняем его
-            // Если поле - примитив, то все просто
-            // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
-
-            */
-
+        return objectByClassName.get(className);
     }
 
 }
