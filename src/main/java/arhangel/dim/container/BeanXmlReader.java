@@ -8,7 +8,10 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -22,7 +25,7 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile){
+    public List<Bean> parseBeans(String pathToFile) {
         List<Bean> beans = new ArrayList<Bean>();
         try {
             File inputFile = new File(pathToFile);
@@ -30,25 +33,26 @@ public class BeanXmlReader {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(inputFile);
             doc.getDocumentElement().normalize();
-            NodeList nList = doc.getElementsByTagName(TAG_BEAN);
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-                Element eElement = (Element) nNode;
-                String beanId = eElement.getAttribute(ATTR_BEAN_ID);
-                String beanClass = eElement.getAttribute(ATTR_BEAN_CLASS);
-                NodeList pList = eElement.getElementsByTagName(TAG_PROPERTY);
+            NodeList ndList = doc.getElementsByTagName(TAG_BEAN);
+            for (int temp = 0; temp < ndList.getLength(); temp++) {
+                Node ndNode = ndList.item(temp);
+                Element elElement = (Element) ndNode;
+                String beanId = elElement.getAttribute(ATTR_BEAN_ID);
+                String beanClass = elElement.getAttribute(ATTR_BEAN_CLASS);
+                NodeList prList = elElement.getElementsByTagName(TAG_PROPERTY);
                 Map<String, Property> properties = new HashMap<String, Property>();
-                for (int temp2 = 0; temp2 < pList.getLength(); temp2++) {
-                    Node pNode = pList.item(temp2);
-                    Element pElement = (Element) pNode;
-                    String name = pElement.getAttribute(ATTR_NAME);
+                for (int temp2 = 0; temp2 < prList.getLength(); temp2++) {
+                    Node prNode = prList.item(temp2);
+                    Element prElement = (Element) prNode;
+                    String name = prElement.getAttribute(ATTR_NAME);
                     String value;
                     ValueType type = ValueType.REF;
-                    if (pElement.getAttribute(ATTR_VALUE) != ""){
-                        value = pElement.getAttribute(ATTR_VALUE);
+                    if (prElement.getAttribute(ATTR_VALUE) != "") {
+                        value = prElement.getAttribute(ATTR_VALUE);
                         type = ValueType.VAL;
+                    } else {
+                        value = prElement.getAttribute(ATTR_REF);
                     }
-                    else value = pElement.getAttribute(ATTR_REF);
                     Property property = new Property(name,value,type);
                     properties.put(name,property);
                 }
