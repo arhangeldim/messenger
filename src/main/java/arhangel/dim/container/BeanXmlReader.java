@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+<<<<<<< HEAD
 /**
  * Created by nexx0f on 15.03.16.
  */
@@ -17,6 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+=======
+import java.util.List;
+
+/**
+ *
+ */
+>>>>>>> master
 public class BeanXmlReader {
     private static final String TAG_BEAN = "bean";
     private static final String TAG_PROPERTY = "property";
@@ -26,6 +34,7 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
+<<<<<<< HEAD
     public List<Bean> parseBeans(String pathToFile) throws IOException, SAXException, ParserConfigurationException {
         File fXmlFile = new File("./example.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -95,4 +104,10 @@ public class BeanXmlReader {
         }
         return returningList;
     }
+=======
+    public List<Bean> parseBeans(String pathToFile) {
+        return null;
+    }
+
+>>>>>>> master
 }
