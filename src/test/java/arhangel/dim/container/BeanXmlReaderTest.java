@@ -17,7 +17,8 @@ public class BeanXmlReaderTest {
         List<Bean> beans = reader.parseBeans("config.xml");
         Assert.assertTrue(beans != null);
         Assert.assertTrue(beans.size() > 0);
-
+        BeanGraph graph = new BeanGraph();
+        graph.sort(beans);
 
     }
 }

@@ -10,11 +10,20 @@ public class Bean {
     private String name; // Уникально имя бина
     private String className; // Класс бина
     private Map<String, Property> properties; // Набор полей бина ИмяПоля-Значение
+    private Object instance;
 
     public Bean(String name, String className, Map<String, Property> properties) {
         this.name = name;
         this.className = className;
         this.properties = properties;
+    }
+
+    public void setInstance(Object instance) {
+        this.instance = instance;
+    }
+
+    public Object getInstance() {
+        return instance;
     }
 
     public Map<String, Property> getProperties() {
