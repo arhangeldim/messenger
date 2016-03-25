@@ -108,8 +108,10 @@ public class BeanGraph {
                     for (BeanVertex verticesToCheck : vertices.keySet()) {
 
                         if (verticesToCheck.getBean().getName().matches(property.getValue())) {
-                            if (isFound)
+                            if (isFound) {
+
                                 throw new InvalidConfigurationException("There should be only one Bean with name " + property.getName());
+                            }
                             isFound = true;
                             addEdge(vertex, verticesToCheck);
                         }
