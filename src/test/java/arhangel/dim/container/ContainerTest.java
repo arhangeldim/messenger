@@ -22,7 +22,6 @@ public class ContainerTest {
     private static Engine expectedEngine;
 
     @BeforeClass
-    @Ignore
     public static void init() {
         try {
             container = new Container("config.xml");
@@ -44,7 +43,6 @@ public class ContainerTest {
     }
 
     @Test
-    @Ignore
     public void testGetByName() throws Exception {
         Car car = (Car) container.getByName("carBean");
         Assert.assertTrue(car != null);
@@ -52,7 +50,6 @@ public class ContainerTest {
     }
 
     @Test
-    @Ignore
     public void testGetByClass() throws Exception {
         Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
         Assert.assertTrue(car != null);
