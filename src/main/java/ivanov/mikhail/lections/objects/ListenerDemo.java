@@ -1,7 +1,5 @@
 package ivanov.mikhail.lections.objects;
 
-import arhangel.dim.lections.objects.*;
-
 /**
  *
  */

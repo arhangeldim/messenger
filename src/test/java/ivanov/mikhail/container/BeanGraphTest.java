@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import arhangel.dim.container.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,15 +16,15 @@ import org.junit.Assert;
 public class BeanGraphTest {
 
     private BeanGraph graph;
-    private List<ivanov.mikhail.container.BeanVertex> vertices;
+    private List<BeanVertex> vertices;
 
     @Before
-    public void initTest() {
+    public void initTest() throws Exception {
         graph = new BeanGraph();
-        ivanov.mikhail.container.BeanVertex v0 = graph.addVertex(new Bean("0", null, null));
-        ivanov.mikhail.container.BeanVertex v1 = graph.addVertex(new Bean("1", null, null));
-        ivanov.mikhail.container.BeanVertex v2 = graph.addVertex(new Bean("2", null, null));
-        ivanov.mikhail.container.BeanVertex v3 = graph.addVertex(new Bean("3", null, null));
+        BeanVertex v0 = graph.addVertex(new Bean("0", null, null));
+        BeanVertex v1 = graph.addVertex(new Bean("1", null, null));
+        BeanVertex v2 = graph.addVertex(new Bean("2", null, null));
+        BeanVertex v3 = graph.addVertex(new Bean("3", null, null));
 
         vertices = new ArrayList<>();
         vertices.addAll(Arrays.asList(v0, v1, v2, v3));
