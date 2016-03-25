@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +41,7 @@ public class Context {
     public static void main(String[] args) throws Exception {
 
 //         Dynamic config
-        Container container = new Container("config.xml");
-        for (Object object : container.objByName.values()) {
-            System.out.println(object.toString());
-        }
+        return;
     }
 
     public Context(String xmlPath) throws Exception {
