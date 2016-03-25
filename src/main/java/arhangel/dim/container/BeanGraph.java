@@ -16,7 +16,6 @@ public class BeanGraph {
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
     private List<BeanVertex> grayBeans = new ArrayList<>();
     private List<BeanVertex> blackBeans = new ArrayList<>();
-    private Stack<BeanVertex> stackBeans = new Stack<>();
 
     /**
      * Добавить вершину в граф

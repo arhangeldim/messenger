@@ -33,7 +33,7 @@ public class BeanGraphTest {
     }
 
     @Test
-//    @Ignore
+    @Ignore
     public void testIsConnected() throws Exception {
         Assert.assertTrue(graph.isConnected(vertices.get(0), vertices.get(1)));
         Assert.assertFalse(graph.isConnected(vertices.get(0), vertices.get(3)));

@@ -2,7 +2,9 @@ package arhangel.dim.container;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.HashMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Created by andy on 14.03.2016.
@@ -23,7 +26,7 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public List<Bean> parseBeans(String pathToFile) throws Exception {
+    public List<Bean> parseBeans(String pathToFile) throws IOException, SAXException, ParserConfigurationException {
         Document doc = this.getDocumentObject(pathToFile);
         NodeList beanNodeList = doc.getElementsByTagName(TAG_BEAN);
         List<Bean> beansList = new LinkedList<>();
@@ -43,7 +46,7 @@ public class BeanXmlReader {
         return beansList;
     }
 
-    private Document getDocumentObject(String pathToFile) throws Exception {
+    private Document getDocumentObject(String pathToFile) throws ParserConfigurationException, IOException, SAXException {
         File xmlFile = new File(pathToFile);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dbuilder = dbFactory.newDocumentBuilder();
