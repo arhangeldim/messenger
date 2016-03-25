@@ -33,16 +33,16 @@ public class BeanXmlReader {
         try {
             File inputFile = new File(pathToFile);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(inputFile);
+            DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse(inputFile);
             doc.getDocumentElement().normalize();
-            NodeList nList = doc.getElementsByTagName(TAG_BEAN);
+            NodeList nodeList = doc.getElementsByTagName(TAG_BEAN);
 
-            for (int i = 0; i < nList.getLength(); i++) {
-                Element beanElement = (Element) nList.item(i);
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element beanElement = (Element) nodeList.item(i);
                 NodeList propertiesNodes = beanElement.getElementsByTagName(TAG_PROPERTY);
 
-                String beanID = beanElement.getAttribute(ATTR_BEAN_ID);
+                String beanId = beanElement.getAttribute(ATTR_BEAN_ID);
                 String beanClass = beanElement.getAttribute(ATTR_BEAN_CLASS);
                 Map<String, Property> beanProps = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class BeanXmlReader {
                     }
                     beanProps.put(propName, beanProperty);
                 }
-                beans.add(new Bean(beanID, beanClass, beanProps));
+                beans.add(new Bean(beanId, beanClass, beanProps));
             }
 
         } catch (Exception e) {

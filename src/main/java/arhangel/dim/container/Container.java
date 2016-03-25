@@ -13,9 +13,9 @@ public class Container {
     private Map<String, Object> objByClass = new HashMap<>();
 
     public Container(String pathToConfig) throws InvalidConfigurationException {
-        BeanXmlReader BXR = new BeanXmlReader();
+        BeanXmlReader beanRead = new BeanXmlReader();
         try {
-            beans = BXR.parseBeans(pathToConfig);
+            beans = beanRead.parseBeans(pathToConfig);
         } catch (Exception e) {
             throw new InvalidConfigurationException("Configuration exception");
         }
