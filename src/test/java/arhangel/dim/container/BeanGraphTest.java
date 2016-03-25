@@ -19,7 +19,7 @@ public class BeanGraphTest {
     private BeanGraph graph;
     private List<BeanVertex> vertices;
 
-    @Ignore
+
     @Before
     public void initTest() {
         graph = new BeanGraph();
@@ -36,7 +36,7 @@ public class BeanGraphTest {
         graph.addEdge(v1, v3);
     }
 
-    @Ignore
+
     @Test
 
     public void testIsConnected() throws Exception {
@@ -44,7 +44,7 @@ public class BeanGraphTest {
         Assert.assertFalse(graph.isConnected(vertices.get(0), vertices.get(3)));
     }
 
-    @Ignore
+
     @Test
     public void testGetLinked() throws Exception {
         BeanVertex[] linked = new BeanVertex[]{vertices.get(1), vertices.get(2)};
@@ -54,7 +54,7 @@ public class BeanGraphTest {
         }
     }
 
-    @Ignore
+
     @Test
     public void testSize() throws Exception {
         Assert.assertEquals(4, graph.size());

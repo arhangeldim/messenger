@@ -1,5 +1,9 @@
 package arhangel.dim.container;
 
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -12,9 +16,13 @@ public class Container {
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException {
+    public Container(String pathToConfig) throws InvalidConfigurationException,
+                                                 IOException,
+                                                 SAXException,
+                                                 ParserConfigurationException {
 
-        // вызываем BeanXmlReader
+        BeanXmlReader reader = new BeanXmlReader();
+        beans = reader.parseBeans(pathToConfig);
     }
 
     /**
