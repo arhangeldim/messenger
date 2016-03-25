@@ -109,7 +109,8 @@ public class Container {
             // храним тип данных
             Type type = field.getType();
 
-            Method method = clazz.getDeclaredMethod("set" + Character.toUpperCase(name.charAt(0)) + name.substring(1), field.getType());
+            Method method = clazz.getDeclaredMethod("set" + Character.toUpperCase(name.charAt(0)) +
+                    name.substring(1), field.getType());
 
             switch (prop.getType()) {
                 case VAL:
