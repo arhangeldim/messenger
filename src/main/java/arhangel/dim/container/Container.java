@@ -67,14 +67,12 @@ public class Container {
 
     private void instantiateBean(Bean bean) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
 
-
         // Примерный ход работы
 
         String className = bean.getClassName();
         Class clazz = Class.forName(className);
         // ищем дефолтный конструктор
         Object ob = clazz.newInstance();
-
 
         for (String name : bean.getProperties().keySet()) {
             // ищем поле с таким именен внутри класса
@@ -85,11 +83,19 @@ public class Container {
             // Делаем приватные поля доступными
             field.setAccessible(true);
 
+            if (bean.getProperties().get(name).getType() == ValueType.REF) {
+                field.set(name, getByName(bean.getProperties().get(name).getValue()));
+            }
+            else {
+                field.set(name, bean.getProperties().get(name).getValue());
+            }
             // Далее определяем тип поля и заполняем его
             // Если поле - примитив, то все просто
             // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
         }
 
-    }
+        objByName.put(bean.getName(), ob);
+        objByClassName.put(bean.getClassName(), ob);
 
+    }
 }
