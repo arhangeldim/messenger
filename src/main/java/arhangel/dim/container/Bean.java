@@ -47,6 +47,6 @@ public class Bean {
                 "name='" + name + '\'' +
                 ", className='" + className + '\'' +
                 '\n' + "properties=" + properties +
-                '}' + '\n'+ '\n';
+                '}';
     }
 }

@@ -1,11 +1,9 @@
 package arhangel.dim.container;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
@@ -53,10 +51,10 @@ public class Container {
 
         try {
 
-        String className = bean.getClassName();
-        Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
+            String className = bean.getClassName();
+            Class clazz = Class.forName(className);
+            // ищем дефолтный конструктор
+            Object ob = clazz.newInstance();
 
             for (String name : bean.getProperties().keySet()) {
                 // ищем поле с таким именен внутри класса
@@ -75,10 +73,10 @@ public class Container {
                 if (type == ValueType.VAL) {
                     System.out.println(Integer.valueOf(bean.getProperties().get(name).getValue()).toString());
                     field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
-                }
-                else {
-                    if (objByName.get(bean.getProperties().get(name).getValue()) == null)
+                } else {
+                    if (objByName.get(bean.getProperties().get(name).getValue()) == null) {
                         System.out.println("null");
+                    }
                     field.set(ob, objByName.get(bean.getProperties().get(name).getValue()));
                 }
 
