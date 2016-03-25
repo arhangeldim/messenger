@@ -1,5 +1,11 @@
 package arhangel.dim.container;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -7,17 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class Context {
 
@@ -41,8 +36,11 @@ public class Context {
 
     public static void main(String[] args) throws Exception {
 
-        // Dynamic config
-        Context context = new Context("config.xml");
+//         Dynamic config
+        Container container = new Container("config.xml");
+        for (Object object : container.objByName.values()) {
+            System.out.println(object.toString());
+        }
     }
 
     public Context(String xmlPath) throws Exception {

@@ -8,7 +8,12 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+
 
 
 /**
@@ -16,11 +21,17 @@ import java.util.*;
  */
 class BeanXmlReader {
 
-    public static void main(String[] args) {
-        System.out.println();
-        BeanXmlReader beanReader = new BeanXmlReader();
-        System.out.println(beanReader.parseBeans("config.xml"));
-    }
+//    public static void main(String[] args) {
+//        try {
+//            System.out.println();
+//            BeanXmlReader beanReader = new BeanXmlReader();
+//            BeanGraph beanGraph = new BeanGraph();
+//            System.out.println(beanGraph.sorted(beanReader.parseBeans("config.xml")));
+//
+//        } catch (InvalidConfigurationException e) {
+//            System.err.println(e.getMessage());
+//        }
+//    }
 
     private static final String TAG_BEAN = "bean";
     private static final String TAG_PROPERTY = "property";
@@ -36,29 +47,29 @@ class BeanXmlReader {
 
             List<Bean> beans = new ArrayList<>();
 
-            File fXmlFile = new File(pathToFile);
+            File xmlFile = new File(pathToFile);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
+            DocumentBuilder builder = dbFactory.newDocumentBuilder();
+            Document doc = builder.parse(xmlFile);
 
             doc.getDocumentElement().normalize();
 
-            NodeList nList = doc.getElementsByTagName(TAG_BEAN);
+            NodeList list = doc.getElementsByTagName(TAG_BEAN);
 
-            for (int currentBeam = 0; currentBeam < nList.getLength(); currentBeam++) {
+            for (int currentBeam = 0; currentBeam < list.getLength(); currentBeam++) {
 
-                Node nNode = nList.item(currentBeam);
+                Node node = list.item(currentBeam);
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element element = (Element) node;
                     String name;
                     String className;
                     Map<String, Property> properties = new HashMap<>();
 
-                    name = eElement.getAttribute(ATTR_BEAN_ID);
-                    className = eElement.getAttribute(ATTR_BEAN_CLASS);
-                    NodeList propertyNodes = eElement.getElementsByTagName(TAG_PROPERTY);
+                    name = element.getAttribute(ATTR_BEAN_ID);
+                    className = element.getAttribute(ATTR_BEAN_CLASS);
+                    NodeList propertyNodes = element.getElementsByTagName(TAG_PROPERTY);
                     for (int currentProperty = 0; currentProperty < propertyNodes.getLength(); currentProperty++) {
                         if (propertyNodes.item(currentProperty).getNodeType() == Node.ELEMENT_NODE) {
                             Element currentElement = (Element) propertyNodes.item(currentProperty);
