@@ -19,8 +19,6 @@ public class Container {
      */
     public Container(String pathToConfig) throws InvalidConfigurationException {
         createdObjects = new HashMap<>();
-
-        // вызываем BeanXmlReader
         BeanXmlReader reader = new BeanXmlReader();
         try {
             beans = reader.parseBeans(pathToConfig);
