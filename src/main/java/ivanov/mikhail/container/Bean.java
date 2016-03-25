@@ -1,7 +1,5 @@
 package ivanov.mikhail.container;
 
-import arhangel.dim.container.*;
-
 import java.util.Map;
 
 /**

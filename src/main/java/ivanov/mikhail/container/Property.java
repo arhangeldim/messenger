@@ -1,7 +1,5 @@
 package ivanov.mikhail.container;
 
-import arhangel.dim.container.*;
-
 /**
  * Описание тега property в xml конфигурации.
  * Тег описывает поля определенного бина
