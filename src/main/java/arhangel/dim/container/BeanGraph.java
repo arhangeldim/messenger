@@ -21,7 +21,7 @@ public class BeanGraph {
      */
     public BeanVertex addVertex(Bean value) {
         BeanVertex vertex = new BeanVertex(value);
-        List <BeanVertex> connectedsortedVertices = new ArrayList<>();
+        List<BeanVertex> connectedsortedVertices = new ArrayList<>();
         if (!vertices.containsKey(vertex)) {
             vertices.put(vertex, connectedsortedVertices);
             colors.put(vertex, 0);
