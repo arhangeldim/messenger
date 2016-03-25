@@ -1,11 +1,13 @@
 package arhangel.dim.container;
 
+import arhangel.dim.container.beans.Gear;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,14 +16,14 @@ import java.util.Map;
  */
 public class Container {
     private List<Bean> beans;
-    private Map<String, Object> objByClassName;
-    private Map<String, Object> objByName;
+    private Map<String, Object> objByClassName = new HashMap<>();
+    private Map<String, Object> objByName = new HashMap<>();
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
      * //* @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException {
+    public Container(String pathToConfig) throws Exception {
         beans = new ArrayList<>();
         BeanXmlReader beanParser = new BeanXmlReader();
         try {
@@ -44,8 +46,17 @@ public class Container {
                 this.beans.add(beanElement);
                 instantiateBean(beanElement);
             }
+//        } catch (CycleReferenceException e) {
+////            throw new InvalidConfigurationException("неверный конфиг");
+//        } catch (ParserConfigurationException e) {
+////            throw new InvalidConfigurationException("неверный конфиг");
+//        } catch (SAXException e) {
+////            throw new InvalidConfigurationException("неверный конфиг");
+//        } catch (IOException e) {
+////            throw new InvalidConfigurationException("неверный конфиг");
+//        }
         } catch (Exception e) {
-            throw new InvalidConfigurationException("неверный конфиг");
+            throw e;
         }
     }
 
@@ -83,17 +94,15 @@ public class Container {
             // Делаем приватные поля доступными
             field.setAccessible(true);
 
-            if (bean.getProperties().get(name).getType() == ValueType.REF) {
-                field.set(name, getByName(bean.getProperties().get(name).getValue()));
-            }
-            else {
-                field.set(name, bean.getProperties().get(name).getValue());
-            }
             // Далее определяем тип поля и заполняем его
             // Если поле - примитив, то все просто
             // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
+            if (bean.getProperties().get(name).getType() == ValueType.REF) {
+                field.set(ob, getByName(bean.getProperties().get(name).getValue()));
+            } else {
+                field.setInt(ob, Integer.parseInt(bean.getProperties().get(name).getValue()));
+            }
         }
-
         objByName.put(bean.getName(), ob);
         objByClassName.put(bean.getClassName(), ob);
 
