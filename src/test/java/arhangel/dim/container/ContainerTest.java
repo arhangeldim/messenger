@@ -43,6 +43,7 @@ public class ContainerTest {
     }
 
     @Test
+    @Ignore
     public void testGetByName() throws Exception {
         Car car = (Car) container.getByName("carBean");
         Assert.assertTrue(car != null);
@@ -50,6 +51,7 @@ public class ContainerTest {
     }
 
     @Test
+    @Ignore
     public void testGetByClass() throws Exception {
         Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
         Assert.assertTrue(car != null);
