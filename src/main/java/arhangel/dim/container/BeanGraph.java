@@ -76,37 +76,25 @@ public class BeanGraph {
      * мой личный метод
      */
     public List<BeanVertex> sort() throws CycleReferenceException {
-        List<BeanVertex> sortedBeanVertexes = new ArrayList<>();
         for (BeanVertex v : this.vertices.keySet()) {
-            this.grayBeans.add(v);
             if (!this.blackBeans.contains(v)) {
-                this.grayBeans.remove(v);
                 this.sortStage(v);
-                this.stackBeans.push(v);
-                this.blackBeans.add(v);
-            } else {
-                throw new CycleReferenceException("cycle detected!");
             }
         }
-        while (!this.stackBeans.isEmpty()) {
-            sortedBeanVertexes.add(this.stackBeans.pop());
-        }
-        return sortedBeanVertexes;
+        return this.blackBeans;
     }
 
     private void sortStage(BeanVertex vertex) throws CycleReferenceException {
         this.grayBeans.add(vertex);
-        if (!this.vertices.get(vertex).isEmpty()) {
-            for (BeanVertex v : this.vertices.get(vertex)) {
-                if (!this.blackBeans.contains(v)) {
-                    this.sortStage(v);
-                    this.grayBeans.remove(v);
-                    this.stackBeans.push(v);
-                    this.blackBeans.add(v);
-                } else {
-                    throw new CycleReferenceException("cycle detected!");
-                }
+        for (BeanVertex v : this.vertices.get(vertex)) {
+            if (this.grayBeans.contains(v)) {
+                throw new CycleReferenceException("Цикл обнаружен!");
+            }
+            if (!this.blackBeans.contains(v)) {
+                this.sortStage(v);
             }
         }
+        this.grayBeans.remove(vertex);
+        this.blackBeans.add(vertex);
     }
 }

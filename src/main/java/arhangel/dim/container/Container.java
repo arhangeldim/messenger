@@ -13,9 +13,13 @@ public class Container {
      * Если не получается считать конфиг, то бросьте исключение
      //* @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) {
+    public Container(String pathToConfig) throws InvalidConfigurationException {
 
-        // вызываем BeanXmlReader
+        try {
+            beans = (new BeanXmlReader()).parseBeans(pathToConfig);
+        } catch (Exception e) {
+            throw new InvalidConfigurationException("неверный конфиг");
+        }
     }
 
     /**
