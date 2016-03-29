@@ -29,8 +29,8 @@ public class BeanGraph {
         return vertex;
     }
 
-    private void updateLinks(Bean value, BeanVertex vertex){
-        for (BeanVertex bv : vertices.keySet()){
+    private void updateLinks(Bean value, BeanVertex vertex) {
+        for (BeanVertex bv : vertices.keySet()) {
             if (bv.getBean().getProperties() != null) {
                 for (Property pr : bv.getBean().getProperties().values()) {
                     if (pr.getType().equals(ValueType.REF) && pr.getName().equals(value.getName())) {
@@ -39,7 +39,7 @@ public class BeanGraph {
                 }
             }
         }
-        if (value.getProperties()!=null) {
+        if (value.getProperties() != null) {
             for (Property pr : value.getProperties().values()) {
                 if (pr.getType().equals(ValueType.REF)) {
                     for (BeanVertex bv : vertices.keySet()) {
@@ -62,7 +62,7 @@ public class BeanGraph {
         if (!vertices.keySet().contains(from)) {
             vertices.put(from, new ArrayList<>()) ;
         }
-        if (!vertices.get(from).contains(to)){
+        if (!vertices.get(from).contains(to)) {
             vertices.get(from).add(to);
         }
     }
