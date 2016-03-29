@@ -1,7 +1,6 @@
 package arhangel.dim.container;
 
 import org.jdom2.JDOMException;
-import org.jgap.InvalidConfigurationException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
