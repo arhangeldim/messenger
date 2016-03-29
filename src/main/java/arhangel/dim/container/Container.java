@@ -17,7 +17,7 @@ public class Container {
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException, IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public Container(String pathToConfig) throws InvalidConfigurationException, IllegalAccessException, InstantiationException, ClassNotFoundException, CycleReferenceException {
 
         BeanXmlReader beanReader = new BeanXmlReader();
         BeanGraph beanGraph = new BeanGraph();

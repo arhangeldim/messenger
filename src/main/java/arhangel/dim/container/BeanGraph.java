@@ -59,7 +59,7 @@ public class BeanGraph {
         return vertices.size();
     }
 
-    private void sort( ) throws InvalidConfigurationException {
+    private void sort() throws InvalidConfigurationException, CycleReferenceException {
         for (BeanVertex vertex : vertices.keySet()) {
 
             if (colors.get(vertex) == 0) {
@@ -69,7 +69,7 @@ public class BeanGraph {
         }
     }
 
-    public void dfs(BeanVertex vertex) throws InvalidConfigurationException {
+    public void dfs(BeanVertex vertex) throws InvalidConfigurationException, CycleReferenceException {
 
         List<BeanVertex> linkedVertices = getLinked(vertex);
         
@@ -84,7 +84,7 @@ public class BeanGraph {
 
             if (colors.get(linkedVertices.get(v)) == 1) {
 
-                throw new InvalidConfigurationException("There is a cycle in config.xml");
+                throw new CycleReferenceException("There is a cycle in config.xml");
             }
         }
 
@@ -121,7 +121,7 @@ public class BeanGraph {
         }
     }
 
-    public  List<Bean> sortedBeanList(List<Bean> beansToSort) throws InvalidConfigurationException {
+    public List<Bean> sortedBeanList(List<Bean> beansToSort) throws InvalidConfigurationException, CycleReferenceException {
         setGraph(beansToSort);
         order = 0;
         sort();
