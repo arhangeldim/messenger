@@ -6,8 +6,17 @@ package arhangel.dim.container;
 public class BeanVertex {
     private Bean bean;
 
+    enum ColorType {
+        BLACK,
+        GREY,
+        WHITE
+    }
+
+    ColorType color;
+
     public BeanVertex(Bean bean) {
         this.bean = bean;
+        this.color = ColorType.BLACK;
     }
 
     public Bean getBean() {
