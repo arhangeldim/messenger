@@ -70,7 +70,7 @@ public class Container {
             throw new UnsupportedOperationException(String
                     .format("No such bean: %s", name));
         }
-        return beanById.get(name);
+        return beanById.get(name).getObject();
     }
 
     /**
@@ -78,7 +78,7 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
-        return beanByClass.get(className);
+        return beanByClass.get(className).getObject();
     }
 
     private void instantiateBean(Bean bean) throws InvalidConfigurationException {
@@ -138,8 +138,7 @@ public class Container {
                         .format("Failed to instantiate field %s", name));
             }
         }
-        beanById.put(bean.getName(), bean);
-        beanByClass.put(bean.getClassName(), bean);
+        bean.setObject(ob);
     }
 
     private Object objectByClassName(String className, String value) {
