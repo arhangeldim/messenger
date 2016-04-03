@@ -7,7 +7,7 @@ import java.util.Map;
  */
 public class Bean {
 
-    private String name; // Уникально имя бина
+    private String name; // Уникальное имя бина
     private String className; // Класс бина
     private Map<String, Property> properties; // Набор полей бина ИмяПоля-Значение
 
