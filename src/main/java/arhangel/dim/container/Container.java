@@ -21,25 +21,28 @@ public class Container {
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException{
+    public Container(String pathToConfig) throws InvalidConfigurationException {
         beans = new BeanGraph();
         objectByName = new HashMap<>();
         objectByClassName = new HashMap<>();
 
         List<Bean> parsingResult = new ArrayList<>();
-        try{
+        try {
             parsingResult = BeanXmlReader.parseBeans(pathToConfig);
-        }catch (IOException ex1){
+        } catch (IOException ex1) {
             throw new InvalidConfigurationException(ex1.getMessage());
-        }catch (ClassNotFoundException ex2){
+        } catch (ClassNotFoundException ex2) {
             throw new InvalidConfigurationException(ex2.getMessage());
         }
-        for (Bean bean: parsingResult){
+        for (Bean bean: parsingResult) {
             beans.addVertex(bean);
         }
         List<Bean> sortedBeans = new ArrayList<>();
-        beans.topSort().stream().forEach(bv->{sortedBeans.add(bv.getBean());});
-        sortedBeans.stream().forEach(bean->{
+        beans.topSort()
+                .stream()
+                .forEach( bv->
+                { sortedBeans.add(bv.getBean()); } );
+        sortedBeans.stream().forEach(bean-> {
             try {
                 instantiateBean(bean);
             } catch (InvalidConfigurationException ex) {
@@ -90,8 +93,7 @@ public class Container {
         }
 
         for (Property pr : bean.getProperties().values()) {
-            String methodName = "set"+ pr.getName().substring(0,1).toUpperCase()
-                                    + pr.getName().substring(1);
+            String methodName = "set" + pr.getName().substring(0,1).toUpperCase() + pr.getName().substring(1);
             Field field = null;
             try {
                 field = clazz.getDeclaredField(pr.getName());

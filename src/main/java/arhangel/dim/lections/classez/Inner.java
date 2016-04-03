@@ -22,12 +22,12 @@ class Inner {
     class Inner2 {
         int b = 0;
 
-        void localMethod() {
+                void localMethod() {
             /*private*/
-            class Local {
-                //                static String field = "";
-                int localInt = 0;
-            }
+                    class Local {
+                        //                static String field = "";
+                        int localInt = 0;
+                    }
             Local local = new Local();
         }
     }
