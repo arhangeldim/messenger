@@ -2,7 +2,6 @@ package arhangel.dim.container;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -10,7 +9,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.Assert;
-
 /**
  *
  */
@@ -36,14 +34,12 @@ public class BeanGraphTest {
     }
 
     @Test
-    @Ignore
     public void testIsConnected() throws Exception {
         Assert.assertTrue(graph.isConnected(vertices.get(0), vertices.get(1)));
         Assert.assertFalse(graph.isConnected(vertices.get(0), vertices.get(3)));
     }
 
     @Test
-    @Ignore
     public void testGetLinked() throws Exception {
         BeanVertex[] linked = new BeanVertex[]{vertices.get(1), vertices.get(2)};
         int counter = 0;
@@ -53,7 +49,7 @@ public class BeanGraphTest {
     }
 
     @Test
-    @Ignore
+
     public void testSize() throws Exception {
         Assert.assertEquals(4, graph.size());
     }
