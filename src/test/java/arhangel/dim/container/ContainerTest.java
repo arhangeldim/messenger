@@ -1,13 +1,11 @@
 package arhangel.dim.container;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import  org.junit.Assert;
-
 import arhangel.dim.container.beans.Car;
 import arhangel.dim.container.beans.Engine;
 import arhangel.dim.container.beans.Gear;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  *
@@ -38,7 +36,6 @@ public class ContainerTest {
         expectedCar = new Car();
         expectedCar.setEngine(expectedEngine);
         expectedCar.setGear(expectedGear);
-
     }
 
     @Test
@@ -53,5 +50,6 @@ public class ContainerTest {
         Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
+
     }
 }
