@@ -148,11 +148,11 @@ MessageStore (сообщения и чаты). С помощью этих инт
 
 Примерная диаграмма классов
 
-![alt tag](https://raw.githubusercontent.com/arhangeldim/messenger/master/messenger/Entities.png)
+![alt tag](https://raw.githubusercontent.com/arhangeldim/messenger/master/Entities.png)
 
 Примерная схема потока данных (данные идут как по стрелкам клиент-сервер, так и в обратную сторону)
 
-![alt tag](https://raw.githubusercontent.com/arhangeldim/messenger/master/messenger/Messenger.png)
+![alt tag](https://raw.githubusercontent.com/arhangeldim/messenger/master/Messenger.png)
 
 
 ## Описание
