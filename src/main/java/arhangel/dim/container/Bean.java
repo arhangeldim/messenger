@@ -43,10 +43,10 @@ public class Bean {
 
     @Override
     public String toString() {
-        return "Bean{" +
+        return  "Bean{" +
                 "name='" + name + '\'' +
                 ", className='" + className + '\'' +
-                ", properties=" + properties +
+                '\n' + "properties=" + properties +
                 '}';
     }
 }
