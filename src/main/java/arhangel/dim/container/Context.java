@@ -3,14 +3,17 @@ package arhangel.dim.container;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import arhangel.dim.container.beans.Car;
+import arhangel.dim.container.dag.Graph;
+import arhangel.dim.container.dag.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,7 +45,12 @@ public class Context {
     public static void main(String[] args) throws Exception {
 
         // Dynamic config
-        Context context = new Context("config.xml");
+        //Context context = new Context("config.xml");
+        Container container = new Container("config.xml");
+        Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
+        System.out.println(car.getGear().getCount());
+        System.out.println(car.getEngine().getPower());
+
     }
 
     public Context(String xmlPath) throws Exception {

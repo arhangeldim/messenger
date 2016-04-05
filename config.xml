@@ -7,10 +7,10 @@
     <bean id="engineBean" class="arhangel.dim.container.beans.Engine">
         <property name="power" val="200"/>
     </bean>
-
     <bean id="carBean" class="arhangel.dim.container.beans.Car">
         <property name="gear" ref="gearBean"/>
         <property name="engine" ref="engineBean"/>
     </bean>
+
 
 </root>
