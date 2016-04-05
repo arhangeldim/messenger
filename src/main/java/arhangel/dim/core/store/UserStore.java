@@ -14,6 +14,11 @@ public interface UserStore {
     User addUser(User user);
 
     /**
+     * Обновить информацию о пользователе
+     */
+    User updateUser(User user);
+
+    /**
      *
      * Получить пользователя по логину/паролю
      * return null if user not found
