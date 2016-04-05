@@ -12,5 +12,12 @@ public class InvalidConfigurationException extends Exception {
     public InvalidConfigurationException(String msg) {
         super(msg);
     }
+<<<<<<< HEAD
+>>>>>>> upstream/master
+=======
+
+    public InvalidConfigurationException(Throwable ex) {
+        super(ex);
+    }
 >>>>>>> upstream/master
 }
