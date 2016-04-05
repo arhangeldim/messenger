@@ -4,7 +4,11 @@ package arhangel.dim.lections.jdbc;
  * Created by r.kildiev on 02.11.2015.
  */
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class JdbcExample {
 
