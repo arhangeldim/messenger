@@ -9,6 +9,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import arhangel.dim.core.User;
 
 public class JdbcExample {
 
@@ -123,6 +129,51 @@ public class JdbcExample {
 //        prepStmnt.setString(parameterIndex, "asd");
 //        rs = prepStmnt.executeQuery();
 
+
+
+        /**
+         * Использование executor для запроса в базу
+         */
+        QueryExecutor exec = new QueryExecutor();
+        List<User> users = exec.execQuery(connection, "SELECT * FROM users;", (rset) -> {
+            System.out.println("handle:");
+            List<User> data = new ArrayList<>();
+            while (rset.next()) {
+                User user = new User();
+                user.setName(rset.getString(2));
+                data.add(user);
+            }
+            return data;
+        });
+
+        System.out.println(users.toString());
+
+
+        /**
+         * Использование prepared executor для запроса в базу
+         */
+        Map<Integer, Object> prepared = new HashMap<>();
+        prepared.put(1, "John");
+
+        users = exec.execQuery(connection, "SELECT * FROM users WHERE name = ?;", prepared, (rset) -> {
+            System.out.println("handle:");
+            List<User> data = new ArrayList<>();
+            while (rset.next()) {
+                User user = new User();
+                user.setName(rset.getString(2));
+                data.add(user);
+            }
+            return data;
+        });
+
+        System.out.println(users.toString());
+
+
+
+
+
     }
+
+
 
 }
