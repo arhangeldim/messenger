@@ -1,6 +1,6 @@
 package arhangel.dim.core.store;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import arhangel.dim.container.Container;
@@ -12,7 +12,7 @@ public class UserStoreTest {
 
     static UserStore store;
 
-    @Before
+    @BeforeClass
     public static void init() {
         try {
             Container container = new Container("server.xml");

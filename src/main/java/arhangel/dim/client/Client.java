@@ -10,7 +10,7 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import arhangel.dim.container.Context;
+import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.TextMessage;
@@ -161,8 +161,8 @@ public class Client implements ConnectionHandler {
         Client client = null;
         // Пользуемся механизмом контейнера
         try {
-            Context context = new Context("client.xml");
-            client = (Client) context.getBeanByName("client");
+            Container context = new Container("client.xml");
+            client = (Client) context.getByName("client");
         } catch (InvalidConfigurationException e) {
             log.error("Failed to create client", e);
             return;
