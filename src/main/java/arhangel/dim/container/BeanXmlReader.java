@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -151,6 +152,34 @@ public class BeanXmlReader {
     }
 
     public class CycleReferenceException extends RuntimeException {
+    }
+
+    public static void main(String[] args) throws InvalidConfigurationException {
+        String path = "src/example.xml";
+        List<Bean> beans = new BeanXmlReader().parseBeans("src/example.xml");
+        for (Bean bean : beans) {
+            System.out.println(bean);
+        }
+
+
+        try {
+            Container container = new Container(path);
+
+            System.out.println(container.getByName("engineBean"));
+            System.out.println(container.getByName("gearBean"));
+            System.out.println(container.getByName("carBean"));
+
+            System.out.println(container.getByClass("arhangel.dim.ioc.beans.Engine"));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
