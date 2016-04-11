@@ -71,7 +71,7 @@ public class Container {
                     if (property.getType() == ValueType.REF) {
                         Object parameter = getByName(property.getValue());
                         Method method = clazz.getMethod(methodName,
-                                parameter.getClass());
+                                parameter.getClass()    );
 
                         method.invoke(ob, parameter);
                     } else {
