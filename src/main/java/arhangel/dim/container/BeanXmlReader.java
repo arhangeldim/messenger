@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+<<<<<<< HEAD
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -22,6 +23,13 @@ import java.util.Map;
  * Created by thefacetakt on 15.03.16.
  */
 
+=======
+import java.util.List;
+
+/**
+ *
+ */
+>>>>>>> 38695ca70e9ef2370d579b5b30f8efebc438659d
 public class BeanXmlReader {
     private static final String TAG_BEAN = "bean";
     private static final String TAG_PROPERTY = "property";
@@ -31,6 +39,7 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
+<<<<<<< HEAD
     public List<Bean> parseBeans(String pathToFile)
             throws ParserConfigurationException, IOException, SAXException {
         List<Bean> result = new ArrayList<>();
@@ -80,4 +89,10 @@ public class BeanXmlReader {
         }
         return result;
     }
+=======
+    public List<Bean> parseBeans(String pathToFile) {
+        return null;
+    }
+
+>>>>>>> 38695ca70e9ef2370d579b5b30f8efebc438659d
 }

@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+<<<<<<< HEAD
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -7,6 +8,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+=======
+>>>>>>> 38695ca70e9ef2370d579b5b30f8efebc438659d
 import java.util.List;
 import java.util.Map;
 
