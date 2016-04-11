@@ -1,6 +1,7 @@
 package arhangel.dim.container;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,13 @@ public class Container {
     private List<Bean> beans;
     public Map<String, Object> objByName = new HashMap<>();
     public Map<String, Object> objByClassName = new HashMap<>();
+
+    private void function() throws InvalidConfigurationException, CycleReferenceException {
+        List<Integer> prevGen = new ArrayList();
+        List<Integer> curGen = new ArrayList();
+
+        prevGen.add(1);
+    }
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
@@ -71,9 +79,18 @@ public class Container {
 
                 ValueType type = bean.getProperties().get(name).getType();
                 if (type == ValueType.VAL) {
+
+                    String fieldType = field.getType().getSimpleName();
+                    switch (fieldType) {
+                        case "Integer": field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
+                            break;
+                        case "String":
+                    }
+
                     System.out.println(Integer.valueOf(bean.getProperties().get(name).getValue()).toString());
                     field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
                 } else {
+
                     if (objByName.get(bean.getProperties().get(name).getValue()) == null) {
                         System.out.println("null");
                     }

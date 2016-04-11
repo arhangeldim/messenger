@@ -70,13 +70,17 @@ class BeanXmlReader {
                     name = element.getAttribute(ATTR_BEAN_ID);
                     className = element.getAttribute(ATTR_BEAN_CLASS);
                     NodeList propertyNodes = element.getElementsByTagName(TAG_PROPERTY);
+
                     for (int currentProperty = 0; currentProperty < propertyNodes.getLength(); currentProperty++) {
+
                         if (propertyNodes.item(currentProperty).getNodeType() == Node.ELEMENT_NODE) {
                             Element currentElement = (Element) propertyNodes.item(currentProperty);
+
                             if (!currentElement.getAttribute(ATTR_REF).matches("")) {
                                 Property property = new Property(currentElement.getAttribute(ATTR_NAME),
                                         currentElement.getAttribute(ATTR_REF), ValueType.REF);
                                 properties.put(currentElement.getAttribute(ATTR_NAME), property);
+
                             } else {
                                 Property property = new Property(currentElement.getAttribute(ATTR_NAME),
                                         currentElement.getAttribute(ATTR_VALUE), ValueType.VAL);

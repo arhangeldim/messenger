@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+import arhangel.dim.container.beans.Car;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -39,12 +40,12 @@ public class Context {
     Map<String, Object> objectsByClass = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
-
-//         Dynamic config
-        return;
+        // Dynamic config
+        Context context = new Context("config.xml");
+        Car car = (Car) context.getBeanByName("carBean");
     }
 
-    public Context(String xmlPath) throws Exception {
+    public Context(String xmlPath) throws InvalidConfigurationException {
         Document config = readXml(xmlPath);
         Element root = config.getDocumentElement();
         NodeList nodes = root.getChildNodes();
@@ -56,7 +57,11 @@ public class Context {
         }
 
         // прочитали xml и знаем все о конфигурации
-        instantiateBeans();
+        try {
+            instantiateBeans();
+        } catch (Exception e) {
+            throw new InvalidConfigurationException(e);
+        }
     }
 
     public Object getBeanByName(String beanName) {
@@ -128,12 +133,14 @@ public class Context {
             case "boolean":
             case "Boolean":
                 return Boolean.valueOf(data);
+            case "java.lang.String":
+                return String.valueOf(data);
             default:
                 throw new InvalidConfigurationException("type name = " + typeName);
         }
     }
 
-    private void parseBean(Node bean) throws Exception {
+    private void parseBean(Node bean) throws InvalidConfigurationException {
         NamedNodeMap attr = bean.getAttributes();
         Node name = attr.getNamedItem(ATTR_BEAN_ID);
         String nameVal = name.getNodeValue();
@@ -155,7 +162,7 @@ public class Context {
         beans.add(new Bean(nameVal, classVal, properties));
     }
 
-    private Property parseProperty(Node node) throws Exception {
+    private Property parseProperty(Node node) throws InvalidConfigurationException {
         NamedNodeMap map = node.getAttributes();
         String name = map.getNamedItem(ATTR_NAME).getNodeValue();
         Node val = map.getNamedItem(ATTR_VALUE);
@@ -173,12 +180,16 @@ public class Context {
         }
     }
 
-    private Document readXml(String path) throws Exception {
+    private Document readXml(String path) throws InvalidConfigurationException {
         File file = new File(path);
-        log.info("Context configuration xml: " + file.getAbsolutePath());
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        return db.parse(file);
+        try {
+            log.info("Context configuration xml: " + file.getAbsolutePath());
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            return db.parse(file);
+        } catch (Exception e) {
+            throw new InvalidConfigurationException(e);
+        }
     }
 
     public List<Bean> getBeans() {

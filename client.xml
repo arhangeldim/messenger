@@ -1,0 +1,11 @@
+<root>
+
+    <bean id="protocol" class="arhangel.dim.core.net.StringProtocol"/>
+
+    <bean id="client" class="arhangel.dim.client.Client">
+        <property name="port" val="19000"/>
+        <property name="host" val="localhost"/>
+        <property name="protocol" ref="protocol"/>
+    </bean>
+
+</root>

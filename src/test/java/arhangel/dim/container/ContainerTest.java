@@ -26,6 +26,8 @@ public class ContainerTest {
             container = new Container("config.xml");
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
+        } catch (CycleReferenceException e) {
+            e.printStackTrace();
         }
         Assert.assertTrue(container != null);
 
