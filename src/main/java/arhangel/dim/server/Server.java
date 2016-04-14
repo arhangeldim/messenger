@@ -2,6 +2,7 @@ package arhangel.dim.server;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.core.Async.Worker;
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.*;
 import arhangel.dim.core.net.Protocol;
@@ -17,6 +18,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Основной класс для сервера сообщений
@@ -37,9 +40,11 @@ public class Server {
 
     Connection connection;
 
+    public int getMaxConnection() {return maxConnection;}
     public int getPort() {
         return port;
     }
+    public Protocol getProtocol() { return protocol;}
 
     public void stop() {
         // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
@@ -100,13 +105,15 @@ public class Server {
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
 
+            ExecutorService executor = Executors.newFixedThreadPool(server.getMaxConnection());
+
             while (true) {
                 byte[] buf = new byte[1024 * 500];
                 int readBytes = in.read(buf);
-                if (readBytes != 0) {
-                    Message msg = server.protocol.decode(buf);
-                    server.commandHandle(msg);
+                if (readBytes > 0) {
+                    executor.submit(new Worker(server, buf));
                 }
+                executor.shutdown();
             }
 
         } catch (Exception e) {

@@ -37,10 +37,8 @@ public class UserDao implements UserStore {
             resultSet.next();
 
             log.trace("Creating found customer to return");
-            newuser = new User();
+            newuser = new User(resultSet.getString("login"), resultSet.getString("password"));
             newuser.setId(Long.parseLong(resultSet.getString("id")));
-            newuser.setLogin(resultSet.getString("login"));
-            newuser.setPassword(resultSet.getString("password"));
             log.info("Customer with login=" + newuser.getLogin() + " created");
 
             resultSet.close();
@@ -77,10 +75,8 @@ public class UserDao implements UserStore {
             log.trace("Get result set");
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                founduser = new User();
+                founduser = new User(resultSet.getString("login"), resultSet.getString("password"));
                 founduser.setId(Long.parseLong(resultSet.getString("id")));
-                founduser.setLogin(resultSet.getString("login"));
-                founduser.setPassword(resultSet.getString("password"));
                 log.info("Customer with login=" + founduser.getLogin() + " found");
             } else {
                 log.trace("Such user wasn't found");
