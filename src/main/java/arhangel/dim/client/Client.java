@@ -1,20 +1,16 @@
 package arhangel.dim.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -81,7 +77,7 @@ public class Client implements ConnectionHandler {
          * Инициализируем поток-слушатель. Синтаксис лямбды скрывает создание анонимного класса Runnable
          */
         socketThread = new Thread(() -> {
-            final byte[] buf = new byte[1024 * 64];
+            final byte[] buf = new byte[1024 * 500];
             log.info("Starting listener thread...");
             while (!Thread.currentThread().isInterrupted()) {
                 try {
@@ -122,11 +118,32 @@ public class Client implements ConnectionHandler {
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
-                // TODO: реализация
+                // FIXME: на тестах может вызвать ошибку
+                if (tokens.length != 2) log.error("Invalid input: " + line);
+                LoginMessage msg = new LoginMessage();
+                msg.setType(Type.MSG_LOGIN);
+                msg.setLogin(tokens[1]);
+                msg.setPassword(tokens[2]);
+
+                send(msg);
                 break;
             case "/help":
-                // TODO: реализация
+                // TODO: Что-то ещё в help?
+                System.out.println("Messenger v1.0");
                 break;
+            case "/info":
+                InfoMessage infomsg = new InfoMessage();
+                infomsg.setType(Type.MSG_INFO);
+
+                // TODO: Случай самоинформации
+                if (tokens[1].isEmpty()) {
+
+                } else {
+                    infomsg.setId(Long.getLong(tokens[1]));
+                }
+                send(infomsg);
+                break;
+
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
@@ -149,6 +166,7 @@ public class Client implements ConnectionHandler {
         log.info(msg.toString());
         out.write(protocol.encode(msg));
         out.flush(); // принудительно проталкиваем буфер с данными
+        out.close();
     }
 
     @Override

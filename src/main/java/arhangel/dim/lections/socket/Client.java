@@ -37,7 +37,7 @@ public class Client {
             e.printStackTrace();
             // exit, failed to open socket
         } finally {
-            IoUtil.closeQuietly(socket);
+
         }
     }
 

@@ -1,6 +1,7 @@
 package arhangel.dim.container;
 
-<<<<<<< HEAD
+import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -13,6 +14,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
+
+
+
 
 public class BeanXmlReader {
 
@@ -71,32 +77,11 @@ public class BeanXmlReader {
 
                 beans.add(new Bean(beanId, className, properties));
             }
-        }
-
-        catch (Exception exc) {
+        } catch (Exception exc) {
             exc.getCause();
         }
 
         return beans;
     }
-=======
-import java.util.List;
 
-/**
- *
- */
-public class BeanXmlReader {
-    private static final String TAG_BEAN = "bean";
-    private static final String TAG_PROPERTY = "property";
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_VALUE = "val";
-    private static final String ATTR_REF = "ref";
-    private static final String ATTR_BEAN_ID = "id";
-    private static final String ATTR_BEAN_CLASS = "class";
-
-    public List<Bean> parseBeans(String pathToFile) {
-        return null;
-    }
-
->>>>>>> upstream/master
 }

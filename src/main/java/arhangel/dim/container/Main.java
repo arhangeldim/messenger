@@ -1,7 +1,24 @@
 package arhangel.dim.container;
 
-/**
- * Created by philip on 15.03.16.
- */
+import arhangel.dim.container.beans.Car;
+import arhangel.dim.container.beans.Engine;
+import arhangel.dim.container.beans.Gear;
+import sun.security.provider.certpath.Vertex;
+
+import java.util.List;
+
+
 public class Main {
+    public static void main(String[] args) throws InvalidConfigurationException, IllegalAccessException, ClassNotFoundException, InstantiationException, NoSuchFieldException {
+        BeanXmlReader reader = new BeanXmlReader();
+
+        List<Bean> beanList = reader.parseBeans("/home/philip/messenger/config.xml");
+
+        Container container = new Container("config.xml");
+
+        Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
+        System.out.println(car);
+
+    }
+
 }
