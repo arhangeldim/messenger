@@ -2,11 +2,13 @@ package arhangel.dim.server;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.container.Main;
 import arhangel.dim.core.Async.Worker;
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.*;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
+import arhangel.dim.core.net.Session;
 import arhangel.dim.core.store.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,9 @@ public class Server {
 
     Connection connection;
 
-    public int getMaxConnection() {return maxConnection;}
+    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
+
+    public int getMaxConnection() { return maxConnection;}
     public int getPort() {
         return port;
     }
@@ -58,27 +62,6 @@ public class Server {
     }
 
     public void commandHandle(Message msg) {
-        String type = msg.getType().toString();
-        try {
-            switch (type) {
-                case "MSG_LOGIN":
-                    LoginMessage loginMessage = (LoginMessage) msg;
-                    UserDao userDao = new UserDao();
-
-                    User founduser = userDao.getUser(loginMessage.getLogin(), loginMessage.getPassword());
-
-                    if (founduser == null) {
-                        founduser = new User(loginMessage.getLogin(), loginMessage.getPassword());
-                        founduser = userDao.addUser(founduser);
-                    }
-                    InfoResultMessage result = new InfoResultMessage(founduser.getId(), founduser.getLogin(), founduser.getPassword(), null);
-                    send(result);
-                    break;
-                default: throw new CommandException("Несуществующая команда сервера");
-            }
-        } catch (Exception e) {
-            e.getMessage();
-        }
     }
 
     public void send(Message msg) throws IOException, ProtocolException {
@@ -98,29 +81,22 @@ public class Server {
 
             System.out.println("Started, waiting for connection");
 
-            Socket socket = serverSocket.accept();
+            while (!serverSocket.isClosed()) {
+                Socket clientSocket = null;
+                clientSocket = serverSocket.accept();
 
-            System.out.println("Accepted. " + socket.getInetAddress());
+                System.out.println("Accepted. " + clientSocket.getInetAddress());
+                Session session = new Session(clientSocket, server.getProtocol());
 
-            InputStream in = socket.getInputStream();
-            OutputStream out = socket.getOutputStream();
-
-            ExecutorService executor = Executors.newFixedThreadPool(server.getMaxConnection());
-
-            while (true) {
-                byte[] buf = new byte[1024 * 500];
-                int readBytes = in.read(buf);
-                if (readBytes > 0) {
-                    executor.submit(new Worker(server, buf));
-                }
-                executor.shutdown();
+                server.threadPool.execute(new Session(clientSocket, server.getProtocol()));
             }
+            server.threadPool.shutdown();
 
-        } catch (Exception e) {
+            } catch (Exception e) {
             e.printStackTrace();
-        } finally {
+            } finally {
 
-        }
+            }
 
     }
 }

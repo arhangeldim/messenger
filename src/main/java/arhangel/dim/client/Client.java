@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.core.User;
 import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,32 +16,14 @@ import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
 
-/**
- * Клиент для тестирования серверного приложения
- */
 public class Client implements ConnectionHandler {
 
-    /**
-     * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
-     * */
     static Logger log = LoggerFactory.getLogger(Client.class);
-
-    /**
-     * Протокол, хост и порт инициализируются из конфига
-     *
-     * */
     private Protocol protocol;
     private int port;
     private String host;
 
-    /**
-     * Тред "слушает" сокет на наличие входящих сообщений от сервера
-     */
     private Thread socketThread;
-
-    /**
-     * С каждым сокетом связано 2 канала in/out
-     */
     private InputStream in;
     private OutputStream out;
 
@@ -68,14 +51,15 @@ public class Client implements ConnectionHandler {
         this.host = host;
     }
 
+    public InputStream getIn() {
+        return in;
+    }
+
     public void initSocket() throws IOException {
         Socket socket = new Socket(host, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
 
-        /**
-         * Инициализируем поток-слушатель. Синтаксис лямбды скрывает создание анонимного класса Runnable
-         */
         socketThread = new Thread(() -> {
             final byte[] buf = new byte[1024 * 500];
             log.info("Starting listener thread...");
@@ -96,7 +80,6 @@ public class Client implements ConnectionHandler {
                 }
             }
         });
-
         socketThread.start();
     }
 
@@ -166,7 +149,6 @@ public class Client implements ConnectionHandler {
         log.info(msg.toString());
         out.write(protocol.encode(msg));
         out.flush(); // принудительно проталкиваем буфер с данными
-        out.close();
     }
 
     @Override
@@ -201,6 +183,11 @@ public class Client implements ConnectionHandler {
                 } catch (ProtocolException | IOException e) {
                     log.error("Failed to process user input", e);
                 }
+
+                byte[] buf = new byte[1024 * 500];
+                int readBytes = client.getIn().read(buf);
+                Message msg = client.getProtocol().decode(buf);
+                log.info("From server: " + msg.toString());
             }
         } catch (Exception e) {
             log.error("Application failed.", e);

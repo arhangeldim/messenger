@@ -27,7 +27,7 @@ public class UserDao implements UserStore {
             Connection conn = daoFactory.connect();
 
             log.trace("Creating prepared statement");
-            PreparedStatement preparedStatement = conn.prepareStatement("insert into User(login, password) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = conn.prepareStatement("insert into Usertable (login, pwd) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, user.getLogin());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.execute();
@@ -67,7 +67,7 @@ public class UserDao implements UserStore {
             conn = daoFactory.connect();
 
             log.trace("Creating prepared statement");
-            PreparedStatement preparedStatement = conn.prepareStatement("select id, login, password from User where login = ? and password = ?");
+            PreparedStatement preparedStatement = conn.prepareStatement("select id, login, pwd from Usertable where login = ? and pwd = ?");
             preparedStatement.setString(1, login);
             preparedStatement.setString(2, pass);
             preparedStatement.execute();
@@ -75,8 +75,9 @@ public class UserDao implements UserStore {
             log.trace("Get result set");
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                founduser = new User(resultSet.getString("login"), resultSet.getString("password"));
-                founduser.setId(Long.parseLong(resultSet.getString("id")));
+                String str = resultSet.getString("pwd");
+                founduser = new User(resultSet.getString("login"), resultSet.getString("pwd"));
+                founduser.setId(Long.parseLong(resultSet.getString("id")));;
                 log.info("Customer with login=" + founduser.getLogin() + " found");
             } else {
                 log.trace("Such user wasn't found");
