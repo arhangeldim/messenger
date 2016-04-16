@@ -15,6 +15,7 @@ public class Graph<V> {
     /**
      * Добавить вершину в граф
      * @param value - объект, привязанный к вершине
+     *              добавляем вершину с данным значением и пустым списком связанных вершин
      */
     public Vertex<V> addVertex(V value) {
         Vertex<V> vertex = new Vertex<>(value);
@@ -27,6 +28,7 @@ public class Graph<V> {
      * @param from из какой вершины
      * @param to в какую вершину
      * @param isDirected - если true, то связь односторонняя, иначе - двухсторонняя
+     *                   заполняем списки связанных вершин
      */
     public void addEdge(Vertex<V> from, Vertex<V> to, boolean isDirected) {
         if (vertices.get(from) != null) {
