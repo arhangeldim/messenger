@@ -30,18 +30,22 @@ public class UserDao implements UserStore {
             PreparedStatement preparedStatement = conn.prepareStatement("insert into Usertable (login, pwd) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, user.getLogin());
             preparedStatement.setString(2, user.getPassword());
-            preparedStatement.execute();
 
-            log.trace("Getting result set");
-            ResultSet resultSet = preparedStatement.getResultSet();
-            resultSet.next();
+            int affectedRows = preparedStatement.executeUpdate();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            generatedKeys.next();
 
-            log.trace("Creating found customer to return");
-            newuser = new User(resultSet.getString("login"), resultSet.getString("password"));
-            newuser.setId(Long.parseLong(resultSet.getString("id")));
-            log.info("Customer with login=" + newuser.getLogin() + " created");
+            newuser = new User(generatedKeys.getString("login"), generatedKeys.getString("pwd"));
+            newuser.setId(generatedKeys.getLong(1));
 
-            resultSet.close();
+            // Добавление нового пользователя в базовый чат
+            preparedStatement = conn.prepareStatement("insert into user_chat (user_id, chat_id) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setLong(1, newuser.getId());
+            preparedStatement.setLong(2, 1);
+
+            affectedRows = preparedStatement.executeUpdate();
+
+            generatedKeys.close();
             log.trace("result set closed");
 
             preparedStatement.close();
@@ -62,35 +66,33 @@ public class UserDao implements UserStore {
         User founduser = null;
 
         try {
-            log.info("Getting user with login=" + login);
-            log.trace("Opening connection");
             conn = daoFactory.connect();
 
-            log.trace("Creating prepared statement");
             PreparedStatement preparedStatement = conn.prepareStatement("select id, login, pwd from Usertable where login = ? and pwd = ?");
             preparedStatement.setString(1, login);
             preparedStatement.setString(2, pass);
             preparedStatement.execute();
 
-            log.trace("Get result set");
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                String str = resultSet.getString("pwd");
                 founduser = new User(resultSet.getString("login"), resultSet.getString("pwd"));
-                founduser.setId(Long.parseLong(resultSet.getString("id")));;
-                log.info("Customer with login=" + founduser.getLogin() + " found");
+                founduser.setId(Long.parseLong(resultSet.getString("id")));
             } else {
-                log.trace("Such user wasn't found");
+                preparedStatement = conn.prepareStatement("select id, login, pwd from Usertable where login = ?");
+                preparedStatement.setString(1, login);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return  founduser = new User(resultSet.getString("login"), null);
+                } else {
+                    return null;
+                }
             }
 
             resultSet.close();
-            log.trace("result set closed");
 
             preparedStatement.close();
-            log.trace("prepared statement closed");
 
             conn.close();
-            log.trace("Connection closed");
         } catch (SQLException e) {
             e.getMessage();
         }

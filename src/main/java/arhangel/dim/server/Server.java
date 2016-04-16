@@ -3,7 +3,6 @@ package arhangel.dim.server;
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.container.Main;
-import arhangel.dim.core.Async.Worker;
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.*;
 import arhangel.dim.core.net.Protocol;
@@ -20,6 +19,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,8 +42,9 @@ public class Server {
     private OutputStream out;
 
     Connection connection;
-
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    List<Session> sessionList = new ArrayList<>();
+
 
     public int getMaxConnection() { return maxConnection;}
     public int getPort() {
@@ -61,7 +63,8 @@ public class Server {
         return protocol.decode(buf);
     }
 
-    public void commandHandle(Message msg) {
+    public List<Session> getSessionList() {
+        return sessionList;
     }
 
     public void send(Message msg) throws IOException, ProtocolException {
@@ -86,11 +89,32 @@ public class Server {
                 clientSocket = serverSocket.accept();
 
                 System.out.println("Accepted. " + clientSocket.getInetAddress());
-                Session session = new Session(clientSocket, server.getProtocol());
+                Session session = new Session(clientSocket, server);
+                server.getSessionList().add(session);
 
-                server.threadPool.execute(new Session(clientSocket, server.getProtocol()));
+
+               // server.threadPool.execute(new Session(clientSocket, server.getProtocol()));
+                while (true) {
+                    byte[] buf = new byte[1024 * 500];
+                    int readBytes = 0;
+                    try {
+                        readBytes = session.getIn().read(buf);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (readBytes > 0) {
+                        Message msg = null;
+                        try {
+                            msg = server.getProtocol().decode(buf);
+                        } catch (ProtocolException e) {
+                            e.printStackTrace();
+                        }
+                        session.onMessage(msg);
+                    }
+                }
             }
-            server.threadPool.shutdown();
+            //server.threadPool.shutdown();
 
             } catch (Exception e) {
             e.printStackTrace();

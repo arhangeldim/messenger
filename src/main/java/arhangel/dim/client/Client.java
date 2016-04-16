@@ -18,6 +18,7 @@ import arhangel.dim.core.net.ProtocolException;
 
 public class Client implements ConnectionHandler {
 
+    private Long userId;
     static Logger log = LoggerFactory.getLogger(Client.class);
     private Protocol protocol;
     private int port;
@@ -30,30 +31,26 @@ public class Client implements ConnectionHandler {
     public Protocol getProtocol() {
         return protocol;
     }
-
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
     }
-
     public int getPort() {
         return port;
     }
-
     public void setPort(int port) {
         this.port = port;
     }
-
     public String getHost() {
         return host;
     }
-
     public void setHost(String host) {
         this.host = host;
     }
-
     public InputStream getIn() {
         return in;
     }
+    public void setUserId(Long userId) { this.userId = userId;}
+    public Long getUserId() { return userId;}
 
     public void initSocket() throws IOException {
         Socket socket = new Socket(host, port);
@@ -89,31 +86,59 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
+        switch (msg.getType().toString()) {
+            case "MSG_STATUS":
+                StatusMessage statusMsg = (StatusMessage) msg;
+                if (statusMsg.getStatus().equals("Logged in")) {
+                    this.setUserId(statusMsg.getSenderId());
+                    log.info("You logged in as user with id = " + statusMsg.getSenderId().toString());
+                }
+        }
     }
 
     /**
      * Обрабатывает входящую строку, полученную с консоли
      * Формат строки можно посмотреть в вики проекта
      */
-    public void processInput(String line) throws IOException, ProtocolException {
+    public boolean processInput(String line) throws IOException, ProtocolException {
         String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
                 // FIXME: на тестах может вызвать ошибку
-                if (tokens.length != 2) log.error("Invalid input: " + line);
+                if (tokens.length < 3) {
+                    log.error("Not enough arguments for login");
+                    return false;
+                } else if (tokens.length > 3) {
+                    log.error("Too many arguments for login");
+                    return false;
+                }
                 LoginMessage msg = new LoginMessage();
                 msg.setType(Type.MSG_LOGIN);
                 msg.setLogin(tokens[1]);
                 msg.setPassword(tokens[2]);
 
                 send(msg);
-                break;
+                return true;
+            case "/text":
+                if (tokens.length < 3) {
+                    log.error("Not enough arguments for message");
+                    return false;
+                } else if (tokens.length > 3) {
+                    log.error("Too many arguments for message");
+                    return false;
+                }
+                TextMessage textMessage = new TextMessage();
+                textMessage.setType(Type.MSG_TEXT);
+                textMessage.setChatId(Long.parseLong(tokens[1]));
+                textMessage.setText(tokens[2]);
+                textMessage.setSenderId(this.getUserId());
+                send(textMessage);
+                return true;
             case "/help":
                 // TODO: Что-то ещё в help?
                 System.out.println("Messenger v1.0");
-                break;
+                return true;
             case "/info":
                 InfoMessage infomsg = new InfoMessage();
                 infomsg.setType(Type.MSG_INFO);
@@ -125,19 +150,10 @@ public class Client implements ConnectionHandler {
                     infomsg.setId(Long.getLong(tokens[1]));
                 }
                 send(infomsg);
-                break;
-
-            case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
-                send(sendMessage);
-                break;
-            // TODO: implement another types from wiki
-
+                return true;
             default:
-                log.error("Invalid input: " + line);
+                log.error("Unknown input command: " + line);
+                return false;
         }
     }
 
@@ -179,7 +195,9 @@ public class Client implements ConnectionHandler {
                     return;
                 }
                 try {
-                    client.processInput(input);
+                    if (!client.processInput(input)) {
+                        continue;
+                    }
                 } catch (ProtocolException | IOException e) {
                     log.error("Failed to process user input", e);
                 }
@@ -187,7 +205,7 @@ public class Client implements ConnectionHandler {
                 byte[] buf = new byte[1024 * 500];
                 int readBytes = client.getIn().read(buf);
                 Message msg = client.getProtocol().decode(buf);
-                log.info("From server: " + msg.toString());
+
             }
         } catch (Exception e) {
             log.error("Application failed.", e);

@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
+
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.store.MessageDao;
+import arhangel.dim.server.Server;
+import com.sun.javafx.scene.control.skin.FXVK;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +32,14 @@ public class Session implements ConnectionHandler, Runnable {
     private User user;
     private Socket socket;
     private Protocol protocol;
+    private Server sessionServer;
 
     private InputStream in;
     private OutputStream out;
 
-    public Session(Socket socket, Protocol protocol) {
-        this.protocol = protocol;
+    public Session(Socket socket, Server server) {
+        this.sessionServer = server;
+        this.protocol = server.getProtocol();
         this.socket = socket;
         try {
             this.in = socket.getInputStream();
@@ -39,6 +48,12 @@ public class Session implements ConnectionHandler, Runnable {
             e.printStackTrace();
         }
     }
+
+    public InputStream getIn() {
+        return in;
+    }
+    public Server getSessionServer() { return sessionServer;}
+    public void setUser(User user) { this.user = user;}
 
     @Override
     public void run() {
@@ -77,22 +92,56 @@ public class Session implements ConnectionHandler, Runnable {
     public void onMessage(Message msg) {
         String type = msg.getType().toString();
         try {
+
             switch (type) {
                 case "MSG_LOGIN":
                     LoginMessage loginMessage = (LoginMessage) msg;
-                    UserDao userDao = new UserDao();
+                    StatusMessage statusMessage = null;
 
+                    UserDao userDao = new UserDao();
                     User founduser = userDao.getUser(loginMessage.getLogin(), loginMessage.getPassword());
 
                     if (founduser == null) {
-                        founduser = new User(loginMessage.getLogin(), loginMessage.getPassword());
-                        founduser = userDao.addUser(founduser);
+                        User newuser = new User(loginMessage.getLogin(), loginMessage.getPassword());
+                        newuser = userDao.addUser(newuser);
+                        statusMessage = new StatusMessage("User " + newuser.getLogin()+ " was created");
+                        statusMessage.setType(Type.MSG_STATUS);
+                        this.send(statusMessage);
+                        break;
+                    } else if (founduser.getPassword() == null) {
+                        statusMessage = new StatusMessage("Wrong password for " + founduser.getLogin());
+                        statusMessage.setType(Type.MSG_STATUS);
+                        this.send(statusMessage);
+                        break;
                     }
                     user = founduser;
-                    StatusMessage statusMessage = new StatusMessage("You logged in as " + user.getLogin());
+                    this.setUser(user);
+                    statusMessage = new StatusMessage("Logged in");
+                    statusMessage.setSenderId(user.getId());
+                    statusMessage.setType(Type.MSG_STATUS);
                     this.send(statusMessage);
                     break;
-                default: throw new CommandException("Несуществующая команда сервера");
+
+                case "MSG_TEXT":
+                    MessageDao messageDao = new MessageDao();
+
+                    //Добавление сообщения в базу
+                    TextMessage textMsg = (TextMessage) msg;
+                    messageDao.addMessage(textMsg.getChatId(), textMsg);
+
+                    //Получение списка пользователей в чате
+                    List<Long> usersIdList = messageDao.getUsersByChatId(textMsg.getChatId());
+                    StatusMessage statusMessageText = new StatusMessage(textMsg.getText());
+                    statusMessageText.setType(Type.MSG_STATUS);
+
+                    //Рассылка сообщения всем в чат
+                    for (int i = 0; i < usersIdList.size(); i++) {
+                        Session session = this.getSessionServer().getSessionList().get(i);
+                        session.send(statusMessageText);
+                    }
+
+                    break;
+                default: throw new CommandException("Unknown server command");
             }
         } catch (Exception e) {
             e.getMessage();
