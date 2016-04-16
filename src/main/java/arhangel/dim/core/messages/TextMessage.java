@@ -6,7 +6,13 @@ import java.util.Objects;
  * Простое текстовое сообщение
  */
 public class TextMessage extends Message {
+    private Long chatId;
     private String text;
+
+    public TextMessage(Long chatId, String text) {
+        this.chatId = chatId;
+        this.text = text;
+    }
 
     public String getText() {
         return text;

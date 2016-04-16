@@ -1,23 +1,26 @@
 package arhangel.dim.client;
 
+import arhangel.dim.client.commands.ChatCreateCommand;
+import arhangel.dim.client.commands.ChatHistoryCommand;
+import arhangel.dim.client.commands.ChatListCommand;
+import arhangel.dim.client.commands.InfoCommand;
+import arhangel.dim.client.commands.LoginCommand;
+import arhangel.dim.client.commands.TextCommand;
+import arhangel.dim.container.Container;
+import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.net.ConnectionHandler;
+import arhangel.dim.core.net.Protocol;
+import arhangel.dim.core.net.ProtocolException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import arhangel.dim.container.Container;
-import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
-import arhangel.dim.core.net.ConnectionHandler;
-import arhangel.dim.core.net.Protocol;
-import arhangel.dim.core.net.ProtocolException;
 
 /**
  * Клиент для тестирования серверного приложения
@@ -27,7 +30,7 @@ public class Client implements ConnectionHandler {
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
      * */
-    static Logger log = LoggerFactory.getLogger(Client.class);
+    private static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
@@ -47,6 +50,11 @@ public class Client implements ConnectionHandler {
      */
     private InputStream in;
     private OutputStream out;
+
+    /**
+     * Текущий пользователь
+     */
+    private ClientUser user;
 
     public Protocol getProtocol() {
         return protocol;
@@ -72,7 +80,7 @@ public class Client implements ConnectionHandler {
         this.host = host;
     }
 
-    public void initSocket() throws IOException {
+    private void initSocket() throws IOException {
         Socket socket = new Socket(host, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
@@ -113,35 +121,6 @@ public class Client implements ConnectionHandler {
     }
 
     /**
-     * Обрабатывает входящую строку, полученную с консоли
-     * Формат строки можно посмотреть в вики проекта
-     */
-    public void processInput(String line) throws IOException, ProtocolException {
-        String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
-        String cmdType = tokens[0];
-        switch (cmdType) {
-            case "/login":
-                // TODO: реализация
-                break;
-            case "/help":
-                // TODO: реализация
-                break;
-            case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
-                send(sendMessage);
-                break;
-            // TODO: implement another types from wiki
-
-            default:
-                log.error("Invalid input: " + line);
-        }
-    }
-
-    /**
      * Отправка сообщения в сокет клиент -> сервер
      */
     @Override
@@ -158,7 +137,7 @@ public class Client implements ConnectionHandler {
 
     public static void main(String[] args) throws Exception {
 
-        Client client = null;
+        Client client;
         // Пользуемся механизмом контейнера
         try {
             Container context = new Container("client.xml");
@@ -167,8 +146,18 @@ public class Client implements ConnectionHandler {
             log.error("Failed to create client", e);
             return;
         }
+
+        ClientMessageCreator comandlineHandler = new ClientMessageCreator()
+                .addHandler(new ChatCreateCommand("/chat_create"))
+                .addHandler(new ChatHistoryCommand("/chat_history"))
+                .addHandler(new ChatListCommand("/chat_list"))
+                .addHandler(new InfoCommand("/info"))
+                .addHandler(new LoginCommand("/login"))
+                .addHandler(new TextCommand("/text"));
+
         try {
             client.initSocket();
+            client.user = new ClientUser();
 
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
@@ -179,7 +168,8 @@ public class Client implements ConnectionHandler {
                     return;
                 }
                 try {
-                    client.processInput(input);
+                    Message message = comandlineHandler.handleCommandline(input, client.user);
+                    client.send(message);
                 } catch (ProtocolException | IOException e) {
                     log.error("Failed to process user input", e);
                 }
