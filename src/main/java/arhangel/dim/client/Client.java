@@ -129,10 +129,15 @@ public class Client implements ConnectionHandler {
                     return false;
                 }
                 TextMessage textMessage = new TextMessage();
+                if (this.getUserId() == null) {
+                    log.error("Can't send a message while not logged in");
+                    return false;
+                }
+                textMessage.setSenderId(this.getUserId());
                 textMessage.setType(Type.MSG_TEXT);
                 textMessage.setChatId(Long.parseLong(tokens[1]));
                 textMessage.setText(tokens[2]);
-                textMessage.setSenderId(this.getUserId());
+
                 send(textMessage);
                 return true;
             case "/help":

@@ -54,6 +54,7 @@ public class Session implements ConnectionHandler, Runnable {
     }
     public Server getSessionServer() { return sessionServer;}
     public void setUser(User user) { this.user = user;}
+    public User getUser() { return this.user;}
 
     @Override
     public void run() {
@@ -98,6 +99,17 @@ public class Session implements ConnectionHandler, Runnable {
                     LoginMessage loginMessage = (LoginMessage) msg;
                     StatusMessage statusMessage = null;
 
+                    for (Session sess : this.getSessionServer().getSessionList()) {
+                        if (sess.getUser() != null) {
+                            if (sess.getUser().getLogin().equals(loginMessage.getLogin())) {
+                                statusMessage = new StatusMessage("User " + loginMessage.getLogin() + " already logged in");
+                                statusMessage.setType(Type.MSG_STATUS);
+                                this.send(statusMessage);
+                                return;
+                            }
+                        }
+                    }
+
                     UserDao userDao = new UserDao();
                     User founduser = userDao.getUser(loginMessage.getLogin(), loginMessage.getPassword());
 
@@ -135,9 +147,13 @@ public class Session implements ConnectionHandler, Runnable {
                     statusMessageText.setType(Type.MSG_STATUS);
 
                     //Рассылка сообщения всем в чат
-                    for (int i = 0; i < usersIdList.size(); i++) {
+                    for (int i = 0; i < this.getSessionServer().getSessionList().size(); i++) {
                         Session session = this.getSessionServer().getSessionList().get(i);
-                        session.send(statusMessageText);
+                        if (session.getUser() != null) {
+                            if (usersIdList.contains(session.getUser().getId())) {
+                                session.send(statusMessageText);
+                            }
+                        }
                     }
 
                     break;

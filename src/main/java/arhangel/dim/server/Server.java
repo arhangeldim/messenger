@@ -93,8 +93,8 @@ public class Server {
                 server.getSessionList().add(session);
 
 
-               // server.threadPool.execute(new Session(clientSocket, server.getProtocol()));
-                while (true) {
+              server.threadPool.execute(session);
+              /* while (true) {
                     byte[] buf = new byte[1024 * 500];
                     int readBytes = 0;
                     try {
@@ -113,8 +113,9 @@ public class Server {
                         session.onMessage(msg);
                     }
                 }
+                */
             }
-            //server.threadPool.shutdown();
+           server.threadPool.shutdown();
 
             } catch (Exception e) {
             e.printStackTrace();
