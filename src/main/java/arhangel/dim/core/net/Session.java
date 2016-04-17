@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import arhangel.dim.client.Client;
+import arhangel.dim.commandHandler.ChatCreateHandler;
+import arhangel.dim.commandHandler.LoginHandler;
 import arhangel.dim.commandHandler.TextHandler;
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.*;
@@ -27,14 +29,16 @@ public class Session implements Runnable, ConnectionHandler {
     static Logger log = LoggerFactory.getLogger(Session.class);
     private User user;
     private Protocol protocol;
-    public Session(InputStream in, OutputStream out, long id, Protocol protocol){
+    public Session(InputStream in, OutputStream out, Protocol protocol){
         this.in = in;
         this.out = out;
         this.protocol = protocol;
+    }
+    public void setUser(Long id, String name){
         user = new User();
         user.setId(id);
+        user.setName(name);
     }
-
     public void run(){
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
@@ -73,12 +77,59 @@ public class Session implements Runnable, ConnectionHandler {
         Type type = msg.getType();
         switch (type) {
             case MSG_TEXT:
-                TextHandler textHandler = new TextHandler();
-                try {
-                    textHandler.execute(this, msg);
-                } catch (CommandException e) {
-                    log.error("Failed to execute textHandler");
+                if (user == null) {
+                    StatusMessage statmesg = new StatusMessage();
+                    statmesg.setText("Unlogged users cannot send messages. Your message is not sent. Log in to send messages.");
+                    try {
+                        send(statmesg);
+                    } catch (Exception e) {
+                        log.error("Failed to send status msg");
+                    }
+                } else {
+                    TextHandler textHandler = new TextHandler();
+                    try {
+                        textHandler.execute(this, msg);
+                    } catch (CommandException e) {
+                        log.error("Failed to execute textHandler");
+                    }
                 }
+                break;
+            case MSG_LOGIN:
+                if (user != null) {
+                    StatusMessage statmesg = new StatusMessage();
+                    statmesg.setText("You are already logged in as "+user.getName());
+                    try {
+                        send(statmesg);
+                    } catch (Exception e) {
+                        log.error("Failed to send status msg");
+                    }
+                } else {
+                    LoginHandler loginHandler = new LoginHandler();
+                    try {
+                        loginHandler.execute(this, msg);
+                    } catch (CommandException e) {
+                        log.error("Failed to execute loginHandler");
+                    }
+                }
+                break;
+            case MSG_CHAT_CREATE:
+                if (user == null) {
+                    StatusMessage statmesg = new StatusMessage();
+                    statmesg.setText("Unlogged users cannot create chats. Your chat is not created. Log in to create chats.");
+                    try {
+                        send(statmesg);
+                    } catch (Exception e) {
+                        log.error("Failed to send status msg");
+                    }
+                } else {
+                    ChatCreateHandler chatCrHandler = new ChatCreateHandler();
+                    try {
+                        chatCrHandler.execute(this, msg);
+                    } catch (CommandException e) {
+                        log.error("Failed to execute chatCrHandler");
+                    }
+                }
+                break;
             default:
                 StatusMessage statmsg = new StatusMessage();
                 statmsg.setText("Wrong type, try again");

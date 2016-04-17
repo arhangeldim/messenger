@@ -7,14 +7,12 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -122,17 +120,27 @@ public class Client implements ConnectionHandler {
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
-                // TODO: реализация
+                LoginMessage loginMsg = new LoginMessage();
+                loginMsg.setLogin(tokens[1]);
+                loginMsg.setPassword(tokens[2]);
+                loginMsg.setType(Type.MSG_LOGIN);
+                send(loginMsg);
                 break;
             case "/help":
-                // TODO: реализация
+                log.info("SOME HELP INFO.");
                 break;
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
+                sendMessage.setChatId(Long.valueOf(tokens[1]).longValue());
+                sendMessage.setText(tokens[2]);
                 send(sendMessage);
+                break;
+            case "/chat_create":
+                ChatCreateMessage crtMsg = new ChatCreateMessage();
+                crtMsg.setUserList(tokens[1].split(","));
+                crtMsg.setType(Type.MSG_CHAT_CREATE);
                 break;
             // TODO: implement another types from wiki
 

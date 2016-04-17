@@ -25,7 +25,6 @@ public class Server {
     private int port;
     private Protocol protocol;
     private int maxConnection = DEFAULT_MAX_CONNECT;
-    private int maxId = 0;
     static Logger log = LoggerFactory.getLogger(Client.class);
 
     private InputStream in;
@@ -58,8 +57,7 @@ public class Server {
                     log.info("Client connected");
                     in = fromclient.getInputStream();
                     out = fromclient.getOutputStream();
-                    Session clientSession = new Session(in, out, maxId, protocol);
-                    maxId += 1;
+                    Session clientSession = new Session(in, out, protocol);
                     clientSession.run();
                 } catch (IOException e) {
                     log.info("Can't accept");

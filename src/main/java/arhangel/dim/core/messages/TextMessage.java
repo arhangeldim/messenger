@@ -21,6 +21,10 @@ public class TextMessage extends Message {
         return chatId;
     }
 
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

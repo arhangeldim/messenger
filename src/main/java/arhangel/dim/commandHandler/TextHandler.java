@@ -23,6 +23,7 @@ public class TextHandler implements Command {
             Statement stmnt = connection.createStatement();
             String sql = "INSERT INTO messages VALUES ("+msg.getSenderId().toString()+","+msg.getChatId().toString()+",'"+msg.getText()+"')";
             stmnt.executeUpdate(sql);
+            stmnt.close();
         } catch (SQLException e) {
             CommandException ex = new CommandException("SQLException");
             throw ex;
