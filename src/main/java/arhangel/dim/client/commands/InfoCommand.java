@@ -29,7 +29,11 @@ public class InfoCommand extends ClientCommandHandler {
             throw new ClientInputException("Too many arguments");
         }
 
-        return new InfoMessage(userId);
+        InfoMessage result = new InfoMessage();
+        result.setId(user.getId());
+        result.setAboutId(userId);
+
+        return result;
     }
 
     @Override

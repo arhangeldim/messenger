@@ -3,7 +3,7 @@ package arhangel.dim.core.messages;
 public class InfoResultMessage extends Message {
     private String info;
 
-    InfoResultMessage() {
+    public InfoResultMessage() {
         super();
         this.setType(Type.MSG_INFO_RESULT);
     }
@@ -14,5 +14,10 @@ public class InfoResultMessage extends Message {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    @Override
+    public String toString() {
+        return "INFO: " + info;
     }
 }

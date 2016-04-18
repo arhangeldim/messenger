@@ -24,14 +24,16 @@ public class ChatHistoryCommand extends GenericCommand {
         ChatHistoryMessage chatHistoryMessage = (ChatHistoryMessage) message;
 
         List<TextMessage> messages;
+        Long chatId = chatHistoryMessage.getChatId();
         try {
-            messages = session.getMessageStore().getMessagesByChatId(chatHistoryMessage.getChatId());
+            messages = session.getMessageStore().getMessagesByChatId(chatId);
         } catch (StorageException e) {
             throw new CommandException("Database failed", e);
         }
 
         ChatHistoryResultMessage resultMessage = new ChatHistoryResultMessage();
         resultMessage.setHistory(messages);
+        resultMessage.setChatId(chatId);
         return resultMessage;
     }
 }

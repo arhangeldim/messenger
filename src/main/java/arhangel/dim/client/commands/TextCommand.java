@@ -30,6 +30,9 @@ public class TextCommand extends ClientCommandHandler {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 2; i < input.length; ++i) {
             stringBuilder.append(input[i]);
+            if (i + 1 != input.length) {
+                stringBuilder.append(" ");
+            }
         }
 
         String text = stringBuilder.toString();
@@ -39,6 +42,6 @@ public class TextCommand extends ClientCommandHandler {
 
     @Override
     String getCommandHelpString() {
-        return String.format("Usage: %s %s", getCommandName(), "<text>");
+        return String.format("Usage: %s %s %s", getCommandName(), "chat_id", "<text>");
     }
 }

@@ -10,6 +10,8 @@ import arhangel.dim.client.commands.UserCreateCommand;
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -118,8 +120,30 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void onMessage(Message msg) {
-        //TODO
         log.info("Message received: {}", msg);
+        if (checkUserStatus(msg)) {
+            System.out.println("Server: " + msg.toString());
+        }
+    }
+
+    private boolean checkUserStatus(Message msg) {
+        if (msg.getType() == Type.MSG_STATUS) {
+            StatusMessage status = (StatusMessage) msg;
+            if (status.getUsername() != null) {
+                user.login(status.getId(), status.getUsername());
+                log.info("Logged in as ({}){}", user.getId(), user.getName());
+            }
+        }
+
+        if (msg.getId() != null) {
+            if (user.isLoginnedFlag()) {
+                if (msg.getId().equals(user.getId())) {
+                    log.error("Wrong receiver");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -134,7 +158,14 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+        socketThread.interrupt();
+        try {
+            in.close();
+            out.close();
+            socketThread.join();
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws Exception {

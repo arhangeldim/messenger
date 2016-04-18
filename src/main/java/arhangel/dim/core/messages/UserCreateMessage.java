@@ -4,9 +4,9 @@ public class UserCreateMessage extends Message {
     private String username;
     private String password;
 
-    UserCreateMessage() {
+    public UserCreateMessage() {
         super();
-        this.setType(Type.MSG_STATUS);
+        this.setType(Type.MSG_USER_CREATE);
     }
 
     public String getUsername() {

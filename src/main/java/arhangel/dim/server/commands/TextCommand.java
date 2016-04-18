@@ -8,6 +8,8 @@ import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.store.StorageException;
 import arhangel.dim.server.Session;
 
+import java.util.Date;
+
 public class TextCommand extends GenericCommand {
     @Override
     boolean checkMessage(Message message) {
@@ -19,11 +21,13 @@ public class TextCommand extends GenericCommand {
         TextMessage textMessage = (TextMessage) message;
         Long chatId = textMessage.getChatId();
         try {
+            textMessage.setDate(new Date(System.currentTimeMillis()));
             Long messageId = session.getMessageStore().addTextMessage(chatId, textMessage);
         } catch (StorageException e) {
             throw new CommandException("Database failed", e);
         }
         StatusMessage answer = new StatusMessage();
+        answer.setId(message.getId());
         answer.setText("Message sent");
         return answer;
     }

@@ -21,13 +21,14 @@ public class ChatCreateCommand extends GenericCommand {
     public Message handleMessage(Session session, Message message) throws CommandException {
         ChatCreateMessage chatCreateMessage = (ChatCreateMessage) message;
         //TODO old chat for 2 users
-        Long chatId = null;
+        Long chatId;
         try {
             chatId = session.getMessageStore().addChat(chatCreateMessage.getParticipants());
         } catch (StorageException e) {
             throw new CommandException("Database failed", e);
         }
         StatusMessage answerMessage = new StatusMessage();
+        answerMessage.setId(message.getId());
         answerMessage.setText(
                 String.format("Chat #%d with participants %s created\n",
                         chatId,

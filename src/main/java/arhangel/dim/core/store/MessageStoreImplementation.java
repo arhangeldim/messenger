@@ -17,7 +17,7 @@ public class MessageStoreImplementation implements MessageStore {
         this.connection = connection;
     }
 
-    Long getCreatedId(PreparedStatement statement) throws SQLException {
+    private Long getCreatedId(PreparedStatement statement) throws SQLException {
         statement.getGeneratedKeys();
         Long result;
         try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -102,8 +102,9 @@ public class MessageStoreImplementation implements MessageStore {
     @Override
     public Long addTextMessage(Long chatId, TextMessage message) throws StorageException {
         //TODO chat existence check
+        // Insert message
         String sql = "INSERT INTO textmessages(text, text_date) VALUES(?, ?)";
-        Long result = null;
+        Long result;
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, message.getText());
             stmt.setDate(2, new java.sql.Date(message.getDate().getTime()));
@@ -117,6 +118,17 @@ public class MessageStoreImplementation implements MessageStore {
         } catch (SQLException e) {
             throw new StorageException(e);
         }
+
+        //insert message in chat
+        sql = "INSERT INTO chat_messages(chat_id, message_id) VALUES(?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, chatId);
+            stmt.setLong(2, result);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+
         return result;
     }
 }

@@ -33,6 +33,8 @@ public class LoginCommand extends GenericCommand {
             answer.setText("Login or password is wrong");
         } else {
             session.setUser(user);
+            answer.setId(user.getId());
+            answer.setUsername(user.getName());
             answer.setText(String.format("Logged in as %s, id#%d", username, user.getId()));
         }
         return answer;

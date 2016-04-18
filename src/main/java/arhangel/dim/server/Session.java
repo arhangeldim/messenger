@@ -27,7 +27,7 @@ import java.util.Arrays;
  * - объект User - описание пользователя
  * - сокеты на чтение/запись данных в канал пользователя
  */
-public class Session implements ConnectionHandler, Runnable {
+public class Session implements ConnectionHandler, Runnable, AutoCloseable {
 
     private User user;
 
@@ -86,10 +86,11 @@ public class Session implements ConnectionHandler, Runnable {
     @Override
     public void close() {
         try {
-            Thread.currentThread().interrupt();
+            log.info("Session closed");
             in.close();
             out.close();
             connection.close();
+            Thread.currentThread().interrupt();
         } catch (IOException | SQLException e) {
             log.error("Cannot close resources");
             e.printStackTrace();
@@ -108,6 +109,10 @@ public class Session implements ConnectionHandler, Runnable {
                 if (read > 0) {
                     Message msg = protocol.decode(Arrays.copyOf(buf, read));
                     onMessage(msg);
+                } else {
+                    if (read == -1) {
+                        close();
+                    }
                 }
             } catch (Exception e) {
                 log.error("Server error", e);

@@ -3,8 +3,9 @@ package arhangel.dim.core.messages;
 
 public class StatusMessage extends Message {
     private String text;
+    private String username;
 
-    StatusMessage() {
+    public StatusMessage() {
         super();
         this.setType(Type.MSG_STATUS);
     }
@@ -21,6 +22,14 @@ public class StatusMessage extends Message {
     public String toString() {
         return "{" + super.toString() +
                 ", text=\"" + text +
-                "\"}";
+                "\" }";
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

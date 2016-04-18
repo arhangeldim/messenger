@@ -1,11 +1,18 @@
 package arhangel.dim.core.messages;
 
 public class InfoMessage extends Message {
+    private Long aboutId;
 
-    public InfoMessage(Long userId) {
+    public InfoMessage() {
         super();
         this.setType(Type.MSG_INFO);
-        this.setSenderId(userId);
     }
 
+    public Long getAboutId() {
+        return aboutId;
+    }
+
+    public void setAboutId(Long aboutId) {
+        this.aboutId = aboutId;
+    }
 }

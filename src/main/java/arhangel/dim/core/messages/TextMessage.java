@@ -17,7 +17,7 @@ public class TextMessage extends Message {
     }
 
     public TextMessage(Long chatId, String text) {
-        super();
+        this();
         this.setChatId(chatId);
         this.setText(text);
     }
