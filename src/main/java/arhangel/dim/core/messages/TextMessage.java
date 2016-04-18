@@ -12,10 +12,12 @@ public class TextMessage extends Message {
     private Date date;
 
     public TextMessage() {
+        super();
         this.setType(Type.MSG_TEXT);
     }
 
     public TextMessage(Long chatId, String text) {
+        super();
         this.setChatId(chatId);
         this.setText(text);
     }

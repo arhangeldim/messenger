@@ -5,6 +5,11 @@ import java.util.List;
 public class ChatListResultMessage extends Message {
     private List<Long> chats;
 
+    ChatListResultMessage() {
+        super();
+        this.setType(Type.MSG_CHAT_LIST_RESULT);
+    }
+
     public List<Long> getChats() {
         return chats;
     }

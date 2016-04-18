@@ -168,8 +168,8 @@ public class Client implements ConnectionHandler {
 
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
-            System.out.println("$");
             while (true) {
+                System.out.print("$");
                 String input = scanner.nextLine();
                 if ("q".equals(input)) {
                     return;
