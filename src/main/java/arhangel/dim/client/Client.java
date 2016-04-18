@@ -172,7 +172,9 @@ public class Client implements ConnectionHandler {
                 }
                 try {
                     Message message = commandlineHandler.handleCommandline(input, client.user);
-                    client.send(message);
+                    if (message != null) {
+                        client.send(message);
+                    }
                 } catch (ProtocolException | IOException e) {
                     log.error("Failed to process user input", e);
                 }

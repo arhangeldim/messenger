@@ -142,7 +142,7 @@ public class Container {
                         case "Double":
                             setter.invoke(ob, Double.parseDouble(value));
                             break;
-                        case "String":
+                        case "java.lang.String":
                             setter.invoke(ob, value);
                             break;
                         default:

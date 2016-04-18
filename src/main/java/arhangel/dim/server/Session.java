@@ -7,12 +7,17 @@ import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.store.MessageStore;
+import arhangel.dim.core.store.MessageStoreImplementation;
 import arhangel.dim.core.store.UserStore;
+import arhangel.dim.core.store.UserStoreImplementation;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 /**
@@ -27,8 +32,10 @@ public class Session implements ConnectionHandler, Runnable {
     // сокет на клиента
     private Socket socket;
 
+    private Connection connection;
     private MessageStore messageStore;
     private UserStore userStore;
+
 
     /**
      * С каждым сокетом связано 2 канала in/out
@@ -40,12 +47,18 @@ public class Session implements ConnectionHandler, Runnable {
 
     private CommandExecutor commandExecutor;
 
-    public Session(Socket socket, Protocol protocol, CommandExecutor commandExecutor) throws IOException {
+    public Session(Socket socket, Protocol protocol, CommandExecutor commandExecutor) throws IOException, ClassNotFoundException, SQLException {
         this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         this.protocol = protocol;
         this.commandExecutor = commandExecutor;
+
+        Class.forName("org.postgresql.Driver");
+        this.connection = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/dmitryKonturov",
+                "trackuser", "trackuser");
+        this.messageStore = new MessageStoreImplementation(connection);
+        this.userStore = new UserStoreImplementation(connection);
     }
 
     @Override
@@ -70,7 +83,8 @@ public class Session implements ConnectionHandler, Runnable {
             Thread.currentThread().interrupt();
             in.close();
             out.close();
-        } catch (IOException e) {
+            connection.close();
+        } catch (IOException | SQLException e) {
             //TODO
             e.printStackTrace();
         }

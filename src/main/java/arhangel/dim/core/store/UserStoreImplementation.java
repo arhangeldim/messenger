@@ -12,7 +12,7 @@ import java.sql.Statement;
 public class UserStoreImplementation implements UserStore {
     private Connection connection;
 
-    UserStoreImplementation(Connection connection) {
+    public UserStoreImplementation(Connection connection) {
         this.connection = connection;
     }
 

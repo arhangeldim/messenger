@@ -13,7 +13,7 @@ import java.util.List;
 public class MessageStoreImplementation implements MessageStore {
     private Connection connection;
 
-    MessageStoreImplementation(Connection connection) {
+    public MessageStoreImplementation(Connection connection) {
         this.connection = connection;
     }
 

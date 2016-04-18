@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  * Основной класс для сервера сообщений
@@ -45,7 +46,7 @@ public class Server {
             Container context = new Container("server.xml");
             server = (Server) context.getByName("server");
         } catch (InvalidConfigurationException e) {
-            log.error("Failed to create client", e);
+            log.error("Failed to create server", e);
             return;
         }
 
@@ -61,15 +62,33 @@ public class Server {
                 .addCommand(Type.MSG_USER_CREATE, new UserCreateCommand());
 
         try {
-            server.serverSocket = new ServerSocket(server.port);
-            //TODO
+            server.serverSocket = new ServerSocket(server.getPort());
+            //TODO Thread pool
             while (true) {
                 Socket socket = server.serverSocket.accept();
-                new Thread(new Session(socket, server.protocol, commandExecutor)).start();
+                log.info("New session");
+                new Thread(new Session(socket, server.getProtocol(), commandExecutor)).start();
             }
-        } catch (IOException e) {
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            log.error("Cannot start new session", e);
             e.printStackTrace();
         }
 
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public Protocol getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
     }
 }
