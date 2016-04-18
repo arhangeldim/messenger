@@ -9,10 +9,9 @@ import java.io.PrintStream;
 
 public abstract class ClientCommandHandler {
 
-    private String commandName;
-
     PrintStream userOutput;
     InputStream userInput;
+    private String commandName;
 
     public ClientCommandHandler(String name, InputStream input, PrintStream output) {
         commandName = name;

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 public class SimpleThread {
 
 
-
     public static void main(String[] args) throws Exception {
         inParallel();
 //        start();

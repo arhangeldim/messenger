@@ -12,7 +12,7 @@ import java.util.Map;
 public class Container {
     private List<Bean> beans;
     private Map<String, Object> objectByName;
-    private  Map<String, Object> objectByClass;
+    private Map<String, Object> objectByClass;
 
     /**
      * Если не получается считать конфиг, то бросьте исключение

@@ -23,7 +23,7 @@ public class UserStoreImplementation implements UserStore {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, userId);
             ResultSet resultSet = stmt.executeQuery();
-            if  (resultSet.next()) {
+            if (resultSet.next()) {
                 result = resultSet.getString("login");
             } else {
                 throw new StorageException("No such user");

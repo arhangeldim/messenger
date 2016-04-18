@@ -32,13 +32,12 @@ public class Client implements ConnectionHandler {
 
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
-     * */
+     */
     private static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
-     *
-     * */
+     */
     private Protocol protocol;
     private int port;
     private String host;
@@ -58,6 +57,61 @@ public class Client implements ConnectionHandler {
      * Текущий пользователь
      */
     private ClientUser user;
+
+    public static void main(String[] args) throws Exception {
+
+        Client client;
+        // Пользуемся механизмом контейнера
+        try {
+            Container context = new Container("client.xml");
+            client = (Client) context.getByName("client");
+        } catch (InvalidConfigurationException e) {
+            log.error("Failed to create client", e);
+            return;
+        }
+
+        log.debug("Client created");
+
+        ClientMessageCreator commandlineHandler = new ClientMessageCreator()
+                .addHandler(new ChatCreateCommand("/chat_create"))
+                .addHandler(new ChatHistoryCommand("/chat_history"))
+                .addHandler(new ChatListCommand("/chat_list"))
+                .addHandler(new InfoCommand("/info"))
+                .addHandler(new LoginCommand("/login"))
+                .addHandler(new TextCommand("/text"))
+                .addHandler(new UserCreateCommand("/user_create"));
+
+        log.debug("commandLineHandler created");
+
+        try {
+            client.initSocket();
+            client.user = new ClientUser();
+
+            // Цикл чтения с консоли
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                System.out.print("$");
+                String input = scanner.nextLine();
+                if ("q".equals(input)) {
+                    return;
+                }
+                try {
+                    Message message = commandlineHandler.handleCommandline(input, client.user);
+                    if (message != null) {
+                        client.send(message);
+                    }
+                } catch (ProtocolException | IOException e) {
+                    log.error("Failed to process user input", e);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Application failed.", e);
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+        }
+    }
 
     public Protocol getProtocol() {
         return protocol;
@@ -165,61 +219,6 @@ public class Client implements ConnectionHandler {
             socketThread.join();
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        Client client;
-        // Пользуемся механизмом контейнера
-        try {
-            Container context = new Container("client.xml");
-            client = (Client) context.getByName("client");
-        } catch (InvalidConfigurationException e) {
-            log.error("Failed to create client", e);
-            return;
-        }
-
-        log.debug("Client created");
-
-        ClientMessageCreator commandlineHandler = new ClientMessageCreator()
-                .addHandler(new ChatCreateCommand("/chat_create"))
-                .addHandler(new ChatHistoryCommand("/chat_history"))
-                .addHandler(new ChatListCommand("/chat_list"))
-                .addHandler(new InfoCommand("/info"))
-                .addHandler(new LoginCommand("/login"))
-                .addHandler(new TextCommand("/text"))
-                .addHandler(new UserCreateCommand("/user_create"));
-
-        log.debug("commandLineHandler created");
-
-        try {
-            client.initSocket();
-            client.user = new ClientUser();
-
-            // Цикл чтения с консоли
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print("$");
-                String input = scanner.nextLine();
-                if ("q".equals(input)) {
-                    return;
-                }
-                try {
-                    Message message = commandlineHandler.handleCommandline(input, client.user);
-                    if (message != null) {
-                        client.send(message);
-                    }
-                } catch (ProtocolException | IOException e) {
-                    log.error("Failed to process user input", e);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Application failed.", e);
-        } finally {
-            if (client != null) {
-                client.close();
-            }
         }
     }
 }

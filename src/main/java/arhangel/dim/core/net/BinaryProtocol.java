@@ -14,16 +14,6 @@ import java.nio.ByteBuffer;
  */
 public class BinaryProtocol implements Protocol {
 
-    private class ChecksumMessage {
-        int size;
-        Message message;
-
-        ChecksumMessage(int size, Message message) {
-            this.size = size;
-            this.message = message;
-        }
-    }
-
     @Override
     public Message decode(byte[] bytes) throws ProtocolException {
         try {
@@ -47,7 +37,7 @@ public class BinaryProtocol implements Protocol {
     @Override
     public byte[] encode(Message msg) throws ProtocolException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
             oos.writeObject(msg);
             oos.flush();
 
@@ -63,6 +53,16 @@ public class BinaryProtocol implements Protocol {
             throw new ProtocolException(e);
         }
 
+    }
+
+    private class ChecksumMessage {
+        int size;
+        Message message;
+
+        ChecksumMessage(int size, Message message) {
+            this.size = size;
+            this.message = message;
+        }
     }
 
 }

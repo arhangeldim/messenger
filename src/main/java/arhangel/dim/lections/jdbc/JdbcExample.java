@@ -126,7 +126,6 @@ public class JdbcExample {
 //        rs = prepStmnt.executeQuery();
 
 
-
         /**
          * Использование executor для запроса в базу
          */
@@ -165,11 +164,7 @@ public class JdbcExample {
         System.out.println(users.toString());
 
 
-
-
-
     }
-
 
 
 }

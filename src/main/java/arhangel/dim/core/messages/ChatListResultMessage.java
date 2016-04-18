@@ -5,14 +5,14 @@ import java.util.List;
 public class ChatListResultMessage extends Message {
     private List<Long> chats;
 
-    @Override
-    public String toString() {
-        return super.toString() + "[" + chats.toString() + "]";
-    }
-
     public ChatListResultMessage() {
         super();
         this.setType(Type.MSG_CHAT_LIST_RESULT);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "[" + chats.toString() + "]";
     }
 
     public List<Long> getChats() {

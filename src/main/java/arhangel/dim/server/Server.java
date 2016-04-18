@@ -25,19 +25,12 @@ import java.sql.SQLException;
 public class Server {
 
     public static final int DEFAULT_MAX_CONNECT = 16;
-
+    private static Logger log = LoggerFactory.getLogger(Server.class);
     // Засетить из конфига
     private int port;
     private Protocol protocol;
     private int maxConnection = DEFAULT_MAX_CONNECT;
-
-    private static Logger log = LoggerFactory.getLogger(Server.class);
-
     private ServerSocket serverSocket;
-
-    public void stop() {
-        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
-    }
 
     public static void main(String[] args) {
         Server server;
@@ -78,6 +71,10 @@ public class Server {
             e.printStackTrace();
         }
 
+    }
+
+    public void stop() {
+        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
     }
 
     public int getPort() {

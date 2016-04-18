@@ -24,6 +24,7 @@ class ClientMessageCreator {
 
     /**
      * Add new handler or overwrite old one.
+     *
      * @param handler handler of the command
      */
     ClientMessageCreator addHandler(ClientCommandHandler handler) {

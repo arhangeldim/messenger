@@ -17,10 +17,12 @@ class Test implements Serializable, Cloneable {
 
     }
 
-    public Test(Object field) { }
+    public Test(Object field) {
+    }
 
     @Deprecated
-    protected static void method(String[] params) { }
+    protected static void method(String[] params) {
+    }
 
 
     public void foo() {

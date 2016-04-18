@@ -5,12 +5,6 @@ package arhangel.dim.container.dag;
  */
 public class Vertex<V> {
 
-    public enum State {
-        DEFAULT,
-        MARKED,
-        VISITED
-    }
-
     private V value;
     private State state = State.DEFAULT;
 
@@ -40,5 +34,11 @@ public class Vertex<V> {
                 "value=" + value +
                 ", state=" + state +
                 '}';
+    }
+
+    public enum State {
+        DEFAULT,
+        MARKED,
+        VISITED
     }
 }

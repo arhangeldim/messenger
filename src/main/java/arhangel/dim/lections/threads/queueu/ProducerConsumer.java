@@ -9,6 +9,12 @@ public class ProducerConsumer {
 
     static boolean isReady = false;
 
+    public static void main(String[] args) {
+        Object lock = new Object();
+        new Consumer(lock).start();
+        new Producer(lock).start();
+    }
+
     static class Producer extends Thread {
         private final Object lock;
 
@@ -63,11 +69,5 @@ public class ProducerConsumer {
             }
         }
 
-    }
-
-    public static void main(String[] args) {
-        Object lock = new Object();
-        new Consumer(lock).start();
-        new Producer(lock).start();
     }
 }

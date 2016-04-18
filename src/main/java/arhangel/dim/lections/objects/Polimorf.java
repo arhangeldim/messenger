@@ -13,27 +13,6 @@ public class Polimorf {
 
     private static Logger log = LoggerFactory.getLogger(Polimorf.class);
 
-    static class Parent {
-        void test() {
-            System.out.println("parent::test()");
-        }
-
-        void testParent() {
-            System.out.println("parent::testParent()");
-        }
-    }
-
-    static class Child extends Parent {
-        @Override
-        void test() {
-            System.out.println("child::test()");
-        }
-
-        void testChild() {
-            System.out.println("child::testParent()");
-        }
-    }
-
     public static void main(String[] args) {
         Parent item = new Child();
 
@@ -67,5 +46,26 @@ public class Polimorf {
         // list.stream().forEach(Parent::test);
 
 
+    }
+
+    static class Parent {
+        void test() {
+            System.out.println("parent::test()");
+        }
+
+        void testParent() {
+            System.out.println("parent::testParent()");
+        }
+    }
+
+    static class Child extends Parent {
+        @Override
+        void test() {
+            System.out.println("child::test()");
+        }
+
+        void testChild() {
+            System.out.println("child::testParent()");
+        }
     }
 }

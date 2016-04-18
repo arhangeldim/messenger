@@ -60,9 +60,9 @@ public class MessageStoreImplementation implements MessageStore {
     @Override
     public List<TextMessage> getMessagesByChatId(Long chatId) throws StorageException {
         String sql = "SELECT * FROM " +
-                     "chat_messages INNER JOIN textmessages " +
-                     "ON chat_messages.message_id = textmessages.text_id " +
-                     "WHERE chat_messages.chat_id = ?;";
+                "chat_messages INNER JOIN textmessages " +
+                "ON chat_messages.message_id = textmessages.text_id " +
+                "WHERE chat_messages.chat_id = ?;";
         List<TextMessage> resultList = new LinkedList<>();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, chatId);
