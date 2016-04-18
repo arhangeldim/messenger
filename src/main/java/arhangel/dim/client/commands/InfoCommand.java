@@ -31,4 +31,9 @@ public class InfoCommand extends ClientCommandHandler {
 
         return new InfoMessage(userId);
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s %s", getCommandName(), "<user_id>");
+    }
 }

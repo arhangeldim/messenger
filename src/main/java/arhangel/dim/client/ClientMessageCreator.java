@@ -33,9 +33,10 @@ class ClientMessageCreator {
 
     private String getHelp() {
         StringBuilder builder = new StringBuilder();
-        builder.append("/help: Write all available commands\n");
+        builder.append("/help           : Write all available commands\n");
         for (ClientCommandHandler handler : shellCommands.values()) {
             builder.append(handler.getCommandHelp());
+            builder.append('\n');
         }
         return builder.toString();
     }

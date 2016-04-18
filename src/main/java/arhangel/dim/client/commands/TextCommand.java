@@ -36,4 +36,9 @@ public class TextCommand extends ClientCommandHandler {
 
         return new TextMessage(chatId, text);
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s %s", getCommandName(), "<text>");
+    }
 }

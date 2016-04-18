@@ -41,4 +41,9 @@ public class UserCreateCommand extends ClientCommandHandler {
 
         return message;
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s %s %s", getCommandName(), "<login>", "<password>");
+    }
 }

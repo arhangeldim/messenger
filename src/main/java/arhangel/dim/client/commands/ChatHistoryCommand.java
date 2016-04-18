@@ -27,4 +27,9 @@ public class ChatHistoryCommand extends ClientCommandHandler {
 
         return new ChatHistoryMessage(chatId);
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s %s", getCommandName(), "<chat_id>");
+    }
 }

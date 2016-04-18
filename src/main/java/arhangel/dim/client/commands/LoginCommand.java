@@ -37,4 +37,9 @@ public class LoginCommand extends ClientCommandHandler {
 
         return new LoginMessage(username, password);
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s %s %s", getCommandName(), "<login>", "<password>");
+    }
 }

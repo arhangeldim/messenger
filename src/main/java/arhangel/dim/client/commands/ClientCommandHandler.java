@@ -40,7 +40,11 @@ public abstract class ClientCommandHandler {
         return commandName;
     }
 
+    String getCommandHelpString() {
+        return "No information";
+    }
+
     public String getCommandHelp() {
-        return commandName + ": No description\n";
+        return String.format("%-16s:  %s", getCommandName(), getCommandHelpString());
     }
 }

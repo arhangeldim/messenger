@@ -46,4 +46,9 @@ public class ChatCreateCommand extends ClientCommandHandler {
 
         return new ChatCreateMessage(participants);
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s %s", getCommandName(), "<user_id list>");
+    }
 }

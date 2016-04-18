@@ -23,11 +23,11 @@ public class CommandExecutor {
     void handleMessage(Message message, Session session) throws CommandException {
         Type messageType = message.getType();
         if (messageType == null) {
-            // TODO: 16.04.16 not expected
+            throw new CommandException("Message type is null");
         } else if (commands.containsKey(messageType)) {
             commands.get(messageType).execute(session, message);
         } else {
-            // TODO: 16.04.16 not found
+            throw new CommandException("Undefined message type");
         }
     }
 }

@@ -18,4 +18,9 @@ public class ChatListCommand extends ClientCommandHandler {
         message.setSenderId(user.getId());
         return message;
     }
+
+    @Override
+    String getCommandHelpString() {
+        return String.format("Usage: %s", getCommandName());
+    }
 }
