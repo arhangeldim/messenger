@@ -1,6 +1,6 @@
 package arhangel.dim.core.messages;
 
-import arhangel.dim.core.net.Session;
+import arhangel.dim.server.Session;
 
 // TODO: на каждое сообщение завести обработчик-команду
 public interface Command {

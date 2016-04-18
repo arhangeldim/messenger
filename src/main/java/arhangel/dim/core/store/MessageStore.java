@@ -1,44 +1,20 @@
 package arhangel.dim.core.store;
 
-import java.util.List;
+import arhangel.dim.core.messages.TextMessage;
 
-import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.Message;
+import java.util.List;
 
 /**
  * Хранилище информации о сообщениях
  */
 public interface MessageStore {
 
-    /**
-     * получаем список ид пользователей заданного чата
-     */
-    List<Long> getChatsByUserId(Long userId);
+    Long addChat(List<Long> participants) throws StorageException;
 
-    /**
-     * получить информацию о чате
-     */
-    Chat getChatById(Long chatId);
+    List<TextMessage> getMessagesByChatId(Long chatId) throws StorageException;
 
-    /**
-     * Список сообщений из чата
-     */
-    List<Long> getMessagesFromChat(Long chatId);
+    List<Long> getChatsByUserId(Long userId) throws StorageException;
 
-    /**
-     * Получить информацию о сообщении
-     */
-    Message getMessageById(Long messageId);
-
-    /**
-     * Добавить сообщение в чат
-     */
-    void addMessage(Long chatId, Message message);
-
-    /**
-     * Добавить пользователя к чату
-     */
-    void addUserToChat(Long userId, Long chatId);
-
+    Long addTextMessage(Long chatId, TextMessage message) throws StorageException;
 
 }

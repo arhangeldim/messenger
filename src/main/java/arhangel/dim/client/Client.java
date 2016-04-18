@@ -6,6 +6,7 @@ import arhangel.dim.client.commands.ChatListCommand;
 import arhangel.dim.client.commands.InfoCommand;
 import arhangel.dim.client.commands.LoginCommand;
 import arhangel.dim.client.commands.TextCommand;
+import arhangel.dim.client.commands.UserCreateCommand;
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.messages.Message;
@@ -117,6 +118,7 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void onMessage(Message msg) {
+        //TODO
         log.info("Message received: {}", msg);
     }
 
@@ -147,13 +149,14 @@ public class Client implements ConnectionHandler {
             return;
         }
 
-        ClientMessageCreator comandlineHandler = new ClientMessageCreator()
+        ClientMessageCreator commandlineHandler = new ClientMessageCreator()
                 .addHandler(new ChatCreateCommand("/chat_create"))
                 .addHandler(new ChatHistoryCommand("/chat_history"))
                 .addHandler(new ChatListCommand("/chat_list"))
                 .addHandler(new InfoCommand("/info"))
                 .addHandler(new LoginCommand("/login"))
-                .addHandler(new TextCommand("/text"));
+                .addHandler(new TextCommand("/text"))
+                .addHandler(new UserCreateCommand("/user_create"));
 
         try {
             client.initSocket();
@@ -168,7 +171,7 @@ public class Client implements ConnectionHandler {
                     return;
                 }
                 try {
-                    Message message = comandlineHandler.handleCommandline(input, client.user);
+                    Message message = commandlineHandler.handleCommandline(input, client.user);
                     client.send(message);
                 } catch (ProtocolException | IOException e) {
                     log.error("Failed to process user input", e);

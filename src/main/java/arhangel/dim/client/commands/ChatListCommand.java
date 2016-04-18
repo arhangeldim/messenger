@@ -14,7 +14,8 @@ public class ChatListCommand extends ClientCommandHandler {
     @Override
     public Message handleInput(String[] input, ClientUser user) throws ClientInputException {
         this.checkUserLogin(user);
-
-        return new ChatListMessage();
+        ChatListMessage message = new ChatListMessage();
+        message.setSenderId(user.getId());
+        return message;
     }
 }
