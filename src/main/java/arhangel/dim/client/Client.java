@@ -149,6 +149,8 @@ public class Client implements ConnectionHandler {
             return;
         }
 
+        log.debug("Client created");
+
         ClientMessageCreator commandlineHandler = new ClientMessageCreator()
                 .addHandler(new ChatCreateCommand("/chat_create"))
                 .addHandler(new ChatHistoryCommand("/chat_history"))
@@ -157,6 +159,8 @@ public class Client implements ConnectionHandler {
                 .addHandler(new LoginCommand("/login"))
                 .addHandler(new TextCommand("/text"))
                 .addHandler(new UserCreateCommand("/user_create"));
+
+        log.debug("commandLineHandler created");
 
         try {
             client.initSocket();

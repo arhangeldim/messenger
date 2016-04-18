@@ -36,6 +36,7 @@ public class Session implements ConnectionHandler, Runnable {
     private MessageStore messageStore;
     private UserStore userStore;
 
+    //private Logger log = LoggerFactory.getLogger(Session.class);
 
     /**
      * С каждым сокетом связано 2 канала in/out
@@ -48,27 +49,34 @@ public class Session implements ConnectionHandler, Runnable {
     private CommandExecutor commandExecutor;
 
     public Session(Socket socket, Protocol protocol, CommandExecutor commandExecutor) throws IOException, ClassNotFoundException, SQLException {
+        System.out.println("Session create started");
         this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         this.protocol = protocol;
         this.commandExecutor = commandExecutor;
 
+        System.out.println("Get database connection");
         Class.forName("org.postgresql.Driver");
         this.connection = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/dmitryKonturov",
                 "trackuser", "trackuser");
         this.messageStore = new MessageStoreImplementation(connection);
         this.userStore = new UserStoreImplementation(connection);
+
+        //TODO remove print
+        System.out.println("Session created");
     }
 
     @Override
     public void send(Message msg) throws ProtocolException, IOException {
+        //log.info("Sending message: {}", msg);
         out.write(protocol.encode(msg));
         out.flush();
     }
 
     @Override
     public void onMessage(Message msg) {
+        //log.info("Handling message: {}", msg);
         try {
             commandExecutor.handleMessage(msg, this);
         } catch (CommandException e) {
@@ -93,16 +101,21 @@ public class Session implements ConnectionHandler, Runnable {
     @Override
     public void run() {
         //TODO
+        //TODO remove print
+        System.out.println("Session running");
+
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 int read = in.read(buf);
+         //       log.info("Incoming message");
+                System.out.println("Incoming");
                 if (read > 0) {
                     Message msg = protocol.decode(Arrays.copyOf(buf, read));
                     onMessage(msg);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+         //       log.error("Server error", e);
                 Thread.currentThread().interrupt();
             }
         }

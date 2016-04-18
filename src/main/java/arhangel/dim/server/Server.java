@@ -67,7 +67,11 @@ public class Server {
             while (true) {
                 Socket socket = server.serverSocket.accept();
                 log.info("New session");
-                new Thread(new Session(socket, server.getProtocol(), commandExecutor)).start();
+                Session session = new Session(socket, server.getProtocol(), commandExecutor);
+                Thread newWorker = new Thread(session);
+                log.info("Worker created");
+                newWorker.start();
+                log.info("Worker started");
             }
         } catch (IOException | SQLException | ClassNotFoundException e) {
             log.error("Cannot start new session", e);
