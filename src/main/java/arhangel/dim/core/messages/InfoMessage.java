@@ -2,9 +2,7 @@ package arhangel.dim.core.messages;
 
 import java.util.Objects;
 
-/**
- * Created by philip on 12.04.16.
- */
+
 public class InfoMessage extends Message {
     private long id;
 

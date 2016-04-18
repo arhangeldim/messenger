@@ -1,8 +1,6 @@
 package arhangel.dim.core.messages;
 
-/**
- * Created by philip on 14.04.16.
- */
+
 public class InfoResultMessage extends Message {
     private long id;
     private String login;

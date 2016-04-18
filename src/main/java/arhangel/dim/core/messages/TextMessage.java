@@ -4,9 +4,7 @@ import arhangel.dim.core.User;
 
 import java.util.Objects;
 
-/**
- * Простое текстовое сообщение
- */
+
 public class TextMessage extends Message {
     private String text;
     private Long chatId;

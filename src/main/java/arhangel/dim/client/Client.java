@@ -25,6 +25,7 @@ public class Client implements ConnectionHandler {
     private String host;
 
     private Thread socketThread;
+    private Socket socket;
     private InputStream in;
     private OutputStream out;
 
@@ -49,11 +50,15 @@ public class Client implements ConnectionHandler {
     public InputStream getIn() {
         return in;
     }
+
+    public Thread getSocketThread() { return socketThread;}
+    public Socket getSocket() { return socket;}
+
     public void setUserId(Long userId) { this.userId = userId;}
     public Long getUserId() { return userId;}
 
     public void initSocket() throws IOException {
-        Socket socket = new Socket(host, port);
+        socket = new Socket(host, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
 
@@ -173,8 +178,13 @@ public class Client implements ConnectionHandler {
     }
 
     @Override
-    public void close() {
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+    public void close() throws IOException {
+        if ( !getSocket().isClosed()) {
+            getSocket().close();
+        }
+        if( !getSocketThread().isInterrupted()) {
+            getSocketThread().interrupt();
+        }
     }
 
     public static void main(String[] args) throws Exception {

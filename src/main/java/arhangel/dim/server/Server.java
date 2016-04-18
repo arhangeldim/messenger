@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Основной класс для сервера сообщений
- */
+
 public class Server {
 
     public static final int DEFAULT_MAX_CONNECT = 16;
@@ -53,13 +51,12 @@ public class Server {
     public Protocol getProtocol() { return protocol;}
 
     public void stop() {
-        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
+        threadPool.shutdown();
     }
 
     public Message recieve() throws IOException, ProtocolException {
         byte[] buf = new byte[1024 * 500];
         int readBytes = in.read(buf);
-
         return protocol.decode(buf);
     }
 
@@ -70,16 +67,15 @@ public class Server {
     public void send(Message msg) throws IOException, ProtocolException {
         log.info(msg.toString());
         out.write(protocol.encode(msg));
-        out.flush(); // принудительно проталкиваем буфер с данными
-        out.close();
+        out.flush();
     }
 
 
     public static void main(String[] args) {
-
+        Server server = null;
         try {
             Container context = new Container("server.xml");
-            Server server = (Server) context.getByName("server");
+            server = (Server) context.getByName("server");
             ServerSocket serverSocket = new ServerSocket(server.getPort());
 
             System.out.println("Started, waiting for connection");
@@ -91,37 +87,13 @@ public class Server {
                 System.out.println("Accepted. " + clientSocket.getInetAddress());
                 Session session = new Session(clientSocket, server);
                 server.getSessionList().add(session);
-
-
-              server.threadPool.execute(session);
-              /* while (true) {
-                    byte[] buf = new byte[1024 * 500];
-                    int readBytes = 0;
-                    try {
-                        readBytes = session.getIn().read(buf);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (readBytes > 0) {
-                        Message msg = null;
-                        try {
-                            msg = server.getProtocol().decode(buf);
-                        } catch (ProtocolException e) {
-                            e.printStackTrace();
-                        }
-                        session.onMessage(msg);
-                    }
-                }
-                */
+                server.threadPool.execute(session);
             }
-           server.threadPool.shutdown();
-
-            } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            } finally {
+        } finally {
+            server.stop();
 
-            }
-
+        }
     }
 }

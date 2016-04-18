@@ -52,13 +52,14 @@ public class Session implements ConnectionHandler, Runnable {
     public InputStream getIn() {
         return in;
     }
+    public Socket getSocket() { return this.socket;}
     public Server getSessionServer() { return sessionServer;}
     public void setUser(User user) { this.user = user;}
     public User getUser() { return this.user;}
 
     @Override
     public void run() {
-        while (true) {
+        while (!getSocket().isClosed()) {
             byte[] buf = new byte[1024 * 500];
             int readBytes = 0;
             try {
@@ -68,7 +69,6 @@ public class Session implements ConnectionHandler, Runnable {
             }
 
             if (readBytes > 0) {
-                //  executor.submit(new Worker(server, buf));
                 Message msg = null;
                 try {
                     msg = protocol.decode(buf);

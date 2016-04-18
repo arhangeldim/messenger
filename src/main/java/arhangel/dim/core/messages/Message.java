@@ -3,9 +3,7 @@ package arhangel.dim.core.messages;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- * Базовый класс для всех сообщений
- */
+
 public abstract class Message implements Serializable {
 
     private Long id;
