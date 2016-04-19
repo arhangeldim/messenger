@@ -105,17 +105,19 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 int read = in.read(buf);
-                log.info("Incoming message");
                 if (read > 0) {
+                    log.info("Incoming message");
                     Message msg = protocol.decode(Arrays.copyOf(buf, read));
                     onMessage(msg);
                 } else {
                     if (read == -1) {
                         close();
+                        Thread.currentThread().interrupt();
                     }
                 }
             } catch (Exception e) {
                 log.error("Server error", e);
+                close();
                 Thread.currentThread().interrupt();
             }
         }

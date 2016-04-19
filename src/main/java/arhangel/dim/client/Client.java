@@ -191,7 +191,7 @@ public class Client implements ConnectionHandler {
 
         if (msg.getId() != null) {
             if (user.isLoginnedFlag()) {
-                if (msg.getId().equals(user.getId())) {
+                if (!msg.getId().equals(user.getId())) {
                     log.error("Wrong receiver");
                     return false;
                 }

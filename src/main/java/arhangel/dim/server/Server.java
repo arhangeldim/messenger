@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Основной класс для сервера сообщений
@@ -54,6 +56,8 @@ public class Server {
                 .addCommand(Type.MSG_TEXT, new TextCommand())
                 .addCommand(Type.MSG_USER_CREATE, new UserCreateCommand());
 
+        ExecutorService service = Executors.newFixedThreadPool(server.getMaxConnection());
+
         try {
             server.serverSocket = new ServerSocket(server.getPort());
             //TODO Thread pool
@@ -61,10 +65,8 @@ public class Server {
                 Socket socket = server.serverSocket.accept();
                 log.info("New session");
                 Session session = new Session(socket, server.getProtocol(), commandExecutor);
-                Thread newWorker = new Thread(session);
-                log.info("Worker created");
-                newWorker.start();
-                log.info("Worker started");
+                service.submit(session);
+                log.info("Session submitted");
             }
         } catch (IOException | SQLException | ClassNotFoundException e) {
             log.error("Cannot start new session", e);
@@ -91,5 +93,13 @@ public class Server {
 
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
+    }
+
+    public int getMaxConnection() {
+        return maxConnection;
+    }
+
+    public void setMaxConnection(int maxConnection) {
+        this.maxConnection = maxConnection;
     }
 }
