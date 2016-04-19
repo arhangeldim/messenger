@@ -8,7 +8,7 @@ public class CommandException extends Exception {
         super(msg);
     }
 
-    public CommandException(Throwable ex) {
+    public CommandException(String msg, Throwable ex) {
         super(ex);
     }
 }
