@@ -1,14 +1,10 @@
 package arhangel.dim.server;
 
 import arhangel.dim.container.Container;
-import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.container.Main;
-import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
-import arhangel.dim.core.store.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +14,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -44,11 +39,17 @@ public class Server {
     List<Session> sessionList = new ArrayList<>();
 
 
-    public int getMaxConnection() { return maxConnection;}
+    public int getMaxConnection() {
+        return maxConnection;
+    }
+
     public int getPort() {
         return port;
     }
-    public Protocol getProtocol() { return protocol;}
+
+    public Protocol getProtocol() {
+        return protocol;
+    }
 
     public void stop() {
         threadPool.shutdown();
@@ -92,8 +93,9 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            server.stop();
-
+            if (server != null) {
+                server.stop();
+            }
         }
     }
 }

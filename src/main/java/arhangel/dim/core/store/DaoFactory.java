@@ -14,7 +14,8 @@ public class DaoFactory {
     public Connection connect() {
         try {
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/PhilSk", "trackuser", "trackuser");
+            conn = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/PhilSk",
+                    "trackuser", "trackuser");
         } catch (Exception e) {
             e.getMessage();
         }

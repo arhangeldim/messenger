@@ -3,7 +3,13 @@ package arhangel.dim.core.net;
 import arhangel.dim.core.messages.Message;
 
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -33,12 +39,12 @@ public class BinaryProtocol implements Protocol {
             ObjectOutput out = new ObjectOutputStream(baos);
 
             out.writeObject(msg);
-            byte[] objBytes = baos.toByteArray();
+            byte[] objBytes = null;
+            objBytes = baos.toByteArray();
             baos.flush();
             baos.close();
             out.flush();
             out.close();
-
             return objBytes;
 
         } catch (IOException e) {

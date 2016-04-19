@@ -27,11 +27,13 @@ public class UserDao implements UserStore {
             Connection conn = daoFactory.connect();
 
             log.trace("Creating prepared statement");
-            PreparedStatement preparedStatement = conn.prepareStatement("insert into Usertable (login, pwd) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "insert into Usertable (login, pwd) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, user.getLogin());
             preparedStatement.setString(2, user.getPassword());
 
-            int affectedRows = preparedStatement.executeUpdate();
+            int affectedRows;
+            affectedRows = preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             generatedKeys.next();
 
@@ -39,7 +41,8 @@ public class UserDao implements UserStore {
             newuser.setId(generatedKeys.getLong(1));
 
             // Добавление нового пользователя в базовый чат
-            preparedStatement = conn.prepareStatement("insert into user_chat (user_id, chat_id) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            preparedStatement = conn.prepareStatement(
+                    "insert into user_chat (user_id, chat_id) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setLong(1, newuser.getId());
             preparedStatement.setLong(2, 1);
 
@@ -68,7 +71,8 @@ public class UserDao implements UserStore {
         try {
             conn = daoFactory.connect();
 
-            PreparedStatement preparedStatement = conn.prepareStatement("select id, login, pwd from Usertable where login = ? and pwd = ?");
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "select id, login, pwd from Usertable where login = ? and pwd = ?");
             preparedStatement.setString(1, login);
             preparedStatement.setString(2, pass);
             preparedStatement.execute();

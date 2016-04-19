@@ -30,7 +30,10 @@ public class MessageDao {
             Connection conn = daoFactory.connect();
 
             log.trace("Creating prepared statement");
-            PreparedStatement preparedStatement = conn.prepareStatement("insert into Messages (user_id, msg_text, chat_id) values(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "insert into Messages (user_id, msg_text, chat_id) " +
+                    "values(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+
             preparedStatement.setLong(1, textMessage.getSenderId());
             preparedStatement.setString(2, textMessage.getText());
             preparedStatement.setLong(3, chatId);
@@ -57,7 +60,9 @@ public class MessageDao {
     public List<Long> getUsersByChatId(Long chatId) {
         Connection conn = daoFactory.connect();
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("select user_id from user_chat where chat_id = ?");
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "select user_id from user_chat where chat_id = ?");
+
             preparedStatement.setLong(1, chatId);
             ResultSet resultSet = preparedStatement.executeQuery();
 

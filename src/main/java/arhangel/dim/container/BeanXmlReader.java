@@ -12,7 +12,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -22,13 +21,13 @@ import java.util.Map;
 
 public class BeanXmlReader {
 
-    final String TAG_BEAN = "bean";
-    final String TAG_PROPERTY = "property";
-    final String ATTR_NAME = "name";
-    final String ATTR_VALUE = "val";
-    final String ATTR_REF = "ref";
-    final String ATTR_BEAN_ID = "id";
-    final String ATTR_BEAN_CLASS = "class";
+    final String tagBean = "bean";
+    final String tagProperty = "property";
+    final String attrName = "name";
+    final String attrValue = "val";
+    final String attrRef = "ref";
+    final String attrBeanId = "id";
+    final String attrBeanClass = "class";
 
     public List<Bean> parseBeans(String pathToFile) {
 
@@ -54,21 +53,23 @@ public class BeanXmlReader {
 
                 Element element = (Element) curNode;
 
-                beanId = element.getAttribute(ATTR_BEAN_ID);
-                className = element.getAttribute(ATTR_BEAN_CLASS);
+                beanId = element.getAttribute(attrBeanId);
+                className = element.getAttribute(attrBeanClass);
 
-                NodeList props = element.getElementsByTagName(TAG_PROPERTY);
+                NodeList props = element.getElementsByTagName(tagProperty);
                 Map properties = new HashMap();
 
                 for (int propCount = 0; propCount < props.getLength(); propCount++) {
 
                     propName = props.item(propCount).getAttributes().item(0).getNodeValue();
 
-                    if (props.item(propCount).getAttributes().item(1).getNodeName().equals(ATTR_REF)) {
+                    if (props.item(propCount).getAttributes().item(1).getNodeName().equals(attrRef)) {
                         type = ValueType.REF;
-                    } else if (props.item(propCount).getAttributes().item(1).getNodeName().equals(ATTR_VALUE)) {
+                    } else if (props.item(propCount).getAttributes().item(1).getNodeName().equals(attrValue)) {
                         type = ValueType.VAL;
-                    } else type = null;
+                    } else {
+                        type = null;
+                    }
 
                     propVal = props.item(propCount).getAttributes().item(1).getNodeValue();
 

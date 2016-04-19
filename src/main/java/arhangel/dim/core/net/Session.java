@@ -52,10 +52,22 @@ public class Session implements ConnectionHandler, Runnable {
     public InputStream getIn() {
         return in;
     }
-    public Socket getSocket() { return this.socket;}
-    public Server getSessionServer() { return sessionServer;}
-    public void setUser(User user) { this.user = user;}
-    public User getUser() { return this.user;}
+
+    public Socket getSocket() {
+        return this.socket;
+    }
+
+    public Server getSessionServer() {
+        return sessionServer;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
 
     @Override
     public void run() {
@@ -102,7 +114,8 @@ public class Session implements ConnectionHandler, Runnable {
                     for (Session sess : this.getSessionServer().getSessionList()) {
                         if (sess.getUser() != null) {
                             if (sess.getUser().getLogin().equals(loginMessage.getLogin())) {
-                                statusMessage = new StatusMessage("User " + loginMessage.getLogin() + " already logged in");
+                                statusMessage = new StatusMessage(
+                                        "User " + loginMessage.getLogin() + " already logged in");
                                 statusMessage.setType(Type.MSG_STATUS);
                                 this.send(statusMessage);
                                 return;
@@ -116,7 +129,7 @@ public class Session implements ConnectionHandler, Runnable {
                     if (founduser == null) {
                         User newuser = new User(loginMessage.getLogin(), loginMessage.getPassword());
                         newuser = userDao.addUser(newuser);
-                        statusMessage = new StatusMessage("User " + newuser.getLogin()+ " was created");
+                        statusMessage = new StatusMessage("User " + newuser.getLogin() + " was created");
                         statusMessage.setType(Type.MSG_STATUS);
                         this.send(statusMessage);
                         break;

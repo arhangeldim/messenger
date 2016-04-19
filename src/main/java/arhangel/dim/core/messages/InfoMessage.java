@@ -6,8 +6,13 @@ import java.util.Objects;
 public class InfoMessage extends Message {
     private long id;
 
-    public long getMesId() { return this.id;}
-    public void setMesId(long id) { this.id = id;}
+    public long getMesId() {
+        return this.id;
+    }
+
+    public void setMesId(long id) {
+        this.id = id;
+    }
 
     @Override
     public int hashCode() {

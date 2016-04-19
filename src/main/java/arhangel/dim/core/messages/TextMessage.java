@@ -13,13 +13,26 @@ public class TextMessage extends Message {
     public String getText() {
         return text;
     }
+
     public void setText(String text) {
         this.text = text;
     }
-    public long getChatId() { return chatId;}
-    public void setChatId(long chatId) { this.chatId = chatId;}
-    public Long getSenderId() { return senderId;}
-    public void setSenderId(Long senderId) { this.senderId = senderId;}
+
+    public long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
+    public Long getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
+    }
 
     @Override
     public boolean equals(Object other) {

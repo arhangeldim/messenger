@@ -1,12 +1,20 @@
 package arhangel.dim.client;
 
-import java.io.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
+
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,30 +40,46 @@ public class Client implements ConnectionHandler {
     public Protocol getProtocol() {
         return protocol;
     }
+
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
     }
+
     public int getPort() {
         return port;
     }
+
     public void setPort(int port) {
         this.port = port;
     }
+
     public String getHost() {
         return host;
     }
+
     public void setHost(String host) {
         this.host = host;
     }
+
     public InputStream getIn() {
         return in;
     }
 
-    public Thread getSocketThread() { return socketThread;}
-    public Socket getSocket() { return socket;}
+    public Thread getSocketThread() {
+        return socketThread;
+    }
 
-    public void setUserId(Long userId) { this.userId = userId;}
-    public Long getUserId() { return userId;}
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
 
     public void initSocket() throws IOException {
         socket = new Socket(host, port);
@@ -98,6 +122,8 @@ public class Client implements ConnectionHandler {
                     this.setUserId(statusMsg.getSenderId());
                     log.info("You logged in as user with id = " + statusMsg.getSenderId().toString());
                 }
+                break;
+            default: log.error("Unknown recieved message");
         }
     }
 
@@ -155,7 +181,7 @@ public class Client implements ConnectionHandler {
 
                 // TODO: Случай самоинформации
                 if (tokens[1].isEmpty()) {
-
+                    log.debug("Self-information case");
                 } else {
                     infomsg.setId(Long.getLong(tokens[1]));
                 }
@@ -182,7 +208,7 @@ public class Client implements ConnectionHandler {
         if ( !getSocket().isClosed()) {
             getSocket().close();
         }
-        if( !getSocketThread().isInterrupted()) {
+        if (!getSocketThread().isInterrupted()) {
             getSocketThread().interrupt();
         }
     }
