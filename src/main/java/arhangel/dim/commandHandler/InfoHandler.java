@@ -11,32 +11,33 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Created by Арина on 17.04.2016.
+ * Created by Арина on 19.04.2016.
  */
-public class LoginHandler extends CommandHandler implements Command {
+public class InfoHandler extends CommandHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
-        LoginMessage msg = (LoginMessage) message;
-        DbConnect db = new DbConnect();
+        StatusMessage msg = (StatusMessage) message;
         try {
-            Connection connection = db.connect();
-            Statement stmnt = connection.createStatement();
-            if (msg.getLogin()!=null) {
-                ResultSet rs = stmnt.executeQuery("SELECT user_id FROM users WHERE login = " + "'" + msg.getLogin() + "' && password = " + "'" + msg.getPassword() + "'");
-                if (ifErrorSend(rs.next(),session,"Wrong combination of login and password. Try again or type /login to register")) {
+            if (msg.getText() != "self") {
+                DbConnect db = new DbConnect();
+                Connection connection = db.connect();
+                Statement stmnt = connection.createStatement();
+                ResultSet rs = stmnt.executeQuery("SELECT login FROM users WHERE user_id = " + msg.getText());
+                if (ifErrorSend(rs.next(),session,"No user with id " + msg.getText())) {
                     return;
                 } else {
-                    session.setUser(Long.valueOf(rs.getString("user_id")), msg.getLogin());
                     StatusMessage statMsg = new StatusMessage();
-                    statMsg.setText("Successfully logged in as " + msg.getLogin());
-                    statMsg.setType(Type.MSG_STATUS);
+                    statMsg.setText("User with id = "+msg.getText()+" has login "+rs.getString("login"));
+                    statMsg.setType(Type.MSG_INFO_RESULT);
                     session.send(statMsg);
                 }
+                stmnt.close();
             } else {
-                Message regMsg = new LoginMessage();
-                regMsg.setType(Type.MSG_LOGIN);
-                session.send(regMsg);
+                StatusMessage statMsg = new StatusMessage();
+                statMsg.setText("Your login is " + session.getUserLogin());
+                statMsg.setType(Type.MSG_INFO_RESULT);
+                session.send(statMsg);
             }
-            stmnt.close();
+
         } catch (SQLException e) {
             System.out.println("sqlexception");
             CommandException ex = new CommandException("SQLException");
@@ -51,4 +52,3 @@ public class LoginHandler extends CommandHandler implements Command {
 
     }
 }
-

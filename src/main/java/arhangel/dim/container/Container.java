@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
+import static jdk.nashorn.internal.runtime.JSType.isNumber;
+
 /**
  * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
  */
@@ -24,7 +26,7 @@ public class Container {
 
     public Container(String pathToConfig) throws InvalidConfigurationException {
         BeanXmlReader reader = new BeanXmlReader();
-        List<Bean> beans = reader.parseBeans("config.xml");
+        List<Bean> beans = reader.parseBeans(pathToConfig);
         Graph<Bean> graph = new Graph<>();
         List<Vertex> vertices = new ArrayList<>();
         for (Bean b:beans) {
@@ -82,8 +84,15 @@ public class Container {
                     // Делаем приватные поля доступными
                     field.setAccessible(true);
                     if (bean.getProperties().get(name).getType() == ValueType.VAL) {
-                        int temp = Integer.parseInt(bean.getProperties().get(name).getValue());
-                        field.setInt(ob,temp);
+                        String str = bean.getProperties().get(name).getValue();
+                        if(isNumber(str)){
+                            int temp = Integer.parseInt(str);
+                            field.setInt(ob,temp);
+                        } else {
+                            field.set(ob,str);
+                        }
+
+
                     } else {
                         field.set(ob,objByName.get(bean.getProperties().get(name).getValue()));
                     }

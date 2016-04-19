@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Arrays;
 
 import arhangel.dim.client.Client;
-import arhangel.dim.commandHandler.ChatCreateHandler;
-import arhangel.dim.commandHandler.LoginHandler;
-import arhangel.dim.commandHandler.TextHandler;
+import arhangel.dim.commandHandler.*;
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
@@ -39,6 +38,9 @@ public class Session implements Runnable, ConnectionHandler {
         user.setId(id);
         user.setName(name);
     }
+    public String getUserLogin() {
+        return user.getName();
+    }
     public void run(){
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
@@ -52,6 +54,15 @@ public class Session implements Runnable, ConnectionHandler {
                 log.error("Failed to process user session: {}", e);
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
+            } finally {
+                try {
+                    in.close();
+                    out.close();
+                    log.info("Closing sockets");
+                } catch(IOException e) {
+                    //ignore
+                }
+
             }
         }
 
@@ -75,16 +86,19 @@ public class Session implements Runnable, ConnectionHandler {
     public void onMessage(Message msg){
         // TODO: Пришло некое сообщение от клиента, его нужно обработать
         Type type = msg.getType();
+        msg.setSenderId(user.getId());
         switch (type) {
+            case MSG_REGISTER:
+                RegistryHandler regHandle = new RegistryHandler();
+                try {
+                    regHandle.execute(this, msg);
+                } catch (CommandException e) {
+                    log.error("Failed to execute regHandle");
+                }
+                break;
             case MSG_TEXT:
                 if (user == null) {
-                    StatusMessage statmesg = new StatusMessage();
-                    statmesg.setText("Unlogged users cannot send messages. Your message is not sent. Log in to send messages.");
-                    try {
-                        send(statmesg);
-                    } catch (Exception e) {
-                        log.error("Failed to send status msg");
-                    }
+                    notLoggedIn("Unlogged users cannot send messages. Your message is not sent. Log in to send messages.");
                 } else {
                     TextHandler textHandler = new TextHandler();
                     try {
@@ -96,13 +110,7 @@ public class Session implements Runnable, ConnectionHandler {
                 break;
             case MSG_LOGIN:
                 if (user != null) {
-                    StatusMessage statmesg = new StatusMessage();
-                    statmesg.setText("You are already logged in as "+user.getName());
-                    try {
-                        send(statmesg);
-                    } catch (Exception e) {
-                        log.error("Failed to send status msg");
-                    }
+                    notLoggedIn("You are already logged in as "+user.getName());
                 } else {
                     LoginHandler loginHandler = new LoginHandler();
                     try {
@@ -114,13 +122,7 @@ public class Session implements Runnable, ConnectionHandler {
                 break;
             case MSG_CHAT_CREATE:
                 if (user == null) {
-                    StatusMessage statmesg = new StatusMessage();
-                    statmesg.setText("Unlogged users cannot create chats. Your chat is not created. Log in to create chats.");
-                    try {
-                        send(statmesg);
-                    } catch (Exception e) {
-                        log.error("Failed to send status msg");
-                    }
+                    notLoggedIn("Unlogged users cannot create chats. Your chat is not created. Log in to create chats.");
                 } else {
                     ChatCreateHandler chatCrHandler = new ChatCreateHandler();
                     try {
@@ -130,6 +132,41 @@ public class Session implements Runnable, ConnectionHandler {
                     }
                 }
                 break;
+            case MSG_CHAT_HIST:
+                if (user == null) {
+                    notLoggedIn("Request available only to logged in users.");
+                } else {
+                    ChatHistHandler chatHistHandler = new ChatHistHandler();
+                    try {
+                        chatHistHandler.execute(this, msg);
+                    } catch (CommandException e) {
+                        log.error("Failed to execute chatHistHandler");
+                    }
+                }
+                break;
+            case MSG_CHAT_LIST:
+                if (user == null) {
+                    notLoggedIn("Request available only to logged in users.");
+                } else {
+                    ChatListHandler chatListHandler = new ChatListHandler();
+                    try {
+                        chatListHandler.execute(this, msg);
+                    } catch (CommandException e) {
+                        log.error("Failed to execute chatListHandler");
+                    }
+                }
+                break;
+            case MSG_INFO:
+                if (user == null) {
+                    notLoggedIn("Request available only to logged in users.");
+                } else {
+                    InfoHandler infoHandler = new InfoHandler();
+                    try {
+                        infoHandler.execute(this, msg);
+                    } catch (CommandException e) {
+                        log.error("Failed to execute InfoHandler");
+                    }
+                }
             default:
                 StatusMessage statmsg = new StatusMessage();
                 statmsg.setText("Wrong type, try again");
@@ -140,7 +177,15 @@ public class Session implements Runnable, ConnectionHandler {
                 }
         }
     }
-
+    public void notLoggedIn(String text) {
+        StatusMessage statmesg = new StatusMessage();
+        statmesg.setText(text);
+        try {
+            send(statmesg);
+        } catch (Exception e) {
+            log.error("Failed to send status msg");
+        }
+    }
     public void close() {
         // TODO: закрыть in/out каналы и сокет. Освободить другие ресурсы, если необходимо
     }

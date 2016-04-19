@@ -12,4 +12,8 @@ public class StatusMessage extends Message {
     public void setText(String status) {
         this.status = status;
     }
+    @Override
+    public String toString() {
+        return "Status:" + status;
+    }
 }

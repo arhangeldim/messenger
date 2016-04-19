@@ -46,11 +46,10 @@ public class Server {
     public void setPort(int port) {
         this.port = port;
     }
-    public void initSocket() throws IOException {
+    public void listen() throws IOException {
         ServerSocket serverSocket = new ServerSocket(port);
-        serverSocketThread = new Thread(() -> {
-            Socket fromclient;
-            while (!Thread.currentThread().isInterrupted()) {
+        Socket fromclient;
+        while (true) {
                 try {
                     log.info("Waiting for a client...");
                     fromclient = serverSocket.accept();
@@ -59,14 +58,17 @@ public class Server {
                     out = fromclient.getOutputStream();
                     Session clientSession = new Session(in, out, protocol);
                     clientSession.run();
+                    log.info("Session closed");
+                    in.close();
+                    out.close();
+                    fromclient.close();
                 } catch (IOException e) {
                     log.info("Can't accept");
-                    Thread.currentThread().interrupt();
+                    break;
                 }
-            }
-        });
+        }
 
-        serverSocketThread.start();
+        log.info("Listener Stopped");
     }
     public static void main(String[] args) throws Exception {
 
@@ -81,7 +83,7 @@ public class Server {
             return;
         }
         try {
-            server.initSocket();
+            server.listen();
         } catch (Exception e) {
             log.error("Application failed.", e);
         } finally {
