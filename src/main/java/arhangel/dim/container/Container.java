@@ -1,6 +1,5 @@
 package arhangel.dim.container;
 
-<<<<<<< HEAD
 import arhangel.dim.container.beans.Engine;
 import arhangel.dim.container.beans.Gear;
 import org.jdom2.JDOMException;
@@ -12,8 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-=======
->>>>>>> master
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
