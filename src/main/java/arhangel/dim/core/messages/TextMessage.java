@@ -1,12 +1,14 @@
 package arhangel.dim.core.messages;
 
+import arhangel.dim.core.User;
+
 import java.util.Objects;
 
-/**
- * Простое текстовое сообщение
- */
+
 public class TextMessage extends Message {
     private String text;
+    private Long chatId;
+    private Long senderId;
 
     public String getText() {
         return text;
@@ -14,6 +16,22 @@ public class TextMessage extends Message {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
+    public Long getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
     }
 
     @Override

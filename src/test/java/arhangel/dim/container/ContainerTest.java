@@ -23,7 +23,17 @@ public class ContainerTest {
     @BeforeClass
     public static void init() {
         try {
-            container = new Container("config.xml");
+            try {
+                container = new Container("config.xml");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
         }
