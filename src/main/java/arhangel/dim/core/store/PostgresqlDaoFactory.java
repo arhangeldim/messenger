@@ -25,12 +25,12 @@ public class PostgresqlDaoFactory extends DaoFactory {
     }
 
     @Override
-    public PostgresqlUserDao getUserDAO() {
+    public PostgresqlUserDao getUserDao() {
         return new PostgresqlUserDao();
     }
 
     @Override
-    public PostgresqlMessageDao getMessageDAO() {
+    public PostgresqlMessageDao getMessageDao() {
         return new PostgresqlMessageDao();
     }
 }

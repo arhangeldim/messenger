@@ -7,7 +7,11 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.RegisterMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,8 +161,7 @@ public class Client implements ConnectionHandler {
                 sendMessage.setType(Type.MSG_TEXT);
                 try {
                     sendMessage.setChatId(parseLong(tokens[1]));
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println("Expected number");
                     return;
                 }

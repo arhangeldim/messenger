@@ -30,7 +30,7 @@ public class PostgresqlUserDao implements UserStore {
             return user;
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }
@@ -65,7 +65,7 @@ public class PostgresqlUserDao implements UserStore {
 
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }
@@ -94,7 +94,7 @@ public class PostgresqlUserDao implements UserStore {
 
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
 
@@ -124,7 +124,7 @@ public class PostgresqlUserDao implements UserStore {
 
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }

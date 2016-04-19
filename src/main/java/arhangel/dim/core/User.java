@@ -8,7 +8,7 @@ public class User {
     private String login;
     private String secret;
 
-    public User(String login, String secret){
+    public User(String login, String secret) {
         setLogin(login);
         setSecret(secret);
     }

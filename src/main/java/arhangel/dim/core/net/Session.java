@@ -77,7 +77,7 @@ public class Session implements ConnectionHandler {
         return server;
     }
 
-    public Session(Server server){
+    public Session(Server server) {
         this.server = server;
     }
 
@@ -117,6 +117,8 @@ public class Session implements ConnectionHandler {
                     e.printStackTrace();
                 }
                 break;
+            default:
+                return;
         }
     }
 

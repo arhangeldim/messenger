@@ -39,11 +39,12 @@ public class PostgresqlMessageDao implements MessageStore {
             connection.prepareStatement("CREATE TABLE IF NOT EXISTS messages (" +
                     "id BIGSERIAL PRIMARY KEY," +
                     "chat_id BIGINT REFERENCES chats (id)," +
-                    "sender_id bigint REFERENCES users (id)," +
+                    "sender_id BIGINT REFERENCES users (id)," +
                     "text TEXT" +
                     ");").execute();
             PreparedStatement createStatement = connection.prepareStatement(
-                    "INSERT INTO messages (chat_id, sender_id, text) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO messages (chat_id, sender_id, text) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
             createStatement.setLong(1, textMessage.getChatId());
             createStatement.setLong(2, textMessage.getSenderId());
             createStatement.setString(3, textMessage.getText());
@@ -56,7 +57,7 @@ public class PostgresqlMessageDao implements MessageStore {
             return textMessage;
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }

@@ -13,11 +13,11 @@ public abstract class DaoFactory {
     // There will be a method for each DAO that can be
     // created. The concrete factories will have to
     // implement these methods.
-    public abstract UserStore getUserDAO();
+    public abstract UserStore getUserDao();
 
-    public abstract MessageStore getMessageDAO();
+    public abstract MessageStore getMessageDao();
 
-    public static DaoFactory getDAOFactory(DaoTypes whichFactory) {
+    public static DaoFactory getDaoFactory(DaoTypes whichFactory) {
 
         switch (whichFactory) {
             case MySQL:

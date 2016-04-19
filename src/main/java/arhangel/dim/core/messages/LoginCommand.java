@@ -13,18 +13,14 @@ public class LoginCommand implements Command {
 
     @Override
     public void execute(Session session, Message message) throws CommandException {
-        if (!session.userAuthenticated())
-        {
+        if (!session.userAuthenticated()) {
             LoginMessage loginMessage = (LoginMessage) message;
-            UserStore userStore = PostgresqlDaoFactory.getDAOFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDAO();
+            UserStore userStore = PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDao();
             User user = userStore.getUser(loginMessage.getLogin(), loginMessage.getSecret());
-            if (user != null)
-            {
+            if (user != null) {
                 session.setUser(user);
                 log.info("{} logged in", user.getLogin());
-            }
-            else
-            {
+            } else {
                 log.error("User with supplied credentials doesn't exist {}", loginMessage.getLogin());
             }
             return;
