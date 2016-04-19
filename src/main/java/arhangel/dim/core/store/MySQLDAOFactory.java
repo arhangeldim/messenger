@@ -17,12 +17,12 @@ public class MysqlDaoFactory extends DaoFactory {
     }
 
     @Override
-    public MysqlUserDao getUserDAO() {
+    public MysqlUserDao getUserDao() {
         return new MysqlUserDao();
     }
 
     @Override
-    public MysqlMessageDao getMessageDAO() {
+    public MysqlMessageDao getMessageDao() {
         return new MysqlMessageDao();
     }
 }
