@@ -33,7 +33,7 @@ public interface MessageStore {
     /**
      * Добавить сообщение в чат
      */
-    void addMessage(Long chatId, Message message);
+    Message addMessage(Long chatId, Message message);
 
     /**
      * Добавить пользователя к чату

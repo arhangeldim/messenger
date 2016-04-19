@@ -139,8 +139,8 @@ public class JdbcExample {
             System.out.println("handle:");
             List<User> data = new ArrayList<>();
             while (rset.next()) {
-                User user = new User();
-                user.setName(rset.getString(2));
+                User user = new User(rset.getString(2), "wtf");
+                //user.setLogin(rset.getString(2));
                 data.add(user);
             }
             return data;
@@ -159,8 +159,8 @@ public class JdbcExample {
             System.out.println("handle:");
             List<User> data = new ArrayList<>();
             while (rset.next()) {
-                User user = new User();
-                user.setName(rset.getString(2));
+                User user = new User(rset.getString(2), "wtf");
+                //user.setLogin(rset.getString(2));
                 data.add(user);
             }
             return data;

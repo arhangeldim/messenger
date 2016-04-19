@@ -4,6 +4,7 @@ package arhangel.dim.core.messages;
  * Маркер типа сообщения
  */
 public enum Type {
+    MSG_REGISTER, //status
     MSG_LOGIN, // status
     MSG_TEXT, // status
     MSG_INFO, // MSG_INFO_RESULT
