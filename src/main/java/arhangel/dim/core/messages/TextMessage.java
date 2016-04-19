@@ -1,12 +1,26 @@
 package arhangel.dim.core.messages;
 
+import java.util.Date;
 import java.util.Objects;
 
 /**
  * Простое текстовое сообщение
  */
 public class TextMessage extends Message {
+    private Long chatId;
     private String text;
+    private Date date;
+
+    public TextMessage() {
+        super();
+        this.setType(Type.MSG_TEXT);
+    }
+
+    public TextMessage(Long chatId, String text) {
+        this();
+        this.setChatId(chatId);
+        this.setText(text);
+    }
 
     public String getText() {
         return text;
@@ -14,6 +28,14 @@ public class TextMessage extends Message {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Override
@@ -28,18 +50,26 @@ public class TextMessage extends Message {
             return false;
         }
         TextMessage message = (TextMessage) other;
-        return Objects.equals(text, message.text);
+        return Objects.equals(getText(), message.getText());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), text);
+        return Objects.hash(super.hashCode(), getText());
     }
 
     @Override
     public String toString() {
         return "TextMessage{" +
-                "text='" + text + '\'' +
+                "text='" + getText() + '\'' +
                 '}';
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 }

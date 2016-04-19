@@ -5,36 +5,6 @@ package arhangel.dim.lections.threads.counting;
  */
 public class CounterTest {
 
-    static class Sequencer extends Thread {
-        private Counter counter;
-
-        public Sequencer(Counter counter) {
-            this.counter = counter;
-        }
-
-        @Override
-        public void run() {
-            for (int i = 0; i < 100_000; i++) {
-                counter.inc();
-            }
-        }
-    }
-
-    static class UnsafeSequencer extends Thread {
-        private LockCounter counter;
-
-        public UnsafeSequencer(LockCounter counter) {
-            this.counter = counter;
-        }
-
-        @Override
-        public void run() {
-            for (int i = 0; i < 100_000; i++) {
-                counter.incUnsafe();
-            }
-        }
-    }
-
     public static void main(String[] args) throws Exception {
         //testCounter();
         testSafeUnsafe();
@@ -81,6 +51,36 @@ public class CounterTest {
         unsafe.join();
 
         System.out.printf("Threads: %d\nCounter: %d", threadNum, counter.inc());
+    }
+
+    static class Sequencer extends Thread {
+        private Counter counter;
+
+        public Sequencer(Counter counter) {
+            this.counter = counter;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < 100_000; i++) {
+                counter.inc();
+            }
+        }
+    }
+
+    static class UnsafeSequencer extends Thread {
+        private LockCounter counter;
+
+        public UnsafeSequencer(LockCounter counter) {
+            this.counter = counter;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < 100_000; i++) {
+                counter.incUnsafe();
+            }
+        }
     }
 
 

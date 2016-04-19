@@ -8,7 +8,7 @@ public class InvalidConfigurationException extends Exception {
         super(msg);
     }
 
-    public InvalidConfigurationException(Throwable ex) {
-        super(ex);
+    public InvalidConfigurationException(Exception exc) {
+        super(exc);
     }
 }

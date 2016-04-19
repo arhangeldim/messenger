@@ -8,6 +8,39 @@ import java.util.concurrent.TimeUnit;
  */
 public class StopThread {
 
+    public static void flagThread() {
+        FlagThread flagThread = new FlagThread();
+        flagThread.start();
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.next();
+        flagThread.stopThread();
+    }
+
+    public static void interruptThread() {
+        Thread thread = new InterThread();
+        thread.start();
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.next();
+        thread.interrupt();
+    }
+
+    public static void dummyThread() {
+        Thread thread = new DummyThread();
+        thread.start();
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.next();
+        thread.interrupt();
+    }
+
+    public static void main(String[] args) throws Exception {
+        //flagThread();
+        //interruptThread();
+        dummyThread();
+    }
+
     static class FlagThread extends Thread {
         private volatile boolean pleaseStop;
 
@@ -56,38 +89,5 @@ public class StopThread {
 //                }
             }
         }
-    }
-
-    public static void flagThread() {
-        FlagThread flagThread = new FlagThread();
-        flagThread.start();
-
-        Scanner scanner = new Scanner(System.in);
-        scanner.next();
-        flagThread.stopThread();
-    }
-
-    public static void interruptThread() {
-        Thread thread = new InterThread();
-        thread.start();
-
-        Scanner scanner = new Scanner(System.in);
-        scanner.next();
-        thread.interrupt();
-    }
-
-    public static void dummyThread() {
-        Thread thread = new DummyThread();
-        thread.start();
-
-        Scanner scanner = new Scanner(System.in);
-        scanner.next();
-        thread.interrupt();
-    }
-
-    public static void main(String[] args) throws Exception {
-        //flagThread();
-        //interruptThread();
-        dummyThread();
     }
 }

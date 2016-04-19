@@ -1,23 +1,29 @@
 package arhangel.dim.client;
 
+import arhangel.dim.client.commands.ChatCreateCommand;
+import arhangel.dim.client.commands.ChatHistoryCommand;
+import arhangel.dim.client.commands.ChatListCommand;
+import arhangel.dim.client.commands.InfoCommand;
+import arhangel.dim.client.commands.LoginCommand;
+import arhangel.dim.client.commands.TextCommand;
+import arhangel.dim.client.commands.UserCreateCommand;
+import arhangel.dim.container.Container;
+import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.net.ConnectionHandler;
+import arhangel.dim.core.net.Protocol;
+import arhangel.dim.core.net.ProtocolException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import arhangel.dim.container.Container;
-import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
-import arhangel.dim.core.net.ConnectionHandler;
-import arhangel.dim.core.net.Protocol;
-import arhangel.dim.core.net.ProtocolException;
 
 /**
  * Клиент для тестирования серверного приложения
@@ -26,13 +32,12 @@ public class Client implements ConnectionHandler {
 
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
-     * */
-    static Logger log = LoggerFactory.getLogger(Client.class);
+     */
+    private static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
-     *
-     * */
+     */
     private Protocol protocol;
     private int port;
     private String host;
@@ -47,6 +52,66 @@ public class Client implements ConnectionHandler {
      */
     private InputStream in;
     private OutputStream out;
+
+    /**
+     * Текущий пользователь
+     */
+    private ClientUser user;
+
+    public static void main(String[] args) throws Exception {
+
+        Client client;
+        // Пользуемся механизмом контейнера
+        try {
+            Container context = new Container("client.xml");
+            client = (Client) context.getByName("client");
+        } catch (InvalidConfigurationException e) {
+            log.error("Failed to create client", e);
+            return;
+        }
+
+        log.debug("Client created");
+
+        ClientMessageCreator commandlineHandler = new ClientMessageCreator()
+                .addHandler(new ChatCreateCommand("/chat_create"))
+                .addHandler(new ChatHistoryCommand("/chat_history"))
+                .addHandler(new ChatListCommand("/chat_list"))
+                .addHandler(new InfoCommand("/info"))
+                .addHandler(new LoginCommand("/login"))
+                .addHandler(new TextCommand("/text"))
+                .addHandler(new UserCreateCommand("/user_create"));
+
+        log.debug("commandLineHandler created");
+
+        try {
+            client.initSocket();
+            client.user = new ClientUser();
+
+            // Цикл чтения с консоли
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                System.out.print("$");
+                String input = scanner.nextLine();
+                if ("q".equals(input)) {
+                    return;
+                }
+                try {
+                    Message message = commandlineHandler.handleCommandline(input, client.user);
+                    if (message != null) {
+                        client.send(message);
+                    }
+                } catch (ProtocolException | IOException e) {
+                    log.error("Failed to process user input", e);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Application failed.", e);
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+        }
+    }
 
     public Protocol getProtocol() {
         return protocol;
@@ -72,7 +137,7 @@ public class Client implements ConnectionHandler {
         this.host = host;
     }
 
-    public void initSocket() throws IOException {
+    private void initSocket() throws IOException {
         Socket socket = new Socket(host, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
@@ -110,35 +175,29 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
+        if (checkUserStatus(msg)) {
+            System.out.println("Server: " + msg.toString());
+        }
     }
 
-    /**
-     * Обрабатывает входящую строку, полученную с консоли
-     * Формат строки можно посмотреть в вики проекта
-     */
-    public void processInput(String line) throws IOException, ProtocolException {
-        String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
-        String cmdType = tokens[0];
-        switch (cmdType) {
-            case "/login":
-                // TODO: реализация
-                break;
-            case "/help":
-                // TODO: реализация
-                break;
-            case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
-                send(sendMessage);
-                break;
-            // TODO: implement another types from wiki
-
-            default:
-                log.error("Invalid input: " + line);
+    private boolean checkUserStatus(Message msg) {
+        if (msg.getType() == Type.MSG_STATUS) {
+            StatusMessage status = (StatusMessage) msg;
+            if (status.getUsername() != null) {
+                user.login(status.getId(), status.getUsername());
+                log.info("Logged in as ({}){}", user.getId(), user.getName());
+            }
         }
+
+        if (msg.getId() != null) {
+            if (user.isLoginnedFlag()) {
+                if (!msg.getId().equals(user.getId())) {
+                    log.error("Wrong receiver");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -153,43 +212,13 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        Client client = null;
-        // Пользуемся механизмом контейнера
+        socketThread.interrupt();
         try {
-            Container context = new Container("client.xml");
-            client = (Client) context.getByName("client");
-        } catch (InvalidConfigurationException e) {
-            log.error("Failed to create client", e);
-            return;
-        }
-        try {
-            client.initSocket();
-
-            // Цикл чтения с консоли
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("$");
-            while (true) {
-                String input = scanner.nextLine();
-                if ("q".equals(input)) {
-                    return;
-                }
-                try {
-                    client.processInput(input);
-                } catch (ProtocolException | IOException e) {
-                    log.error("Failed to process user input", e);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Application failed.", e);
-        } finally {
-            if (client != null) {
-                client.close();
-            }
+            in.close();
+            out.close();
+            socketThread.join();
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
         }
     }
 }

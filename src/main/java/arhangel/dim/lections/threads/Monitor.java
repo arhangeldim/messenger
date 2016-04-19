@@ -11,18 +11,6 @@ public class Monitor {
 
     int counter = 0;
 
-    public void doChange() {
-        synchronized (lockObject) {
-            counter++;
-        }
-    }
-
-    public void doAnotherChange() {
-        synchronized (anotherLockObject) {
-            counter++;
-        }
-    }
-
     public static void main(String[] args) {
         Monitor monitor = new Monitor();
 
@@ -39,6 +27,18 @@ public class Monitor {
         }).start();
 
         System.out.println(monitor.counter);
+    }
+
+    public void doChange() {
+        synchronized (lockObject) {
+            counter++;
+        }
+    }
+
+    public void doAnotherChange() {
+        synchronized (anotherLockObject) {
+            counter++;
+        }
     }
 
 

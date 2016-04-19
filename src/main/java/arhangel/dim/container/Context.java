@@ -23,30 +23,18 @@ import arhangel.dim.container.beans.Car;
 
 public class Context {
 
-    private static Logger log = LoggerFactory.getLogger(Context.class);
-
     private static final String TAG_BEAN = "bean";
     private static final String TAG_PROPERTY = "property";
-
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "val";
     private static final String ATTR_REF = "ref";
-
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
-
-
+    private static Logger log = LoggerFactory.getLogger(Context.class);
     List<Bean> beans = new ArrayList<>();
 
     Map<String, Object> objectsById = new HashMap<>();
     Map<String, Object> objectsByClass = new HashMap<>();
-
-    public static void main(String[] args) throws Exception {
-
-        // Dynamic config
-        Context context = new Context("config.xml");
-        Car car = (Car) context.getBeanByName("carBean");
-    }
 
     public Context(String xmlPath) throws InvalidConfigurationException {
         Document config = readXml(xmlPath);
@@ -65,6 +53,13 @@ public class Context {
         } catch (Exception e) {
             throw new InvalidConfigurationException(e);
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        // Dynamic config
+        Context context = new Context("config.xml");
+        Car car = (Car) context.getBeanByName("carBean");
     }
 
     public Object getBeanByName(String beanName) {

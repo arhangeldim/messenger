@@ -11,9 +11,11 @@ import java.util.Map;
  */
 public class Graph<V> {
     private Map<Vertex<V>, List<Vertex<V>>> vertices = new HashMap<>();
+    private LinkedList<Vertex<V>> sorted = new LinkedList<>();
 
     /**
      * Добавить вершину в граф
+     *
      * @param value - объект, привязанный к вершине
      */
     public Vertex<V> addVertex(V value) {
@@ -24,8 +26,9 @@ public class Graph<V> {
 
     /**
      * Соединить вершины ребром
-     * @param from из какой вершины
-     * @param to в какую вершину
+     *
+     * @param from       из какой вершины
+     * @param to         в какую вершину
      * @param isDirected - если true, то связь односторонняя, иначе - двухсторонняя
      */
     public void addEdge(Vertex<V> from, Vertex<V> to, boolean isDirected) {
@@ -57,8 +60,6 @@ public class Graph<V> {
     public int size() {
         return vertices.size();
     }
-
-    private LinkedList<Vertex<V>> sorted = new LinkedList<>();
 
     public void dfs() {
         vertices.keySet().stream().filter(vertex -> vertex.getState() != Vertex.State.VISITED).forEach(this::dfs);

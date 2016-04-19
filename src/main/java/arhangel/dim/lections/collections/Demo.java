@@ -10,21 +10,6 @@ import java.util.function.Predicate;
  */
 public class Demo {
 
-    // SAM - Single Abstract Method
-    static class MyPredicate implements Predicate<Integer> {
-        @Override
-        public boolean test(Integer integer) {
-            return integer % 2 != 0;
-        }
-    }
-
-    static class MyConsumer<T> implements Consumer<T> {
-        @Override
-        public void accept(T item) {
-            System.out.println("# " + item);
-        }
-    }
-
     public static void main(String[] args) {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
 
@@ -56,5 +41,20 @@ public class Demo {
                 .sorted()
                 .forEach(System.out::println);
 
+    }
+
+    // SAM - Single Abstract Method
+    static class MyPredicate implements Predicate<Integer> {
+        @Override
+        public boolean test(Integer integer) {
+            return integer % 2 != 0;
+        }
+    }
+
+    static class MyConsumer<T> implements Consumer<T> {
+        @Override
+        public void accept(T item) {
+            System.out.println("# " + item);
+        }
     }
 }

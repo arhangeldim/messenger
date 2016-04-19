@@ -1,8 +1,6 @@
 package arhangel.dim.lections.jdbc;
 
-/**
- * Created by r.kildiev on 02.11.2015.
- */
+import arhangel.dim.core.User;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import arhangel.dim.core.User;
 
 public class JdbcExample {
 
@@ -130,7 +126,6 @@ public class JdbcExample {
 //        rs = prepStmnt.executeQuery();
 
 
-
         /**
          * Использование executor для запроса в базу
          */
@@ -169,11 +164,7 @@ public class JdbcExample {
         System.out.println(users.toString());
 
 
-
-
-
     }
-
 
 
 }

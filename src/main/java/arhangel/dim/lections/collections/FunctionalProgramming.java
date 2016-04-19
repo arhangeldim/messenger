@@ -9,32 +9,6 @@ import java.util.List;
 
 public class FunctionalProgramming {
 
-    // Принимает одно значение, возвращает одно значение
-    interface Function<R, T> {
-        R apply(T val);
-    }
-
-    // Принимает элемент и проверяет его на условие
-    interface Predicate<T> {
-        boolean test(T val);
-    }
-
-    // Принимает 2 аргумента, проводит опреацию и возвращает результат
-    interface BiFunction<R, U, V> {
-        R apply(U val1, V val2);
-    }
-
-    // 2 аргумента одного типа
-    interface BiOperator<T> extends BiFunction<T, T, T> {
-        T apply(T val1, T val2);
-    }
-
-    static class Square implements Function<Integer, Integer> {
-        public Integer apply(Integer val) {
-            return val * val;
-        }
-    }
-
     /*
     Применить к каждому элементу коллекции заданную операцию
      */
@@ -71,5 +45,31 @@ public class FunctionalProgramming {
             }
         }));
 
+    }
+
+    // Принимает одно значение, возвращает одно значение
+    interface Function<R, T> {
+        R apply(T val);
+    }
+
+    // Принимает элемент и проверяет его на условие
+    interface Predicate<T> {
+        boolean test(T val);
+    }
+
+    // Принимает 2 аргумента, проводит опреацию и возвращает результат
+    interface BiFunction<R, U, V> {
+        R apply(U val1, V val2);
+    }
+
+    // 2 аргумента одного типа
+    interface BiOperator<T> extends BiFunction<T, T, T> {
+        T apply(T val1, T val2);
+    }
+
+    static class Square implements Function<Integer, Integer> {
+        public Integer apply(Integer val) {
+            return val * val;
+        }
     }
 }
