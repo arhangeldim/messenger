@@ -113,9 +113,9 @@ public class BeanGraph {
         }
         return result;
     }
-
-    public boolean isAcyclic() {
-        boolean result = true;
+/*
+    public boolean isConnected() {
+        boolean result = false;
         used.clear();
         for (BeanVertex vertex: vertices.keySet()) {
             used.put(vertex, 0);
@@ -123,10 +123,11 @@ public class BeanGraph {
         for (BeanVertex vertex: vertices.keySet()) {
             if (used.get(vertex) == 0) {
                 if (dfs(vertex)) {
-                    result = false;
+                    result = true;
                 }
             }
         }
         return result;
     }
+   */
 }
