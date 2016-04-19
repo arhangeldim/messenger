@@ -20,11 +20,11 @@ public class QueryExecutor {
     /**
      * Словарь подготовленных запросов, с Generated Keys
      */
-    private Map<String, PreparedStatement> preparedStatementMapGK;
+    private Map<String, PreparedStatement> preparedStatementMapGenKey;
 
     public QueryExecutor() {
         preparedStatementMap = new HashMap<>();
-        preparedStatementMapGK = new HashMap<>();
+        preparedStatementMapGenKey = new HashMap<>();
     }
 
     public void prepareStatement(Connection connection, String query) throws SQLException {
@@ -34,8 +34,8 @@ public class QueryExecutor {
     }
 
     public void prepareStatementGeneratedKeys(Connection connection, String query) throws SQLException {
-        if (preparedStatementMapGK.get(query) == null) {
-            preparedStatementMapGK.put(query, connection.prepareStatement(query,
+        if (preparedStatementMapGenKey.get(query) == null) {
+            preparedStatementMapGenKey.put(query, connection.prepareStatement(query,
                     PreparedStatement.RETURN_GENERATED_KEYS));
         }
     }
@@ -77,7 +77,7 @@ public class QueryExecutor {
     }
 
     public <T> T execUpdate(String sql, Map<Integer, Object> args, ResultHandler<T> handler) throws SQLException {
-        PreparedStatement pstmt = preparedStatementMapGK.get(sql);
+        PreparedStatement pstmt = preparedStatementMapGenKey.get(sql);
         if (pstmt == null) {
             throw new SQLException(String.format("Statement \"%s\" wasn't prepared", sql));
         }
@@ -95,7 +95,7 @@ public class QueryExecutor {
         for (Map.Entry<String, PreparedStatement> pair : preparedStatementMap.entrySet()) {
             pair.getValue().close();
         }
-        for (Map.Entry<String, PreparedStatement> pair : preparedStatementMapGK.entrySet()) {
+        for (Map.Entry<String, PreparedStatement> pair : preparedStatementMapGenKey.entrySet()) {
             pair.getValue().close();
         }
     }

@@ -12,7 +12,7 @@ public class ServerMain {
             serverThread.start();
             System.out.println("Server started, type /stop to stop it");
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            while(true) {
+            while (true) {
                 String line = reader.readLine();
                 if (line.equals("/stop")) {
                     server.close();

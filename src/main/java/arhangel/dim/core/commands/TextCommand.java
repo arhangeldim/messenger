@@ -1,6 +1,9 @@
 package arhangel.dim.core.commands;
 
-import arhangel.dim.core.message.*;
+import arhangel.dim.core.message.AnswerMessage;
+import arhangel.dim.core.message.Chat;
+import arhangel.dim.core.message.Protocol;
+import arhangel.dim.core.message.SerializationProtocol;
 import arhangel.dim.core.store.ChatStore;
 import arhangel.dim.core.store.DataStore;
 import arhangel.dim.core.session.Session;
@@ -55,8 +58,8 @@ public class TextCommand implements Command {
             chat.addMessage(authorId, authorName, messageFromUser);
             SessionManager manager = session.getSessionManager();
             for (Integer id : participants) {
-                Session destinationSession = manager.getSessionById(id);
                 success = AnswerMessage.Value.CHAT;
+                Session destinationSession = manager.getSessionById(id);
                 AnswerMessage answer = new AnswerMessage(messageFromUser, success);
                 answer.setMessage(String.format("Chat %d, from %d: %s", chatId, authorId, messageFromUser));
                 answer.setId(authorId);

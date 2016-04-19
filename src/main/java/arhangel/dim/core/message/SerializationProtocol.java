@@ -1,6 +1,12 @@
 package arhangel.dim.core.message;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectInput;
 import java.nio.ByteBuffer;
 
 public class SerializationProtocol<T> implements Protocol<T> {

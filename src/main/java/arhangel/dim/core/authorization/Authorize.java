@@ -7,7 +7,7 @@ import arhangel.dim.core.message.SerializationProtocol;
 import arhangel.dim.core.session.Session;
 import arhangel.dim.core.store.UserStore;
 
-import java.io.*;
+import java.io.DataOutputStream;
 import java.util.List;
 
 /**

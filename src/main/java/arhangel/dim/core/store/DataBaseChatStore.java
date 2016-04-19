@@ -5,16 +5,19 @@ import arhangel.dim.core.message.Chat;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Реализация хранилища чатов в БД PostegreSql
  */
-public class DBChatStore implements ChatStore {
+
+public class DataBaseChatStore implements ChatStore {
     private Connection connection;
     private QueryExecutor executor;
 
-    public DBChatStore(Connection conn) {
+    public DataBaseChatStore(Connection conn) {
         this.connection = conn;
         this.executor = new QueryExecutor();
     }
@@ -26,9 +29,9 @@ public class DBChatStore implements ChatStore {
         Map<Integer, Object> queryArgs = new HashMap<>();
         queryArgs.put(1, "temp");
         executor.prepareStatementGeneratedKeys(connection, sql);
-        chatId = executor.execUpdate(sql, queryArgs, (r) -> {
-            if (r.next()) {
-                return r.getInt(1);
+        chatId = executor.execUpdate(sql, queryArgs, (resSet) -> {
+            if (resSet.next()) {
+                return resSet.getInt(1);
             }
             return -1;
         });
@@ -46,11 +49,11 @@ public class DBChatStore implements ChatStore {
     @Override
     public Map<Integer, Chat> getChatList() throws Exception {
         String sql = "SELECT * FROM userschat";
-        return executor.execQuery(connection, sql, (r) -> {
+        return executor.execQuery(connection, sql, (resSet) -> {
             Map<Integer, Chat> result = new HashMap<>();
-            while (r.next()) {
-                int chatId = r.getInt("chat_id");
-                int userId = r.getInt("user_id");
+            while (resSet.next()) {
+                int chatId = resSet.getInt("chat_id");
+                int userId = resSet.getInt("user_id");
                 Chat chat = result.get(chatId);
                 if (chat == null) {
                     chat = new Chat(chatId, connection);
@@ -71,9 +74,9 @@ public class DBChatStore implements ChatStore {
         Map<Integer, Object> queryArgs = new HashMap<>();
         queryArgs.put(1, id);
         executor.prepareStatement(connection, sql);
-        executor.execQuery(sql, queryArgs, (r) -> {
-            while (r.next()) {
-                int userId = r.getInt("user_id");
+        executor.execQuery(sql, queryArgs, (resSet) -> {
+            while (resSet.next()) {
+                int userId = resSet.getInt("user_id");
                 result.addParticipant(userId);
             }
             return null;

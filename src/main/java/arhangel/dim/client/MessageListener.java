@@ -58,6 +58,8 @@ public class MessageListener implements Runnable {
             case CHAT:
                 System.out.println(message);
                 break;
+            default:
+                break;
         }
     }
 }

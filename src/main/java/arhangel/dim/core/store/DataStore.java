@@ -1,6 +1,15 @@
 package arhangel.dim.core.store;
 
-import arhangel.dim.core.commands.*;
+
+import arhangel.dim.core.commands.Command;
+import arhangel.dim.core.commands.LoginCommand;
+import arhangel.dim.core.commands.RegisterCommand;
+import arhangel.dim.core.commands.UserInfoCommand;
+import arhangel.dim.core.commands.TextCommand;
+import arhangel.dim.core.commands.ChatCreateCommand;
+import arhangel.dim.core.commands.ChatHistoryCommand;
+import arhangel.dim.core.commands.ChatListCommand;
+import arhangel.dim.core.commands.HelpCommand;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -15,10 +24,10 @@ public class DataStore {
     private ChatStore chatStore;
     private Connection connection;
 
-    public DataStore(UserStore fileUserStore, ChatStore chatStore, Connection c) {
+    public DataStore(UserStore fileUserStore, ChatStore chatStore, Connection conn) {
         this.userStore = fileUserStore;
         this.chatStore = chatStore;
-        this.connection = c;
+        this.connection = conn;
         commandsStore = new HashMap<>();
         commandsStore.put("/register", new RegisterCommand());
         commandsStore.put("/login", new LoginCommand());

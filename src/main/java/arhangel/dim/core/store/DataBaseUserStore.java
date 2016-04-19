@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Хранилище пользователей, реализованное на базе данных PostegreSql.
  */
-public class DBUserStore implements UserStore {
+public class DataBaseUserStore implements UserStore {
     /**
      * Соединение с БД
      */
@@ -24,7 +24,7 @@ public class DBUserStore implements UserStore {
      */
     private QueryExecutor executor;
 
-    public DBUserStore(Connection conn) {
+    public DataBaseUserStore(Connection conn) {
         this.connection = conn;
         this.executor = new QueryExecutor();
     }
@@ -38,13 +38,16 @@ public class DBUserStore implements UserStore {
         queryArgs.put(1, name);
         String sql = "SELECT * FROM USERS where LOGIN = ?";
         executor.prepareStatement(connection, sql);
-        return executor.execQuery(sql, queryArgs, (r) -> {
+        return executor.execQuery(sql, queryArgs, (resSet) -> {
             List<User> data = new ArrayList<>();
-            while (r.next()) {
-                User u = new User(r.getString("login"), r.getString("password"), r.getString("nick"));
-                int id = r.getInt("id");
-                u.setId(id);
-                data.add(u);
+            while (resSet.next()) {
+                User user = new User(resSet.getString("login"),
+                        resSet.getString("password"),
+                        resSet.getString("nick"));
+
+                int id = resSet.getInt("id");
+                user.setId(id);
+                data.add(user);
             }
             return data;
         });
@@ -59,10 +62,10 @@ public class DBUserStore implements UserStore {
         queryArgs.put(1, id);
         String sql = "SELECT * FROM USERS where ID = ?";
         executor.prepareStatement(connection, sql);
-        return executor.execQuery(sql, queryArgs, (r) -> {
+        return executor.execQuery(sql, queryArgs, (resSet) -> {
             User result = new User();
-            while (r.next()) {
-                result = new User(r.getString("login"), r.getString("password"), r.getString("nick"));
+            while (resSet.next()) {
+                result = new User(resSet.getString("login"), resSet.getString("password"), resSet.getString("nick"));
                 result.setId(id);
             }
             return result;
@@ -83,9 +86,9 @@ public class DBUserStore implements UserStore {
             queryArgs.put(3, user.getName());
             String sql = "INSERT INTO USERS (LOGIN, PASSWORD, NICK) VALUES (?, ?, ? )";
             executor.prepareStatementGeneratedKeys(connection, sql);
-            result = executor.execUpdate(sql, queryArgs, (r) -> {
-                if (r.next()) {
-                    return r.getInt(1);
+            result = executor.execUpdate(sql, queryArgs, (resSet) -> {
+                if (resSet.next()) {
+                    return resSet.getInt(1);
                 }
                 return -1;
             });

@@ -6,17 +6,17 @@ import arhangel.dim.core.message.Message;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Map;
 
 /**
  * Реализация хранилища сообщений на БД PostegreSQL
  */
-public class DBMessageStore implements MessageStore {
+public class DataBaseMessageStore implements MessageStore {
     private Connection connection;
     private int chatId;
     private QueryExecutor executor;
 
-    public DBMessageStore(Connection conn, Chat chat) {
+    public DataBaseMessageStore(Connection conn, Chat chat) {
         this.connection = conn;
         this.chatId = chat.getId();
         this.executor = new QueryExecutor();
@@ -31,6 +31,7 @@ public class DBMessageStore implements MessageStore {
     public synchronized Map<Integer, Message> getMessagesMap() throws Exception {
         return null;
     }
+
     @Override
     public void close() throws SQLException {
         executor.close();

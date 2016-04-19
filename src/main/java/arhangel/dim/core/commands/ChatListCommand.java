@@ -36,10 +36,10 @@ public class ChatListCommand implements Command {
                     builder.append(userIdIt);
                     builder.append(", ");
                 }
-                builder.deleteCharAt(builder.length()-1);
+                builder.deleteCharAt(builder.length() - 1);
                 builder.append("\n");
             }
-            builder.deleteCharAt(builder.length()-1);
+            builder.deleteCharAt(builder.length() - 1);
             message = builder.toString();
         }
         writer.write(protocol.encode(new AnswerMessage(message, success)));

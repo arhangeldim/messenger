@@ -10,13 +10,16 @@ import arhangel.dim.core.session.Session;
 import arhangel.dim.core.session.SessionManager;
 import arhangel.dim.core.store.DataStore;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 /**
  * Обработчик команд, поступающих от определённого клиента
  */
-public class CommandHandler implements Runnable{
+public class CommandHandler implements Runnable {
     /**
      * Потоки для общения с клиентом
      */

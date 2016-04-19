@@ -63,7 +63,7 @@ public class ClientMain {
     public void handleUserCommands() throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String line;
-        while(true) {
+        while (true) {
             line = reader.readLine();
             Message writeMessage;
             if (line.startsWith("/")) {
@@ -87,6 +87,7 @@ public class ClientMain {
         try {
             listenThread.interrupt();
             writeThread.interrupt();
+            // join
         } catch (Exception e) {
             System.err.println("Failed to stop threads " + e.toString());
         } finally {

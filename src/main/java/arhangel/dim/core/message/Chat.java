@@ -1,6 +1,6 @@
 package arhangel.dim.core.message;
 
-import arhangel.dim.core.store.DBMessageStore;
+import arhangel.dim.core.store.DataBaseMessageStore;
 import arhangel.dim.core.store.MessageStore;
 
 import java.sql.Connection;
@@ -19,14 +19,14 @@ public class Chat {
         this.id = id;
         this.participantIds = new ArrayList<>();
         this.connection = conn;
-        this.messageStore = new DBMessageStore(connection, this);
+        this.messageStore = new DataBaseMessageStore(connection, this);
     }
 
     public Chat(List<Integer> participantIds, Integer id, Connection conn) {
         this.id = id;
         this.participantIds = participantIds;
         this.connection = conn;
-        this.messageStore = new DBMessageStore(conn, this);
+        this.messageStore = new DataBaseMessageStore(conn, this);
     }
 
     public boolean addParticipant(int id) {

@@ -1,8 +1,8 @@
 package arhangel.dim.server;
 
-import arhangel.dim.core.store.DBUserStore;
-import arhangel.dim.core.jdbc.DBOrganizer;
-import arhangel.dim.core.store.DBChatStore;
+import arhangel.dim.core.store.DataBaseUserStore;
+import arhangel.dim.core.jdbc.DataBaseOrganizer;
+import arhangel.dim.core.store.DataBaseChatStore;
 import arhangel.dim.core.session.SessionManager;
 import arhangel.dim.core.store.DataStore;
 
@@ -46,10 +46,10 @@ public class MultiThreadServer implements Runnable, AutoCloseable {
             this.serverPort = 9000;
             isStopped = false;
             clientThreads = new ArrayList<>();
-            DBOrganizer.reorganizeDB(null);
+            DataBaseOrganizer.reorganizeDataBase(null);
             connection = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/Kud8",
                     "trackuser", "trackuser");
-            dataStore = new DataStore(new DBUserStore(connection), new DBChatStore(connection), connection);
+            dataStore = new DataStore(new DataBaseUserStore(connection), new DataBaseChatStore(connection), connection);
             sessionManager = new SessionManager();
         } catch (Exception e) {
             System.err.println("Server: exception caught " + e.toString());
