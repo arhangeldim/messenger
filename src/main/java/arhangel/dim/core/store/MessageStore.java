@@ -1,5 +1,8 @@
 package arhangel.dim.core.store;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 
 import arhangel.dim.core.Chat;
@@ -33,12 +36,12 @@ public interface MessageStore {
     /**
      * Добавить сообщение в чат
      */
-    void addMessage(Long chatId, Message message);
+    Message addMessage(Long chatId, Message message);
 
     /**
      * Добавить пользователя к чату
      */
     void addUserToChat(Long userId, Long chatId);
-
-
 }
+
+;

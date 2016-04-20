@@ -32,3 +32,4 @@ public interface UserStore {
      */
     User getUserById(Long id);
 }
+

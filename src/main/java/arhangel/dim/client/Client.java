@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.net.BinaryProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ public class Client implements ConnectionHandler {
     private Protocol protocol;
     private int port;
     private String host;
+
 
     /**
      * Тред "слушает" сокет на наличие входящих сообщений от сервера
@@ -123,6 +126,11 @@ public class Client implements ConnectionHandler {
         switch (cmdType) {
             case "/login":
                 // TODO: реализация
+                LoginMessage loginMessage = new LoginMessage();
+                loginMessage.setLogin(tokens[1]);
+                loginMessage.setType(Type.MSG_LOGIN);
+                loginMessage.setPassword(tokens[2]);
+                send(loginMessage);
                 break;
             case "/help":
                 // TODO: реализация
@@ -131,7 +139,8 @@ public class Client implements ConnectionHandler {
                 // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
+                sendMessage.setChatId(Long.parseLong(tokens[1]));
+                sendMessage.setText(tokens[2]);
                 send(sendMessage);
                 break;
             // TODO: implement another types from wiki
@@ -158,15 +167,18 @@ public class Client implements ConnectionHandler {
 
     public static void main(String[] args) throws Exception {
 
-        Client client = null;
+        Client client = new Client();
+        client.setHost("localhost");
+        client.setPort(19000);
+        client.setProtocol(new BinaryProtocol());
         // Пользуемся механизмом контейнера
-        try {
-            Container context = new Container("client.xml");
-            client = (Client) context.getByName("client");
-        } catch (InvalidConfigurationException e) {
-            log.error("Failed to create client", e);
-            return;
-        }
+//        try {
+//            Container context = new Container("client.xml");
+//            client = (Client) context.getByName("client");
+//        } catch (InvalidConfigurationException e) {
+//            log.error("Failed to create client", e);
+//            return;
+//        }
         try {
             client.initSocket();
 

@@ -8,6 +8,16 @@ import java.util.Objects;
 public class TextMessage extends Message {
     private String text;
 
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
+
+    private Long chatId;
+
     public String getText() {
         return text;
     }
