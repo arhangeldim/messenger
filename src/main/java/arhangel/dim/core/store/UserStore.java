@@ -1,34 +1,20 @@
 package arhangel.dim.core.store;
 
-import arhangel.dim.core.User;
+import arhangel.dim.core.authorization.User;
+
+import java.sql.SQLException;
+import java.util.List;
+
 
 /**
- * Хранилище информации о пользователе
+ * Хранилище пользователей
  */
 public interface UserStore {
+    User getUser(int id) throws Exception;
 
-    /**
-     * Добавить пользователя в хранилище
-     * Вернуть его же
-     */
-    User addUser(User user);
+    List<User> getUserByName(String name) throws Exception;
 
-    /**
-     * Обновить информацию о пользователе
-     */
-    User updateUser(User user);
+    int addUser(User user) throws Exception;
 
-    /**
-     *
-     * Получить пользователя по логину/паролю
-     * return null if user not found
-     */
-    User getUser(String login, String pass);
-
-    /**
-     *
-     * Получить пользователя по id, например запрос информации/профиля
-     * return null if user not found
-     */
-    User getUserById(Long id);
+    void close() throws SQLException;
 }

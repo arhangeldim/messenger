@@ -1,44 +1,19 @@
 package arhangel.dim.core.store;
 
-import java.util.List;
+import java.sql.SQLException;
+import java.util.Map;
 
-import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.message.Chat;
+import arhangel.dim.core.message.Message;
 
 /**
  * Хранилище информации о сообщениях
  */
 public interface MessageStore {
 
-    /**
-     * получаем список ид пользователей заданного чата
-     */
-    List<Long> getChatsByUserId(Long userId);
+    void addMessage(int authorId, String from, String message, Chat chat) throws Exception;
 
-    /**
-     * получить информацию о чате
-     */
-    Chat getChatById(Long chatId);
+    Map<Integer, Message> getMessagesMap() throws Exception;
 
-    /**
-     * Список сообщений из чата
-     */
-    List<Long> getMessagesFromChat(Long chatId);
-
-    /**
-     * Получить информацию о сообщении
-     */
-    Message getMessageById(Long messageId);
-
-    /**
-     * Добавить сообщение в чат
-     */
-    void addMessage(Long chatId, Message message);
-
-    /**
-     * Добавить пользователя к чату
-     */
-    void addUserToChat(Long userId, Long chatId);
-
-
+    void close() throws SQLException;
 }
