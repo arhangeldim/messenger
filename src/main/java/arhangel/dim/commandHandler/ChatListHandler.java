@@ -1,6 +1,10 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
@@ -14,7 +18,7 @@ import java.sql.Statement;
  * Created by Арина on 19.04.2016.
  */
 public class ChatListHandler implements Command {
-    public void execute (Session session, Message msg) throws CommandException{
+    public void execute(Session session, Message msg) throws CommandException {
         if (session.getUser() == null) {
             session.notLoggedIn("Request available only to logged in users.");
             return;
@@ -24,7 +28,8 @@ public class ChatListHandler implements Command {
         try {
             Connection connection = db.connect();
             stmnt = connection.createStatement();
-            ResultSet rs = stmnt.executeQuery("SELECT * FROM chattousers WHERE user_id = " + msg.getSenderId().toString());
+            String sql = "SELECT * FROM chattousers WHERE user_id = " + msg.getSenderId().toString();
+            ResultSet rs = stmnt.executeQuery(sql);
             ChatListMessage chatList = new ChatListMessage();
             chatList.setType(Type.MSG_CHAT_LIST_RESULT);
             String result = "";

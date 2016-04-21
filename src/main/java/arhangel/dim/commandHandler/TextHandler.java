@@ -1,6 +1,11 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
@@ -16,7 +21,7 @@ import java.sql.Statement;
 public class TextHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
         if (session.getUser() == null) {
-            session.notLoggedIn("Unlogged users cannot send messages. Your message is not sent. Log in to send messages.");
+            session.notLoggedIn("Unlogged users cannot send messages. Your message is not sent.");
             return;
         }
         TextMessage msg = (TextMessage) message;
@@ -27,12 +32,15 @@ public class TextHandler implements Command {
             ResultSet rs = stmnt.executeQuery("SELECT * FROM chattouser WHERE chat_id = " + msg.getChatId().toString());
             if (!rs.next()) {
                 StatusMessage errorMsg = new StatusMessage();
-                errorMsg.setText("There is no chat with id = " + msg.getChatId().toString() + ", though you may create it with chat_create <user_id list>. Message is not sent.");
+                String text = "There is no chat with id = " + msg.getChatId().toString();
+                errorMsg.setText(text);
                 errorMsg.setType(Type.MSG_STATUS);
                 session.send(errorMsg);
                 return;
             }
-            String sql = "INSERT INTO messages VALUES ("+msg.getSenderId().toString()+","+msg.getChatId().toString()+",'"+msg.getText()+"')";
+            String msgSender = msg.getSenderId().toString();
+            String chatId = msg.getChatId().toString();
+            String sql = "INSERT INTO messages VALUES (" + msgSender + "," + chatId + ",'" + msg.getText() + "')";
             stmnt.executeUpdate(sql);
             stmnt.close();
         } catch (SQLException e) {

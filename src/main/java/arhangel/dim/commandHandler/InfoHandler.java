@@ -1,6 +1,10 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
@@ -26,11 +30,11 @@ public class InfoHandler extends CommandHandler implements Command {
                 Connection connection = db.connect();
                 Statement stmnt = connection.createStatement();
                 ResultSet rs = stmnt.executeQuery("SELECT login FROM users WHERE user_id = " + msg.getText());
-                if (ifErrorSend(rs.next(),session,"No user with id " + msg.getText())) {
+                if (ifErrorSend(rs.next(), session, "No user with id " + msg.getText())) {
                     return;
                 } else {
                     StatusMessage statMsg = new StatusMessage();
-                    statMsg.setText("User with id = "+msg.getText()+" has login "+rs.getString("login"));
+                    statMsg.setText("User with id = " + msg.getText() + " has login " + rs.getString("login"));
                     statMsg.setType(Type.MSG_INFO_RESULT);
                     session.send(statMsg);
                 }

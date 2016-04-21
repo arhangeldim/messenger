@@ -1,6 +1,11 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatHistResultMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
@@ -13,13 +18,13 @@ import java.sql.Statement;
 /**
  * Created by Арина on 19.04.2016.
  */
-public class ChatHistHandler extends CommandHandler implements Command  {
-    public void execute(Session session, Message message) throws CommandException {
+public class ChatHistHandler extends CommandHandler implements Command {
+    public void execute(Session session, Message messg) throws CommandException {
         if (session.getUser() == null) {
             session.notLoggedIn("Request available only to logged in users.");
             return;
         }
-        ChatHistoryMessage msg = (ChatHistoryMessage) message;
+        ChatHistoryMessage msg = (ChatHistoryMessage) messg;
         DbConnect db = new DbConnect();
         Statement stmnt;
         String chat = msg.getChatId().toString();
@@ -27,11 +32,13 @@ public class ChatHistHandler extends CommandHandler implements Command  {
             Connection connection = db.connect();
             stmnt = connection.createStatement();
             ResultSet mess = stmnt.executeQuery("SELECT * FROM messages WHERE chat_id = " + chat);
-            if (ifErrorSend(mess.next(),session,"There is no chat with id = " + chat)) {
+            if (ifErrorSend(mess.next(), session, "There is no chat with id = " + chat)) {
                 return;
             }
-            ResultSet rs = stmnt.executeQuery("SELECT * FROM chattouser WHERE chat_id = " + chat + "&& user_id = " + msg.getSenderId().toString());
-            if (ifErrorSend(rs.next(),session,"You don't belong to chat with id = " + chat + ". Deal with it.")) {
+            Long sender = msg.getSenderId();
+            String sql = "SELECT * FROM chattouser WHERE chat_id = " + chat + "&& user_id = " + sender.toString();
+            ResultSet rs = stmnt.executeQuery(sql);
+            if (ifErrorSend(rs.next(), session, "You don't belong to chat with id = " + chat + ". Deal with it.")) {
                 return;
             }
             ChatHistResultMessage result = new ChatHistResultMessage();
@@ -40,7 +47,7 @@ public class ChatHistHandler extends CommandHandler implements Command  {
                 String messageText = mess.getString("text");
                 userId = mess.getInt("sender_id");
                 if (userId == msg.getSenderId()) {
-                    result.addMsg("[You] "+messageText);
+                    result.addMsg("[You] " + messageText);
                 } else {
                     result.addMsg("[" + String.valueOf(userId) + "] " + messageText);
                 }

@@ -1,6 +1,11 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
@@ -17,6 +22,8 @@ public class RegistryHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
         LoginMessage msg = (LoginMessage) message;
         DbConnect db = new DbConnect();
+        String login = msg.getLogin();
+        String password = msg.getPassword();
         try {
             Connection connection = db.connect();
             Statement stmnt = connection.createStatement();
@@ -25,12 +32,12 @@ public class RegistryHandler implements Command {
             if (rs.next()) {
                 userId = rs.getInt("max_id") + 1;
             }
-            String sql = "INSERT INTO users VALUES ('"+msg.getLogin()+"','"+msg.getPassword()+"',"+String.valueOf(userId)+")";
-            session.setUser(Long.valueOf(userId), msg.getLogin());
+            String sql = "INSERT INTO users VALUES ('" + login + "','" + password + "'," + String.valueOf(userId) + ")";
+            session.setUser(Long.valueOf(userId), login);
             stmnt.executeUpdate(sql);
             stmnt.close();
             StatusMessage statMsg = new StatusMessage();
-            statMsg.setText("Successfully registred as " + msg.getLogin());
+            statMsg.setText("Successfully registred as " + login);
             statMsg.setType(Type.MSG_STATUS);
             session.send(statMsg);
         } catch (SQLException e) {

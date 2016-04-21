@@ -1,6 +1,11 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
@@ -16,17 +21,19 @@ import java.sql.Statement;
 public class LoginHandler extends CommandHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
         if (session.getUser() != null) {
-            session.notLoggedIn("You are already logged in as "+session.getUser().getName());
+            session.notLoggedIn("You are already logged in as " + session.getUser().getName());
             return;
         }
         LoginMessage msg = (LoginMessage) message;
         DbConnect db = new DbConnect();
+        String query = "SELECT user_id FROM users WHERE login = ";
+        String sql = query + "'" + msg.getLogin() + "' && password = '" + msg.getPassword() + "'";
         try {
             Connection connection = db.connect();
             Statement stmnt = connection.createStatement();
-            if (msg.getLogin()!=null) {
-                ResultSet rs = stmnt.executeQuery("SELECT user_id FROM users WHERE login = " + "'" + msg.getLogin() + "' && password = " + "'" + msg.getPassword() + "'");
-                if (ifErrorSend(rs.next(),session,"Wrong combination of login and password. Try again or type /login to register")) {
+            if (msg.getLogin() != null) {
+                ResultSet rs = stmnt.executeQuery(sql);
+                if (ifErrorSend(rs.next(), session, "Wrong login or password. Try again or type /login to register")) {
                     return;
                 } else {
                     session.setUser(Long.valueOf(rs.getString("user_id")), msg.getLogin());
