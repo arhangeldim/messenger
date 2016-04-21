@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Arrays;
 
-import arhangel.dim.client.Client;
-import arhangel.dim.commandHandler.*;
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +30,9 @@ public class Session implements Runnable, ConnectionHandler {
     static Logger log = LoggerFactory.getLogger(Session.class);
     private User user;
     private Protocol protocol;
-    public Session(Socket socket, Protocol protocol){
-        try{
+
+    public Session(Socket socket, Protocol protocol) {
+        try {
             this.in = socket.getInputStream();
             this.out = socket.getOutputStream();
         } catch (IOException e) {
@@ -40,16 +41,18 @@ public class Session implements Runnable, ConnectionHandler {
 
         this.protocol = protocol;
     }
-    public void setUser(Long id, String name){
+
+    public void setUser(Long id, String name) {
         user = new User();
         user.setId(id);
         user.setName(name);
     }
+
     public User getUser() {
         return user;
     }
 
-    public void run(){
+    public void run() {
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
             try {
@@ -67,7 +70,7 @@ public class Session implements Runnable, ConnectionHandler {
                     in.close();
                     out.close();
                     log.info("Closing sockets");
-                } catch(IOException e) {
+                } catch (IOException e) {
                     //ignore
                 }
 
@@ -91,7 +94,7 @@ public class Session implements Runnable, ConnectionHandler {
         out.flush();
     }
 
-    public void onMessage(Message msg){
+    public void onMessage(Message msg) {
         // TODO: Пришло некое сообщение от клиента, его нужно обработать
         Type type = msg.getType();
         if (user != null) {
@@ -104,6 +107,7 @@ public class Session implements Runnable, ConnectionHandler {
         }
 
     }
+
     public void notLoggedIn(String text) {
         StatusMessage statmesg = new StatusMessage();
         statmesg.setText(text);
@@ -113,6 +117,7 @@ public class Session implements Runnable, ConnectionHandler {
             log.error("Failed to send status msg");
         }
     }
+
     public void close() {
         // TODO: закрыть in/out каналы и сокет. Освободить другие ресурсы, если необходимо
     }

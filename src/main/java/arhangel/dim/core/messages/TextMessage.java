@@ -37,7 +37,7 @@ public class TextMessage extends Message {
             return false;
         }
         TextMessage message = (TextMessage) other;
-        return Objects.equals(text, message.text)&&Objects.equals(chatId, message.chatId);
+        return Objects.equals(text, message.text) && Objects.equals(chatId, message.chatId);
     }
 
     @Override

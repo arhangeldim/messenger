@@ -1,4 +1,4 @@
-package arhangel.dim.commandHandler;
+package arhangel.dim.commandhandler;
 
 import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.StatusMessage;

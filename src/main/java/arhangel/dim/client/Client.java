@@ -7,7 +7,14 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +31,12 @@ public class Client implements ConnectionHandler {
 
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
-     * */
+     */
     static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
-     *
-     * */
+     */
     private Protocol protocol;
     private int port;
     private String host;
@@ -114,7 +120,7 @@ public class Client implements ConnectionHandler {
             String login = scanner.nextLine();
             log.info("Choose password");
             String password = scanner.nextLine();
-            log.info("Register user with login '"+login+"' and password '"+password+"'?[Y/N]");
+            log.info("Register user with login '" + login + "' and password '" + password + "'?[Y/N]");
             String answer = scanner.nextLine();
             if ("Y".equals(answer)) {
                 LoginMessage loginMsg = new LoginMessage();
@@ -202,8 +208,8 @@ public class Client implements ConnectionHandler {
                     st.setText(tokens[1]);
                 }
                 send(st);
-            // TODO: implement another types from wiki
-
+                // TODO: implement another types from wiki
+                break;
             default:
                 log.error("Invalid input: " + line);
         }
@@ -214,7 +220,7 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
-        log.info("Sending message: "+msg.toString());
+        log.info("Sending message: " + msg.toString());
         out.write(protocol.encode(msg));
         out.flush(); // принудительно проталкиваем буфер с данными
     }

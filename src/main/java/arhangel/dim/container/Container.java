@@ -21,6 +21,7 @@ public class Container {
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
+     *
      * @throws InvalidConfigurationException неверный конфиг
      */
 
@@ -29,30 +30,30 @@ public class Container {
         List<Bean> beans = reader.parseBeans(pathToConfig);
         Graph<Bean> graph = new Graph<>();
         List<Vertex> vertices = new ArrayList<>();
-        for (Bean b:beans) {
+        for (Bean b : beans) {
             vertices.add(graph.addVertex(b));
         }
-        for (Vertex<Bean> b:vertices) {
-            for (Property p: b.getValue().getProperties().values()) {
+        for (Vertex<Bean> b : vertices) {
+            for (Property p : b.getValue().getProperties().values()) {
                 if (p.getType() == ValueType.REF) {
-                    for (Vertex<Bean> bn:vertices) {
+                    for (Vertex<Bean> bn : vertices) {
                         if (bn.getValue().getName().equals(p.getValue())) {
-                            graph.addEdge(bn,b,true);
+                            graph.addEdge(bn, b, true);
                         }
                     }
                 }
             }
         }
         List<Vertex<Bean>> sorted = graph.toposort();
-        for (Vertex<Bean> b:sorted) {
+        for (Vertex<Bean> b : sorted) {
             //this.beans.add(b.getValue());
             this.instantiateBean(b.getValue());
         }
     }
 
     /**
-     *  Вернуть объект по имени бина из конфига
-     *  Например, Car car = (Car) container.getByName("carBean")
+     * Вернуть объект по имени бина из конфига
+     * Например, Car car = (Car) container.getByName("carBean")
      */
 
     public Object getByName(String name) {
@@ -85,23 +86,23 @@ public class Container {
                     field.setAccessible(true);
                     if (bean.getProperties().get(name).getType() == ValueType.VAL) {
                         String str = bean.getProperties().get(name).getValue();
-                        if(isNumber(str)){
+                        if (isNumber(str)) {
                             int temp = Integer.parseInt(str);
-                            field.setInt(ob,temp);
+                            field.setInt(ob, temp);
                         } else {
-                            field.set(ob,str);
+                            field.set(ob, str);
                         }
 
 
                     } else {
-                        field.set(ob,objByName.get(bean.getProperties().get(name).getValue()));
+                        field.set(ob, objByName.get(bean.getProperties().get(name).getValue()));
                     }
                 } catch (NoSuchFieldException e) {
                     throw new InvalidConfigurationException("Нет такого поля");
                 }
             }
-            objByName.put(bean.getName(),ob);
-            objByClassName.put(bean.getClassName(),ob);
+            objByName.put(bean.getName(), ob);
+            objByClassName.put(bean.getClassName(), ob);
         } catch (Exception e) {
             e.printStackTrace();
         }

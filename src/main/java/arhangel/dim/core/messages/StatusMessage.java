@@ -5,6 +5,7 @@ package arhangel.dim.core.messages;
  */
 public class StatusMessage extends Message {
     private String status;
+
     public String getText() {
         return status;
     }
@@ -12,6 +13,7 @@ public class StatusMessage extends Message {
     public void setText(String status) {
         this.status = status;
     }
+
     @Override
     public String toString() {
         return "Status:" + status;

@@ -5,10 +5,17 @@ package arhangel.dim.core.messages;
  */
 public class ChatListMessage extends Message {
     String chatList;
-    public void setChatList(String list) { chatList = list; }
-    public String getChatList() { return chatList; }
+
+    public void setChatList(String list) {
+        chatList = list;
+    }
+
+    public String getChatList() {
+        return chatList;
+    }
+
     @Override
     public String toString() {
-        return "Your chat list: "+chatList;
+        return "Your chat list: " + chatList;
     }
 }

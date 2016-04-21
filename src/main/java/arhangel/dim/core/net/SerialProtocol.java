@@ -4,10 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ByteArrayOutputStream;
+
+
 
 /**
  * Простейший протокол передачи данных
@@ -27,11 +33,9 @@ public class SerialProtocol implements Protocol {
             in = new ObjectInputStream(bis);
             msg = (Message) in.readObject();
         } catch (IOException ex) {
-            ProtocolException e = new ProtocolException("IOException while reading bytes");
-            throw e;
+            throw new ProtocolException("IOException while reading bytes");
         } catch (ClassNotFoundException ex) {
-            ProtocolException e = new ProtocolException("ClassNotFoundException while deserializing bytes");
-            throw e;
+            throw new ProtocolException("ClassNotFoundException while deserializing bytes");
         }
         return msg;
     }
@@ -46,8 +50,7 @@ public class SerialProtocol implements Protocol {
             out.writeObject(msg);
             yourBytes = bos.toByteArray();
         } catch (IOException ex) {
-            ProtocolException e = new ProtocolException("IOException while serializing message");
-            throw e;
+            throw new ProtocolException("IOException while serializing message");
         }
         return yourBytes;
     }
