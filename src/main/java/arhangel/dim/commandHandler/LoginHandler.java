@@ -15,6 +15,10 @@ import java.sql.Statement;
  */
 public class LoginHandler extends CommandHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
+        if (session.getUser() != null) {
+            session.notLoggedIn("You are already logged in as "+session.getUser().getName());
+            return;
+        }
         LoginMessage msg = (LoginMessage) message;
         DbConnect db = new DbConnect();
         try {

@@ -15,6 +15,10 @@ import java.sql.Statement;
  */
 public class ChatListHandler implements Command {
     public void execute (Session session, Message msg) throws CommandException{
+        if (session.getUser() == null) {
+            session.notLoggedIn("Request available only to logged in users.");
+            return;
+        }
         DbConnect db = new DbConnect();
         Statement stmnt;
         try {

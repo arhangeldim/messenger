@@ -15,6 +15,10 @@ import java.sql.Statement;
  */
 public class TextHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
+        if (session.getUser() == null) {
+            session.notLoggedIn("Unlogged users cannot send messages. Your message is not sent. Log in to send messages.");
+            return;
+        }
         TextMessage msg = (TextMessage) message;
         DbConnect db = new DbConnect();
         try {

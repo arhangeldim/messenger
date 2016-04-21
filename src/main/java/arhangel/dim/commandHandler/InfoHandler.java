@@ -15,6 +15,10 @@ import java.sql.Statement;
  */
 public class InfoHandler extends CommandHandler implements Command {
     public void execute(Session session, Message message) throws CommandException {
+        if (session.getUser() == null) {
+            session.notLoggedIn("Request available only to logged in users.");
+            return;
+        }
         StatusMessage msg = (StatusMessage) message;
         try {
             if (msg.getText() != "self") {
@@ -33,7 +37,7 @@ public class InfoHandler extends CommandHandler implements Command {
                 stmnt.close();
             } else {
                 StatusMessage statMsg = new StatusMessage();
-                statMsg.setText("Your login is " + session.getUserLogin());
+                statMsg.setText("Your login is " + session.getUser().getName());
                 statMsg.setType(Type.MSG_INFO_RESULT);
                 session.send(statMsg);
             }

@@ -214,7 +214,7 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
-        log.info(msg.toString());
+        log.info("Sending message: "+msg.toString());
         out.write(protocol.encode(msg));
         out.flush(); // принудительно проталкиваем буфер с данными
     }

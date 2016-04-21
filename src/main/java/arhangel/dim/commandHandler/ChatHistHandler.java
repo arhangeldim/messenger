@@ -15,6 +15,10 @@ import java.sql.Statement;
  */
 public class ChatHistHandler extends CommandHandler implements Command  {
     public void execute(Session session, Message message) throws CommandException {
+        if (session.getUser() == null) {
+            session.notLoggedIn("Request available only to logged in users.");
+            return;
+        }
         ChatHistoryMessage msg = (ChatHistoryMessage) message;
         DbConnect db = new DbConnect();
         Statement stmnt;

@@ -1,8 +1,11 @@
 package arhangel.dim.server;
 
 import arhangel.dim.client.Client;
+import arhangel.dim.commandHandler.*;
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.Session;
 import org.slf4j.Logger;
@@ -13,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Основной класс для сервера сообщений
@@ -20,7 +25,7 @@ import java.net.Socket;
 public class Server {
 
     public static final int DEFAULT_MAX_CONNECT = 16;
-
+    public static HashMap<Type, Command> map = new HashMap<Type, Command>();
     // Засетить из конфига
     private int port;
     private Protocol protocol;
@@ -54,13 +59,10 @@ public class Server {
                     log.info("Waiting for a client...");
                     fromclient = serverSocket.accept();
                     log.info("Client connected");
-                    in = fromclient.getInputStream();
-                    out = fromclient.getOutputStream();
-                    Session clientSession = new Session(in, out, protocol);
-                    clientSession.run();
+                    Session clientSession = new Session(fromclient, protocol);
+                    Thread thread = new Thread(clientSession);
+                    thread.start();
                     log.info("Session closed");
-                    in.close();
-                    out.close();
                     fromclient.close();
                 } catch (IOException e) {
                     log.info("Can't accept");
@@ -69,6 +71,15 @@ public class Server {
         }
 
         log.info("Listener Stopped");
+    }
+    public static void setMap(){
+        map.put(Type.MSG_CHAT_CREATE, new ChatCreateHandler());
+        map.put(Type.MSG_CHAT_HIST, new ChatHistHandler());
+        map.put(Type.MSG_CHAT_LIST, new ChatListHandler());
+        map.put(Type.MSG_INFO, new InfoHandler());
+        map.put(Type.MSG_REGISTER, new RegistryHandler());
+        map.put(Type.MSG_TEXT, new TextHandler());
+        map.put(Type.MSG_LOGIN, new LoginHandler());
     }
     public static void main(String[] args) throws Exception {
 
@@ -82,6 +93,7 @@ public class Server {
             log.error("Failed to create server", e);
             return;
         }
+        setMap();
         try {
             server.listen();
         } catch (Exception e) {

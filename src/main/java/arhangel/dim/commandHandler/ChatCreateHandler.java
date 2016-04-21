@@ -15,6 +15,10 @@ import java.sql.Statement;
  */
 public class ChatCreateHandler extends CommandHandler implements Command {
         public void execute(Session session, Message message) throws CommandException {
+            if (session.getUser() == null) {
+                session.notLoggedIn("Unlogged users cannot create chats. Your chat is not created. Log in to create chats.");
+                return;
+            }
             ChatCreateMessage msg = (ChatCreateMessage) message;
             DbConnect db = new DbConnect();
             Statement stmnt;

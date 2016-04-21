@@ -14,6 +14,8 @@ import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static arhangel.dim.server.Server.map;
+
 /**
  * Здесь храним всю информацию, связанную с отдельным клиентом.
  * - объект User - описание пользователя
@@ -28,9 +30,14 @@ public class Session implements Runnable, ConnectionHandler {
     static Logger log = LoggerFactory.getLogger(Session.class);
     private User user;
     private Protocol protocol;
-    public Session(InputStream in, OutputStream out, Protocol protocol){
-        this.in = in;
-        this.out = out;
+    public Session(Socket socket, Protocol protocol){
+        try{
+            this.in = socket.getInputStream();
+            this.out = socket.getOutputStream();
+        } catch (IOException e) {
+            log.error("Failed to init socket");
+        }
+
         this.protocol = protocol;
     }
     public void setUser(Long id, String name){
@@ -38,9 +45,10 @@ public class Session implements Runnable, ConnectionHandler {
         user.setId(id);
         user.setName(name);
     }
-    public String getUserLogin() {
-        return user.getName();
+    public User getUser() {
+        return user;
     }
+
     public void run(){
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
@@ -86,7 +94,15 @@ public class Session implements Runnable, ConnectionHandler {
     public void onMessage(Message msg){
         // TODO: Пришло некое сообщение от клиента, его нужно обработать
         Type type = msg.getType();
-        msg.setSenderId(user.getId());
+        if (user != null) {
+            msg.setSenderId(user.getId());
+        }
+        try {
+            map.get(type).execute(this, msg);
+        } catch (CommandException e) {
+            log.error("Failed to execute regHandle");
+        }
+
         switch (type) {
             case MSG_REGISTER:
                 RegistryHandler regHandle = new RegistryHandler();
@@ -167,6 +183,7 @@ public class Session implements Runnable, ConnectionHandler {
                         log.error("Failed to execute InfoHandler");
                     }
                 }
+                break;
             default:
                 StatusMessage statmsg = new StatusMessage();
                 statmsg.setText("Wrong type, try again");
