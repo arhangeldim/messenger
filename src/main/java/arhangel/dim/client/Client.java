@@ -6,18 +6,28 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatListResultMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.utils.ParseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
+
+import static arhangel.dim.core.messages.Type.MSG_CHAT_LIST;
+import static arhangel.dim.core.messages.Type.MSG_LOGIN;
+import static arhangel.dim.core.messages.Type.MSG_TEXT;
 
 /**
  * Клиент для тестирования серверного приложения
@@ -26,13 +36,12 @@ public class Client implements ConnectionHandler {
 
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
-     * */
+     */
     static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
-     *
-     * */
+     */
     private Protocol protocol;
     private int port;
     private String host;
@@ -109,7 +118,29 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void onMessage(Message msg) {
+
         log.info("Message received: {}", msg);
+
+        switch (msg.getType()) {
+            case MSG_STATUS:
+                StatusMessage msgStatus = (StatusMessage) msg;
+                System.out.println(msgStatus.getText());
+                break;
+            case MSG_CHAT_LIST_RESULT:
+                ChatListResultMessage msgChatListResult = (ChatListResultMessage) msg;
+                if (msgChatListResult.getChatIds().size() == 0) {
+                    System.out.println("You have no chats yet.");
+                } else {
+                    System.out.println("Your chats: " + String.join(",", msgChatListResult.getChatIds().stream()
+                            .map(Object::toString)
+                            .collect(Collectors.toList())));
+                }
+                break;
+            default:
+                log.error("unsupported type of message");
+                break;
+        }
+
     }
 
     /**
@@ -122,7 +153,22 @@ public class Client implements ConnectionHandler {
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
-                // TODO: реализация
+                LoginMessage loginMessage = new LoginMessage();
+                loginMessage.setType(MSG_LOGIN);
+                loginMessage.setLogin(tokens[1]);
+                loginMessage.setPassword(tokens[2]);
+                send(loginMessage);
+                break;
+            case "/chat_list":
+                ChatListMessage chatListMessage = new ChatListMessage();
+                chatListMessage.setType(MSG_CHAT_LIST);
+                send(chatListMessage);
+                break;
+            case "/chat_create":
+                ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
+                chatCreateMessage.setUserIds(ParseUtils
+                        .stringArrToLongList(tokens[1].replaceAll("[\\s]+", "").split(",")));
+                send(chatCreateMessage);
                 break;
             case "/help":
                 // TODO: реализация
@@ -130,8 +176,9 @@ public class Client implements ConnectionHandler {
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
+                sendMessage.setType(MSG_TEXT);
                 sendMessage.setText(tokens[1]);
+                System.out.println("SEND");
                 send(sendMessage);
                 break;
             // TODO: implement another types from wiki
@@ -153,6 +200,14 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
+        try {
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        socketThread.interrupt();
         // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
     }
 
@@ -175,6 +230,7 @@ public class Client implements ConnectionHandler {
             System.out.println("$");
             while (true) {
                 String input = scanner.nextLine();
+                log.info("Command readed from console");
                 if ("q".equals(input)) {
                     return;
                 }

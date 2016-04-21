@@ -6,7 +6,9 @@ import java.util.Objects;
  * Простое текстовое сообщение
  */
 public class TextMessage extends Message {
+
     private String text;
+    private Long chatId;
 
     public String getText() {
         return text;
@@ -16,24 +18,41 @@ public class TextMessage extends Message {
         this.text = text;
     }
 
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
+
     @Override
-    public boolean equals(Object other) {
-        if (this == other) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (other == null || getClass() != other.getClass()) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        if (!super.equals(other)) {
+        if (!super.equals(object)) {
             return false;
         }
-        TextMessage message = (TextMessage) other;
-        return Objects.equals(text, message.text);
+
+        TextMessage that = (TextMessage) object;
+
+        if (text != null ? !text.equals(that.text) : that.text != null) {
+            return false;
+        }
+        return !(chatId != null ? !chatId.equals(that.chatId) : that.chatId != null);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), text);
+        int result = super.hashCode();
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (chatId != null ? chatId.hashCode() : 0);
+        return result;
     }
 
     @Override

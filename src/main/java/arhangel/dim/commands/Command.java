@@ -1,5 +1,7 @@
-package arhangel.dim.core.messages;
+package arhangel.dim.commands;
 
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.net.Session;
 
 // TODO: на каждое сообщение завести обработчик-команду

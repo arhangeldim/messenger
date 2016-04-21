@@ -11,6 +11,14 @@ public abstract class Message implements Serializable {
     private Long id;
     private Long senderId;
     private Type type;
+    private Long timestamp;
+
+    public Message() {
+    }
+
+    public Message(Type type) {
+        this.type = type;
+    }
 
     public Long getId() {
         return id;
@@ -36,23 +44,45 @@ public abstract class Message implements Serializable {
         this.type = type;
     }
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     @Override
-    public boolean equals(Object other) {
-        if (this == other) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (other == null || getClass() != other.getClass()) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        Message message = (Message) other;
-        return Objects.equals(id, message.id) &&
-                Objects.equals(senderId, message.senderId) &&
-                type == message.type;
+
+        Message message = (Message) object;
+
+        if (id != null ? !id.equals(message.id) : message.id != null) {
+            return false;
+        }
+        if (senderId != null ? !senderId.equals(message.senderId) : message.senderId != null) {
+            return false;
+        }
+        if (type != message.type) {
+            return false;
+        }
+        return !(timestamp != null ? !timestamp.equals(message.timestamp) : message.timestamp != null);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, senderId, type);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (senderId != null ? senderId.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
+        return result;
     }
 
     @Override

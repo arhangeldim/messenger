@@ -64,11 +64,13 @@ public class Container {
         for (Method method : clazz.getMethods()) {
             if (method.getName().startsWith("set")) {
                 Property property = findPropertyByName(properties, method.getName().substring(3).toLowerCase());
-                if (property.getType().equals(ValueType.REF)) {
-                    method.invoke(result, getByName(property.getValue()));
-                } else {
-                    Object arg = parseArgument(method.getParameterTypes()[0], property.getValue());
-                    method.invoke(result, arg);
+                if (property != null) {
+                    if (property.getType().equals(ValueType.REF)) {
+                        method.invoke(result, getByName(property.getValue()));
+                    } else {
+                        Object arg = parseArgument(method.getParameterTypes()[0], property.getValue());
+                        method.invoke(result, arg);
+                    }
                 }
             }
         }
