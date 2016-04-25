@@ -21,8 +21,8 @@ public class Container {
     public Container(String pathToConfig) throws InvalidConfigurationException {
         BeanXmlReader reader = new BeanXmlReader();
         try {
-            this.beans = reader.parseBeans(pathToConfig); // вызываем BeanXmlReader
-            for (Bean elem : this.beans) {
+            beans = reader.parseBeans(pathToConfig); // вызываем BeanXmlReader
+            for (Bean elem : beans) {
                 instantiateBean(elem); //instance
             }
         } catch (Exception exc) {
@@ -57,7 +57,12 @@ public class Container {
                 field.setAccessible(true);
 
                 if (bean.getProperties().get(name).getType() == ValueType.VAL) {
-                    field.set(obj, Integer.parseInt(bean.getProperties().get(name).getValue()));
+                    try {
+                        Integer num = Integer.parseInt(bean.getProperties().get(name).getValue());
+                        field.set(obj, num);
+                    } catch (NumberFormatException exc) {
+                        field.set(obj, bean.getProperties().get(name).getValue());
+                    }
                 } else {
                     field.set(obj, objByName.get(bean.getProperties().get(name).getValue()));
                 }
@@ -65,9 +70,7 @@ public class Container {
             objByName.put(bean.getName(), obj);
             objByClassName.put(bean.getClassName(), obj);
 
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException exc) {
-            exc.printStackTrace();
-        } catch (NoSuchFieldException exc) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchFieldException exc) {
             throw new InvalidConfigurationException(exc.getMessage());
         }
         /*
@@ -97,3 +100,4 @@ public class Container {
     }
 
 }
+
