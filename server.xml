@@ -9,8 +9,8 @@
         <property name="userStore" ref="userStore"/>
         <property name="messageStore" ref="messageStore"/>
         <property name="dbLocation" val="jdbc:postgresql://178.62.140.149:5432/zzzzzzzzzzzzz"/>
-        <property name="dbLogin" val="d.denisenko"/>
-        <property name="dbPassword" val="d.denisenko"/>
+        <property name="dbLogin" val="trackuser"/>
+        <property name="dbPassword" val="trackuser"/>
         <property name="protocol" ref="protocol"/>
     </bean>
 
