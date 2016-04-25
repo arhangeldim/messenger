@@ -2,10 +2,6 @@ package arhangel.dim.container;
 
 
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -14,10 +10,9 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +23,7 @@ import java.util.Map;
  * Created by dmitriy on 11.03.16.
  * Рассчитывается, что файл config.xml строго типизирован, например, с помощью .xsd
  */
+
 public class BeanXmlReader {
 
     private static final String TAG_BEAN = "bean";
@@ -101,7 +97,7 @@ public class BeanXmlReader {
         return result;
     }
 
-    private static class MyErrorHandler implements ErrorHandler {
+    private class MyErrorHandler implements ErrorHandler {
 
         private PrintWriter out;
 
@@ -135,5 +131,3 @@ public class BeanXmlReader {
         }
     }
 }
-
-

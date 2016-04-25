@@ -1,6 +1,5 @@
 target/
 classes/
-*.class
 *.iml
 .idea
 
