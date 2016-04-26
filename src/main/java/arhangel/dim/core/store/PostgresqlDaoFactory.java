@@ -9,6 +9,10 @@ public class PostgresqlDaoFactory extends DaoFactory {
             "org.postgresql.Driver";
     public static final String DBURL =
             "jdbc:postgresql://178.62.140.149:5432/gafusss";
+    public static final String DBUSER =
+            "trackuser";
+    public static final String DBPASS =
+            "trackuser";
 
     // method to create Cloudscape connections
     public static Connection createConnection() {
@@ -17,7 +21,7 @@ public class PostgresqlDaoFactory extends DaoFactory {
         Connection connection = null;
         try {
             Class.forName(DRIVER);
-            connection = DriverManager.getConnection(DBURL, "trackuser", "trackuser");
+            connection = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
         } catch (Exception e) {
             e.printStackTrace();
         }

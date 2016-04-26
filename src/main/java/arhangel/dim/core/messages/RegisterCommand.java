@@ -15,7 +15,8 @@ public class RegisterCommand implements Command {
     public void execute(Session session, Message message) throws CommandException {
         if (!session.userAuthenticated()) {
             RegisterMessage registerMessage = (RegisterMessage) message;
-            UserStore userStore = PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDao();
+            UserStore userStore = session.getServer().getUserStore();
+            // PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDao();
             if (userStore.getUserByLogin(registerMessage.getLogin()) == null) {
                 User user = new User(registerMessage.getLogin(), registerMessage.getSecret());
                 userStore.addUser(user);

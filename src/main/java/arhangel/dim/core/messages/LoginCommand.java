@@ -15,7 +15,8 @@ public class LoginCommand implements Command {
     public void execute(Session session, Message message) throws CommandException {
         if (!session.userAuthenticated()) {
             LoginMessage loginMessage = (LoginMessage) message;
-            UserStore userStore = PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDao();
+            UserStore userStore = session.getServer().getUserStore();
+            // PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDao();
             User user = userStore.getUser(loginMessage.getLogin(), loginMessage.getSecret());
             if (user != null) {
                 session.setUser(user);
