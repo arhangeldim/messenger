@@ -3,12 +3,19 @@ package arhangel.dim.core.store;
 import arhangel.dim.core.Chat;
 import arhangel.dim.core.messages.Message;
 
+import java.sql.Connection;
 import java.util.List;
 
 /**
  * Created by dmitriy on 25.04.16.
  */
 public class MessageStoreImpl implements MessageStore {
+    private Connection connection;
+
+    public MessageStoreImpl(Connection connection) {
+        this.connection = connection;
+    }
+
     @Override
     public List<Long> getChatsByUserId(Long userId) {
         return null;

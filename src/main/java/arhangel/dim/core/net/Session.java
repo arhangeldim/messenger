@@ -5,11 +5,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.store.MessageStore;
+import arhangel.dim.core.store.MessageStoreImpl;
 import arhangel.dim.core.store.UserStore;
+import arhangel.dim.core.store.UserStoreImpl;
 import arhangel.dim.server.Server;
 
 /**
@@ -39,6 +43,18 @@ public class Session implements ConnectionHandler {
     private MessageStore messageStorage;
     private Server server;
     private Protocol protocol;
+
+    public Session(Socket socket, Server server) throws IOException, SQLException {
+        this.socket = socket;
+        this.in = socket.getInputStream();
+        this.out = socket.getOutputStream();
+        this.server = server;
+        this.protocol = server.getProtocol();
+        connection = DriverManager.getConnection(server.getDbLoc(), server.getDbLogin(),
+                server.getDbPassword());
+        this.messageStorage = new MessageStoreImpl(connection);
+        this.userStorage = new UserStoreImpl(connection);
+    }
 
     @Override
     public void send(Message msg) throws ProtocolException, IOException {

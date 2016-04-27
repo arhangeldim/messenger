@@ -1,6 +1,5 @@
 package arhangel.dim.core.store;
 
-import arhangel.dim.container.Bean;
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.server.Server;
@@ -8,7 +7,6 @@ import arhangel.dim.server.Server;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.util.List;
 
 /**
  * Created by dmitriy on 25.04.16.

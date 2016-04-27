@@ -1,7 +1,11 @@
 package arhangel.dim.core.messages.commands;
 
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 import arhangel.dim.core.store.UserStoreImpl;
@@ -23,7 +27,7 @@ public class ComLogin implements Command {
         User user = storage.getUser(name, pass);
         if (user != null) {
             StatusMessage response = new StatusMessage();
-            response.text = String.format("Hello, %s", name);
+            response.setText(String.format("Hello, %s", name));
             session.authUser(user);
             session.send(response);
         }

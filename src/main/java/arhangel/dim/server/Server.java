@@ -33,4 +33,7 @@ public class Server {
         return  this.dbPassword;
     }
 
+    public Protocol getProtocol() {
+        return protocol;
+    }
 }
