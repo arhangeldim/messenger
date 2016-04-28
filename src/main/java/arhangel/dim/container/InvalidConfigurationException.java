@@ -1,14 +1,10 @@
 package arhangel.dim.container;
 
 /**
- * Неверная конфигурация
+ * Ошибка конфигурации
  */
 public class InvalidConfigurationException extends Exception {
-    public InvalidConfigurationException(String msg) {
-        super(msg);
-    }
-
-    public InvalidConfigurationException(Throwable ex) {
-        super(ex);
+    public InvalidConfigurationException(String message) {
+        super(message);
     }
 }

@@ -38,7 +38,6 @@ public class ContainerTest {
         expectedCar = new Car();
         expectedCar.setEngine(expectedEngine);
         expectedCar.setGear(expectedGear);
-
     }
 
     @Test
