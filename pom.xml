@@ -22,15 +22,15 @@
     подпрограмм maven-->
     <build>
         <plugins>
-            <plugin>
-                <!-- Данный плагин описывает, какой класс мы хотим стартовать по умолчанию (должен содержать main())-->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <configuration>
-                    <mainClass>arhangel.dim.lections.jdbc.JdbcExample</mainClass>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+            <!--&lt;!&ndash; Данный плагин описывает, какой класс мы хотим стартовать по умолчанию (должен содержать main())&ndash;&gt;-->
+            <!--<groupId>org.codehaus.mojo</groupId>-->
+            <!--<artifactId>exec-maven-plugin</artifactId>-->
+            <!--<version>1.4.0</version>-->
+            <!--<configuration>-->
+            <!--<mainClass>arhangel.dim.lections.jdbc.JdbcExample</mainClass>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -62,6 +62,60 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>client</id>
+            <activation>
+                <property>
+                    <name>Client</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.4.0</version>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>arhangel.dim.lections.socket.nio.NioClient</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>server</id>
+            <activation>
+                <property>
+                    <name>Server</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.4.0</version>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>arhangel.dim.lections.socket.nio.NioServer</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 
     <!-- Maven умеет автоматически вытягивать необходимые библиотеки из глобального репозитория, не придется
     устанавливать их руками. Достаточно указать имя либы и версию. -->
