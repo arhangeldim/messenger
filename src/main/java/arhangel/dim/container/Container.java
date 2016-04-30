@@ -63,7 +63,8 @@ public class Container {
 
         for (Method method : clazz.getMethods()) {
             if (method.getName().startsWith("set")) {
-                Property property = findPropertyByName(properties, method.getName().substring(3).toLowerCase());
+                String methodName = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
+                Property property = findPropertyByName(properties, methodName);
                 if (property != null) {
                     if (property.getType().equals(ValueType.REF)) {
                         method.invoke(result, getByName(property.getValue()));

@@ -5,7 +5,7 @@ import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.net.ProtocolException;
-import arhangel.dim.core.net.Session;
+import arhangel.dim.session.Session;
 import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.server.Server;
 

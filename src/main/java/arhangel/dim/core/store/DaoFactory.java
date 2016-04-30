@@ -8,9 +8,9 @@ import java.sql.SQLException;
  */
 public interface DaoFactory {
 
-    public Connection getConnection() throws SQLException;
+    Connection getConnection() throws SQLException;
 
-    public UserStore getUserStoreDao() throws SQLException;
+    UserStore getUserStoreDao() throws SQLException;
 
-    public MessageStore getMessageStoreDao() throws SQLException;
+    MessageStore getMessageStoreDao() throws SQLException;
 }

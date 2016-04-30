@@ -33,7 +33,8 @@ public class StringProtocol implements Protocol {
         switch (type) {
             case MSG_TEXT:
                 TextMessage textMsg = new TextMessage();
-                textMsg.setSenderId(parseLong(tokens[2]));
+                textMsg.setSenderId(parseLong(tokens[1]));
+                textMsg.setChatId(parseLong(tokens[2]));
                 textMsg.setText(tokens[3]);
                 textMsg.setType(type);
                 return textMsg;
@@ -89,7 +90,7 @@ public class StringProtocol implements Protocol {
         switch (type) {
             case MSG_TEXT:
                 TextMessage sendMessage = (TextMessage) msg;
-                builder.append(String.valueOf(sendMessage.getSenderId())).append(DELIMITER);
+                builder.append(String.valueOf(sendMessage.getChatId())).append(DELIMITER);
                 builder.append(sendMessage.getText()).append(DELIMITER);
                 break;
             case MSG_LOGIN:

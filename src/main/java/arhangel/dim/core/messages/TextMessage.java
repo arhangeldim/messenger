@@ -59,6 +59,7 @@ public class TextMessage extends Message {
     public String toString() {
         return "TextMessage{" +
                 "text='" + text + '\'' +
+                "chat_id='" + chatId + '\'' +
                 '}';
     }
 }

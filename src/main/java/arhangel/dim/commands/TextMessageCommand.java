@@ -2,7 +2,7 @@ package arhangel.dim.commands;
 
 import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.net.Session;
+import arhangel.dim.session.Session;
 import arhangel.dim.server.Server;
 
 /**

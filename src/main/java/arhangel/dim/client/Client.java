@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -171,13 +172,14 @@ public class Client implements ConnectionHandler {
                 send(chatCreateMessage);
                 break;
             case "/help":
-                // TODO: реализация
+                System.out.println(helpInfo());
                 break;
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setType(MSG_TEXT);
-                sendMessage.setText(tokens[1]);
+                sendMessage.setChatId(Long.parseLong(tokens[1]));
+                sendMessage.setText(line.replace(tokens[0] + " " + tokens[1] + " ", ""));
                 System.out.println("SEND");
                 send(sendMessage);
                 break;
@@ -194,7 +196,11 @@ public class Client implements ConnectionHandler {
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
         log.info(msg.toString());
-        out.write(protocol.encode(msg));
+        byte[] bytes = protocol.encode(msg);
+//        Integer size = bytes.length;
+        byte[] size = ByteBuffer.allocate(4).putInt(bytes.length).array();
+        out.write(size);
+        out.write(bytes);
         out.flush(); // принудительно проталкиваем буфер с данными
     }
 
@@ -209,6 +215,17 @@ public class Client implements ConnectionHandler {
 
         socketThread.interrupt();
         // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+    }
+
+    private String helpInfo(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Usage: /command [arg...]").append("\n");
+        sb.append("Available commands:").append("\n");
+        sb.append("\t/login <login> <password>").append("\n");
+        sb.append("\t/chat_list").append("\n");
+        sb.append("\t/chat_create <user_id...>").append("\n");
+        sb.append("\t/text <chat_id> <text>");
+        return sb.toString();
     }
 
     public static void main(String[] args) throws Exception {
@@ -227,8 +244,8 @@ public class Client implements ConnectionHandler {
 
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
-            System.out.println("$");
             while (true) {
+                System.out.print("$");
                 String input = scanner.nextLine();
                 log.info("Command readed from console");
                 if ("q".equals(input)) {
