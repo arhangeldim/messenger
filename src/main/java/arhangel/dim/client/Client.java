@@ -7,14 +7,19 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -26,13 +31,12 @@ public class Client implements ConnectionHandler {
 
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
-     * */
+     */
     static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
-     *
-     * */
+     */
     private Protocol protocol;
     private int port;
     private String host;
@@ -109,7 +113,29 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void onMessage(Message msg) {
-        log.info("Message received: {}", msg);
+        log.info("Message received: {}", msg.toString());
+        if (msg.getType() == Type.MSG_LOGIN) {
+            Scanner scanner = new Scanner(System.in);
+            log.info("Choose login");
+            String login = scanner.nextLine();
+            log.info("Choose password");
+            String password = scanner.nextLine();
+            log.info("Register user with login '" + login + "' and password '" + password + "'?[Y/N]");
+            String answer = scanner.nextLine();
+            if ("Y".equals(answer)) {
+                LoginMessage loginMsg = new LoginMessage();
+                loginMsg.setLogin(login);
+                loginMsg.setPassword(password);
+                loginMsg.setType(Type.MSG_REGISTER);
+                try {
+                    send(loginMsg);
+                } catch (ProtocolException e) {
+                    log.error("ProtocolException, failed to send registry message");
+                } catch (IOException e) {
+                    log.error("IOException, failed to send registry message");
+                }
+            }
+        }
     }
 
     /**
@@ -122,20 +148,68 @@ public class Client implements ConnectionHandler {
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
-                // TODO: реализация
+                LoginMessage loginMsg = new LoginMessage();
+                if (tokens.length == 3) {
+                    loginMsg.setLogin(tokens[1]);
+                    loginMsg.setPassword(tokens[2]);
+                } else if (tokens.length != 1) {
+                    log.error("Wrong format of login request. Type /help to see the right format");
+                    break;
+                }
+                loginMsg.setType(Type.MSG_LOGIN);
+                send(loginMsg);
                 break;
             case "/help":
-                // TODO: реализация
+                log.info("SOME HELP INFO.");
                 break;
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
-                send(sendMessage);
+                if (tokens.length == 3) {
+                    TextMessage sendMessage = new TextMessage();
+                    sendMessage.setType(Type.MSG_TEXT);
+                    sendMessage.setChatId(Long.valueOf(tokens[1]).longValue());
+                    sendMessage.setText(tokens[2]);
+                    send(sendMessage);
+                } else {
+                    log.error("Wrong format of text message. Type /help to see the right format");
+                }
                 break;
-            // TODO: implement another types from wiki
-
+            case "/chat_create":
+                if (tokens.length == 2) {
+                    ChatCreateMessage crtMsg = new ChatCreateMessage();
+                    crtMsg.setUserList(tokens[1].split(","));
+                    crtMsg.setType(Type.MSG_CHAT_CREATE);
+                    send(crtMsg);
+                } else {
+                    log.error("Wrong format of chat creation request. Type /help to see the right format");
+                }
+                break;
+            case "/chat_history":
+                if (tokens.length == 2) {
+                    ChatHistoryMessage histMsg = new ChatHistoryMessage();
+                    histMsg.setChatId(Long.valueOf(tokens[1]));
+                    histMsg.setType(Type.MSG_CHAT_HIST);
+                    send(histMsg);
+                } else {
+                    log.error("Wrong format of chat history request. Type /help to see the right format");
+                }
+                break;
+            case "/chat_list":
+                ChatListMessage listMsg = new ChatListMessage();
+                listMsg.setType(Type.MSG_CHAT_LIST);
+                send(listMsg);
+                break;
+            case "/info":
+                StatusMessage st = new StatusMessage();
+                st.setType(Type.MSG_INFO);
+                if (tokens.length == 1) {
+                    st.setText("self");
+                } else {
+                    st.setText(tokens[1]);
+                }
+                send(st);
+                // TODO: implement another types from wiki
+                break;
             default:
                 log.error("Invalid input: " + line);
         }
@@ -146,7 +220,7 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
-        log.info(msg.toString());
+        log.info("Sending message: " + msg.toString());
         out.write(protocol.encode(msg));
         out.flush(); // принудительно проталкиваем буфер с данными
     }
@@ -163,13 +237,13 @@ public class Client implements ConnectionHandler {
         try {
             Container context = new Container("client.xml");
             client = (Client) context.getByName("client");
+            System.out.println(client.port);
         } catch (InvalidConfigurationException e) {
             log.error("Failed to create client", e);
             return;
         }
         try {
             client.initSocket();
-
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
             System.out.println("$");
