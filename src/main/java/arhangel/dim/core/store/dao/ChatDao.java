@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface ChatDao extends GenericDao<Chat, Long> {
 
-    List<Chat> getChatsByAdminId(User admin) throws PersistException;
+    List<Chat> getChatsByAdmin(User admin) throws PersistException;
 
 }

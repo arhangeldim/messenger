@@ -9,6 +9,7 @@ import arhangel.dim.core.store.dao.ChatDao;
 import arhangel.dim.session.Session;
 import arhangel.dim.server.Server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,15 +33,17 @@ public class ChatListMessageCommand implements Command {
                 session.send(errorMessage);
                 return;
             }
-            // TODO
 
             ChatDao chatDao = (ChatDao) server.getDbFactory().getDao(Chat.class);
 
-
-            List<Long> chatsIds = chatDao.getChatsByAdminId(session.getUser())
-                    .stream()
-                    .map(Chat::getId)
-                    .collect(Collectors.toList());
+            List<Long> chatsIds = new ArrayList<>();
+            List<Chat> chats = chatDao.getChatsByAdmin(session.getUser());
+            if (chats != null) {
+                chatsIds = chats
+                        .stream()
+                        .map(Chat::getId)
+                        .collect(Collectors.toList());
+            }
 
             ChatListResultMessage chatListResultMessage = new ChatListResultMessage();
             chatListResultMessage.setChatIds(chatsIds);

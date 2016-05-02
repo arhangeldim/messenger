@@ -1,17 +1,11 @@
 package arhangel.dim.core.net;
 
-import arhangel.dim.core.messages.ChatCreateMessage;
-import arhangel.dim.core.messages.ChatListMessage;
-import arhangel.dim.core.messages.ChatListResultMessage;
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.StatusMessage;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.messages.*;
 import arhangel.dim.utils.ParseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -76,6 +70,27 @@ public class StringProtocol implements Protocol {
                 }
                 return chatListResultMessage;
 
+            case MSG_INFO:
+                InfoMessage infoMessage = new InfoMessage();
+                infoMessage.setSenderId(parseLong(tokens[1]));
+                infoMessage.setTarget(parseLong(tokens[2]));
+                infoMessage.setType(type);
+                return infoMessage;
+
+            case MSG_INFO_RESULT:
+                InfoResultMessage infoResultMessage = new InfoResultMessage();
+                infoResultMessage.setType(type);
+                infoResultMessage.setSenderId(parseLong(tokens[1]));
+                infoResultMessage.setName(tokens[2]);
+                if (tokens.length > 3 && tokens[3].length() > 0) {
+                    infoResultMessage.setChats(Arrays.asList(tokens[3].split(",")).stream()
+                            .map(this::parseLong)
+                            .collect(Collectors.toList()));
+                } else {
+                    infoResultMessage.setChats(new ArrayList<>());
+                }
+                return infoResultMessage;
+
             default:
                 throw new ProtocolException("Invalid type: " + type);
         }
@@ -122,6 +137,23 @@ public class StringProtocol implements Protocol {
                                 .collect(Collectors.toList()))).append(DELIMITER);
                 break;
 
+            case MSG_INFO:
+                InfoMessage infoMessage = (InfoMessage) msg;
+                builder.append(infoMessage.getTarget()).append(DELIMITER);
+                break;
+
+            case MSG_INFO_RESULT:
+                InfoResultMessage infoResultMessage = (InfoResultMessage) msg;
+                builder.append(infoResultMessage.getName()).append(DELIMITER);
+                if (infoResultMessage.getChats() != null && infoResultMessage.getChats().size() > 0) {
+                    builder.append(String.join(",",
+                            infoResultMessage.getChats().stream()
+                                    .map(Object::toString)
+                                    .collect(Collectors.toList())));
+
+                }
+                builder.append(DELIMITER);
+                break;
             default:
                 throw new ProtocolException("Invalid type: " + type);
 

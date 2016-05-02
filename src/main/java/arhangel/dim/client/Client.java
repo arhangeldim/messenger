@@ -9,13 +9,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import arhangel.dim.core.messages.ChatCreateMessage;
-import arhangel.dim.core.messages.ChatListMessage;
-import arhangel.dim.core.messages.ChatListResultMessage;
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.StatusMessage;
-import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.*;
 import arhangel.dim.utils.ParseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +20,7 @@ import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
 
-import static arhangel.dim.core.messages.Type.MSG_CHAT_LIST;
-import static arhangel.dim.core.messages.Type.MSG_LOGIN;
-import static arhangel.dim.core.messages.Type.MSG_TEXT;
+import static arhangel.dim.core.messages.Type.*;
 
 /**
  * Клиент для тестирования серверного приложения
@@ -137,6 +129,16 @@ public class Client implements ConnectionHandler {
                             .collect(Collectors.toList())));
                 }
                 break;
+            case MSG_INFO_RESULT:
+                InfoResultMessage infoResultMessage = (InfoResultMessage) msg;
+                StringBuilder sb = new StringBuilder();
+                sb.append("Info. User: ").append(infoResultMessage.getName())
+                        .append(", chats: ").append(String.join(",", infoResultMessage.getChats()
+                        .stream()
+                        .map(Object::toString).collect(Collectors.toList())))
+                        .append(".");
+                System.out.println(sb.toString());
+                break;
             default:
                 log.error("unsupported type of message");
                 break;
@@ -180,11 +182,18 @@ public class Client implements ConnectionHandler {
                 sendMessage.setType(MSG_TEXT);
                 sendMessage.setChatId(Long.parseLong(tokens[1]));
                 sendMessage.setText(line.replace(tokens[0] + " " + tokens[1] + " ", ""));
-                System.out.println("SEND");
                 send(sendMessage);
                 break;
-            // TODO: implement another types from wiki
-
+            case "/info":
+                InfoMessage infoMessage = new InfoMessage();
+                infoMessage.setType(MSG_INFO);
+                if (tokens.length == 1){
+                    infoMessage.setTarget(-1L);
+                } else {
+                    infoMessage.setTarget(Long.parseLong(tokens[1]));
+                }
+                send(infoMessage);
+                break;
             default:
                 log.error("Invalid input: " + line);
         }

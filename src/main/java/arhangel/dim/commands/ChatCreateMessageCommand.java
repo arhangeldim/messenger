@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -50,7 +49,7 @@ public class ChatCreateMessageCommand implements Command {
             if (participants.size() == 1) {
                 log.info("1 partitioner");
 //                List<Long> chatsByUser = messageStore.getChatsByUserId(session.getUser().getId());
-                List<Chat> chatsByUser = chatDao.getChatsByAdminId(session.getUser());
+                List<Chat> chatsByUser = chatDao.getChatsByAdmin(session.getUser());
                 if (chatsByUser != null) {
                     for (Chat chat : chatsByUser) {
                         log.info("CHAT " + chat.toString());

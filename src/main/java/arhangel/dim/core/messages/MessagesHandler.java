@@ -21,6 +21,7 @@ public class MessagesHandler {
         commands.put(LoginMessage.class, new LoginMessageCommand(server));
         commands.put(ChatListMessage.class, new ChatListMessageCommand(server));
         commands.put(ChatCreateMessage.class, new ChatCreateMessageCommand(server));
+        commands.put(InfoMessage.class, new InfoMessageCommand(server));
     }
 
     public void execute(Session session, Message message) throws CommandException {

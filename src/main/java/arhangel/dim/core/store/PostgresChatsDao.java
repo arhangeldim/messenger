@@ -188,7 +188,7 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
     }
 
     @Override
-    public List<Chat> getChatsByAdminId(User admin) throws PersistException {
+    public List<Chat> getChatsByAdmin(User admin) throws PersistException {
         List<Chat> chats = getByLongFieldValue(ADMIN_, admin.getId());
         return chats;
     }
