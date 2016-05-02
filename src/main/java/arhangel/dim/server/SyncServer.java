@@ -7,8 +7,8 @@ import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.session.NioSession;
 import arhangel.dim.session.Session;
-import arhangel.dim.core.store.DaoFactory;
-import arhangel.dim.core.store.PostgresqlDaoFactory;
+import arhangel.dim.core.store.dao.DaoFactory;
+import arhangel.dim.core.store.PostgresDaoFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +45,12 @@ public class SyncServer {
     public void start() {
         service = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-        try {
-            dbFactory = new PostgresqlDaoFactory();
-        } catch (ClassNotFoundException e) {
-            log.error("Database connection problems", e);
-            return;
-        }
+//        try {
+//            dbFactory = new PostgresDaoFactory();
+//        } catch (ClassNotFoundException e) {
+//            log.error("Database connection problems", e);
+//            return;
+//        }
 
         try {
             ServerSocket serverSocket = new ServerSocket(port);

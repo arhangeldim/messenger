@@ -6,16 +6,15 @@ import arhangel.dim.core.messages.LoginMessage;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.net.ProtocolException;
+import arhangel.dim.core.store.dao.UserDao;
 import arhangel.dim.session.Session;
-import arhangel.dim.core.store.PersistException;
-import arhangel.dim.core.store.UserStore;
+import arhangel.dim.core.store.dao.PersistException;
 import arhangel.dim.server.Server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import static arhangel.dim.core.messages.Type.MSG_STATUS;
 
@@ -40,30 +39,33 @@ public class LoginMessageCommand implements Command {
         String login = loginMessage.getLogin();
         String password = loginMessage.getPassword();
 
-        UserStore userStore;
-
         User user;
         try {
-            userStore = server.getDbFactory().getUserStoreDao();
-            user = userStore.getUser(login, password);
 
+            UserDao userDao = (UserDao) server.getDbFactory().getDao(User.class);
+
+            user = userDao.getUserByLogin(login);
 
             if (user == null) {
                 log.info("There is no user " + loginMessage.getLogin());
                 user = new User();
                 user.setName(loginMessage.getLogin());
                 user.setPassword(loginMessage.getPassword());
-                user = userStore.addUser(user);
+                user = userDao.persist(user);
                 log.info("User " + user.getName() + " created.");
             }
 
-            session.setUser(user);
-
             StatusMessage response = new StatusMessage();
-            response.setText(String.format("You login like: %s. Your id: %d", user.getName(), user.getId()));
             response.setType(MSG_STATUS);
+
+            if (!user.getPassword().equals(password)) {
+                response.setText("Incorrect login or password. Please, try again!");
+            } else {
+                session.setUser(user);
+                response.setText(String.format("You login like: %s. Your id: %d", user.getName(), user.getId()));
+            }
             session.send(response);
-        } catch (PersistException | SQLException | ProtocolException | IOException e) {
+        } catch (PersistException | ProtocolException | IOException e) {
             throw new CommandException(e);
         }
 

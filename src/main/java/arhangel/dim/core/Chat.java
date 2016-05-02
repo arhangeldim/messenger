@@ -1,6 +1,7 @@
 package arhangel.dim.core;
 
 import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.store.dao.Identified;
 import arhangel.dim.utils.ParseUtils;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * А над этим классом надо еще поработать
  */
-public class Chat {
+public class Chat implements Identified<Long>{
 
     private Long id;
     private List<Long> messages = new ArrayList<>();

@@ -1,56 +1,56 @@
+import arhangel.dim.core.Chat;
 import arhangel.dim.core.User;
-import arhangel.dim.core.store.PersistException;
-import arhangel.dim.core.store.PostgresqlDaoFactory;
-import arhangel.dim.core.store.PostgresqlUserStore;
-import arhangel.dim.core.store.UserStore;
-
-import java.sql.SQLException;
+import arhangel.dim.core.store.dao.GenericDao;
+import arhangel.dim.core.store.dao.PersistException;
+import arhangel.dim.core.store.PostgresDaoFactory;
 
 /**
  * Created by olegchuikin on 08/04/16.
  */
 public class JdbcTest {
     public static void main(String[] args) {
-
         try {
-            PostgresqlDaoFactory factory = new PostgresqlDaoFactory();
-            UserStore userStoreDao = factory.getUserStoreDao();
+            PostgresDaoFactory postgresDaoFactory = new PostgresDaoFactory();
+            GenericDao<User, Long> userDao = postgresDaoFactory.getDao(User.class);
+//            for (User user : userDao.getAll()) {
+//                System.out.println(user.getId() + " " + user.getName() + " " + user.getPassword());
+//            }
 
-            User user = new User();
-            user.setName("Hi");
-            user.setPassword("pass");
+//            User user = new User();
+//            user.setName("admin");
+//            user.setPassword("admin");
+//            userDao.persist(user);
+//            userDao.getAll().stream().forEach(System.out::println);
 
-            user = userStoreDao.addUser(user);
+//            System.out.println(userDao.getByPK(22L));
+//            System.out.println(userDao.getByPK(300L));
 
-            for (User user1 : ((PostgresqlUserStore) userStoreDao).getAll()) {
-                System.out.println(user1);
-            }
-            System.out.println("===================================");
+//            TextMessage msg = new TextMessage();
+//            msg.setType(Type.MSG_TEXT);
+//            msg.setText("Pica pica");
+//            msg.setTimestamp(System.currentTimeMillis());
+//            msg.setChatId(1L);
+//            msg.setSenderId(1L);
+//
+//            GenericDao<TextMessage, Long> msgDao = postgresDaoFactory.getDao(TextMessage.class);
+//            msgDao.persist(msg);
+//            msgDao.getAll().stream().forEach(System.out::println);
 
-//            User user1 = userStoreDao.getUser("asd", "adf");
-//            System.out.println(user1);
-            User userById = userStoreDao.getUserById(3L);
-            System.out.println(userById);
 
-            User user1 = userStoreDao.getUser("Hi", "pass");
+//            User admin = userDao.getByPK(19L);
+//            Chat chat = new Chat();
+//            chat.setAdmin(admin);
+//            List<Long> prts = new ArrayList<>();
+//            prts.add(13L);
+//            prts.add(15L);
+//            prts.add(17L);
+//            chat.setParticipants(prts);
+            GenericDao<Chat, Long> chatDao = postgresDaoFactory.getDao(Chat.class);
+            Chat byPK = chatDao.getByPK(7L);
+            System.out.println(byPK);
 
-            System.out.println(user1);
-            user1.setName("NEW NAME");
-            userStoreDao.updateUser(user1);
-            Long id = user1.getId();
-            user1 = userStoreDao.getUserById(id);
-            System.out.println(user1);
-
-//            System.out.println(user.getName());
-//            System.out.println(user.getId());
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
         } catch (PersistException e) {
             e.printStackTrace();
         }
-
     }
 }

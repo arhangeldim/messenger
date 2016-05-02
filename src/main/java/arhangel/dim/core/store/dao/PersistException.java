@@ -1,4 +1,4 @@
-package arhangel.dim.core.store;
+package arhangel.dim.core.store.dao;
 
 /**
  * Created by olegchuikin on 19/04/16.

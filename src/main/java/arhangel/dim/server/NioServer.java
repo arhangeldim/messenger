@@ -3,8 +3,9 @@ package arhangel.dim.server;
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.net.Protocol;
-import arhangel.dim.core.store.DaoFactory;
-import arhangel.dim.core.store.PostgresqlDaoFactory;
+import arhangel.dim.core.store.dao.DaoFactory;
+import arhangel.dim.core.store.PostgresDaoFactory;
+import arhangel.dim.core.store.dao.PersistException;
 import arhangel.dim.nio.ClientPipelineFactory;
 import arhangel.dim.session.FixSizedSessionManager;
 import arhangel.dim.session.SessionsManager;
@@ -57,9 +58,9 @@ public class NioServer implements Server {
     public void start() {
 
         try {
-            dbFactory = new PostgresqlDaoFactory();
-        } catch (ClassNotFoundException e) {
-            log.error("Database connection problems", e);
+            dbFactory = new PostgresDaoFactory();
+        } catch (PersistException e) {
+            e.printStackTrace();
             return;
         }
 

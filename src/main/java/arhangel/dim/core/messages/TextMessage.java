@@ -1,11 +1,13 @@
 package arhangel.dim.core.messages;
 
+import arhangel.dim.core.store.dao.Identified;
+
 import java.util.Objects;
 
 /**
  * Простое текстовое сообщение
  */
-public class TextMessage extends Message {
+public class TextMessage extends Message implements Identified<Long>{
 
     private String text;
     private Long chatId;

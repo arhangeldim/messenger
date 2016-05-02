@@ -1,6 +1,6 @@
 package arhangel.dim.server;
 
-import arhangel.dim.core.store.DaoFactory;
+import arhangel.dim.core.store.dao.DaoFactory;
 import arhangel.dim.session.SessionsManager;
 
 /**

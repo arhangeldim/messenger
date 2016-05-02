@@ -1,13 +1,16 @@
 package arhangel.dim.core;
 
+import arhangel.dim.core.store.dao.Identified;
+
 /**
  * Представление пользователя
  */
-public class User {
+public class User implements Identified<Long> {
     private Long id;
     private String name;
     private String password;
 
+    @Override
     public Long getId() {
         return id;
     }

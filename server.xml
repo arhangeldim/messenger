@@ -3,7 +3,7 @@
     <bean id="protocol" class="arhangel.dim.core.net.StringProtocol"/>
 
     <bean id="server" class="arhangel.dim.server.NioServer">
-        <property name="maxConnection" val="1"/>
+        <property name="maxConnection" val="4"/>
         <property name="port" val="19000"/>
         <property name="protocol" ref="protocol"/>
     </bean>

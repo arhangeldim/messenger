@@ -1,17 +1,16 @@
 package arhangel.dim.commands;
 
+import arhangel.dim.core.Chat;
 import arhangel.dim.core.messages.ChatListResultMessage;
 import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
-import arhangel.dim.core.net.ProtocolException;
+import arhangel.dim.core.store.dao.ChatDao;
 import arhangel.dim.session.Session;
-import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.server.Server;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by olegchuikin on 19/04/16.
@@ -33,15 +32,21 @@ public class ChatListMessageCommand implements Command {
                 session.send(errorMessage);
                 return;
             }
-            MessageStore messageStore = server.getDbFactory().getMessageStoreDao();
-            Long userId = session.getUser().getId();
-            List<Long> chatsByUserId = messageStore.getChatsByUserId(userId);
+            // TODO
+
+            ChatDao chatDao = (ChatDao) server.getDbFactory().getDao(Chat.class);
+
+
+            List<Long> chatsIds = chatDao.getChatsByAdminId(session.getUser())
+                    .stream()
+                    .map(Chat::getId)
+                    .collect(Collectors.toList());
 
             ChatListResultMessage chatListResultMessage = new ChatListResultMessage();
-            chatListResultMessage.setChatIds(chatsByUserId);
+            chatListResultMessage.setChatIds(chatsIds);
             session.send(chatListResultMessage);
 
-        } catch (SQLException | ProtocolException | IOException e) {
+        } catch (Exception e) {
             throw new CommandException(e);
         }
     }

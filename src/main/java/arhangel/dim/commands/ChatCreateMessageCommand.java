@@ -6,8 +6,9 @@ import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.net.ProtocolException;
+import arhangel.dim.core.store.dao.ChatDao;
+import arhangel.dim.core.store.dao.PersistException;
 import arhangel.dim.session.Session;
-import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.server.Server;
 import arhangel.dim.utils.ParseUtils;
 import org.slf4j.Logger;
@@ -40,23 +41,28 @@ public class ChatCreateMessageCommand implements Command {
                 return;
             }
 
-            MessageStore messageStore = server.getDbFactory().getMessageStoreDao();
+            // TODO
+//            MessageStore messageStore = null;//server.getDbFactory().getMessageStore();
+
+            ChatDao chatDao = (ChatDao) server.getDbFactory().getDao(Chat.class);
 
             List<Long> participants = ((ChatCreateMessage) message).getUserIds();
             if (participants.size() == 1) {
                 log.info("1 partitioner");
-                List<Long> chatsByUser = messageStore.getChatsByUserId(session.getUser().getId());
-                for (Long chatId : chatsByUser) {
-                    Chat chat = messageStore.getChatById(chatId);
-                    log.info("CHAT " + chat.toString());
-                    if (chat.getParticipants().size() == 1 &&
-                            chat.getParticipants().get(0).equals(participants.get(0))) {
-                        StatusMessage response = new StatusMessage();
-                        response.setText(String.format(
-                                "You already have chat with user %d. Chat id: %d",
-                                participants.get(0), chat.getId()));
-                        session.send(response);
-                        return;
+//                List<Long> chatsByUser = messageStore.getChatsByUserId(session.getUser().getId());
+                List<Chat> chatsByUser = chatDao.getChatsByAdminId(session.getUser());
+                if (chatsByUser != null) {
+                    for (Chat chat : chatsByUser) {
+                        log.info("CHAT " + chat.toString());
+                        if (chat.getParticipants().size() == 1 &&
+                                chat.getParticipants().get(0).equals(participants.get(0))) {
+                            StatusMessage response = new StatusMessage();
+                            response.setText(String.format(
+                                    "You already have chat with user %d. Chat id: %d",
+                                    participants.get(0), chat.getId()));
+                            session.send(response);
+                            return;
+                        }
                     }
                 }
 
@@ -65,16 +71,14 @@ public class ChatCreateMessageCommand implements Command {
             Chat chat = new Chat();
             chat.setAdmin(session.getUser());
             chat.setParticipants(participants);
-            messageStore.addChat(chat);
+            chat = chatDao.persist(chat);
 
             StatusMessage response = new StatusMessage();
             response.setText(String.format("New chat with %s was created. Chat id: %d",
                     String.join(",", ParseUtils.longListToStringArr(participants)), chat.getId()));
             session.send(response);
-            return;
 
-
-        } catch (SQLException | ProtocolException | IOException e) {
+        } catch (PersistException | ProtocolException | IOException e) {
             throw new CommandException(e);
         }
     }
