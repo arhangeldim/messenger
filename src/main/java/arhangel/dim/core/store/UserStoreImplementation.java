@@ -28,6 +28,7 @@ public class UserStoreImplementation implements UserStore {
                 user.setPassword(resultSet.getString("password"));
             } else {
                 throw new StorageException("No such user");
+
             }
         } catch (SQLException e) {
             throw new StorageException(e);

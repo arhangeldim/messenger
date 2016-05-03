@@ -65,17 +65,12 @@ public class Server {
         Map<Type, GenericCommand> command = new HashMap<>();
         command.put(Type.MSG_CHAT_CREATE, new ChatCreateCommand());
         command.put(Type.MSG_USER_CREATE, new UserCreateCommand());
-/*
-        Interpreter interpreter = new Interpreter( new GenericCommand[] {
-                new ChatCreateCommand(),
-                new ChatHistoryCommand(),
-                new ChatListCommand(),
-                new InfoCommand(),
-                new LoginCommand(),
-                new TextCommand(),
-                new UserCreateCommand(),
-        });
-*/
+        command.put(Type.MSG_LOGIN, new LoginCommand());
+        command.put(Type.MSG_CHAT_HIST, new ChatHistoryCommand());
+        command.put(Type.MSG_CHAT_LIST, new ChatListCommand());
+        command.put(Type.MSG_INFO, new InfoCommand());
+        command.put(Type.MSG_TEXT, new TextCommand());
+
         Interpreter interpreter = new Interpreter(command);
         DataBase db = new DataBase();
 

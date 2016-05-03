@@ -17,14 +17,15 @@ public class InfoCommand extends GenericCommand {
     Message handleMessage(Session session, Message message) throws CommandException {
         InfoMessage infoMessage = (InfoMessage) message;
         Long userId = infoMessage.getSenderId();
-        User user;
+        User user = null;
+        InfoResultMessage answer = new InfoResultMessage();
         try {
             user = session.getUserStore().getUserById(userId);
+            answer.setInfo(" username: " + user.getName() + "; id: " + user.getId());
         } catch (StorageException e) {
-            throw new CommandException("Database failed", e);
+            //throw new CommandException("Database failed", e);
+            answer.setInfo(e.getMessage());
         }
-        InfoResultMessage answer = new InfoResultMessage();
-        answer.setInfo(' ' + user.getName() + user.getId() + user.getPassword());
         return answer;
     }
 }

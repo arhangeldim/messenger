@@ -34,13 +34,16 @@ public class MessageStoreImplementation implements MessageStore {
 
     @Override
     public Long addChat(List<Long> participants) throws StorageException {
-        String sqlCreateChat = "INSERT INTO chats(id) VALUES(?)";
+        String sqlCreateChat = "INSERT INTO chats(temp) VALUES(?)";
         Long chatId;
         try (PreparedStatement statement = connection.prepareStatement(sqlCreateChat,
                 Statement.RETURN_GENERATED_KEYS)) {
             statement.setLong(1, participants.get(0));
             statement.executeUpdate();
             chatId = getNextId(statement);
+            /*
+             * Возвращать существующие чаты вместо создания новых
+             */
         } catch (SQLException e) {
             throw new StorageException(e);
         }
@@ -107,12 +110,12 @@ public class MessageStoreImplementation implements MessageStore {
 
     @Override
     public Long addMessage(Long chatId, TextMessage message) throws StorageException {
-        // Insert message
-        String sql = "INSERT INTO textmessages(text, text_date) VALUES(?, ?)";
+        String sql = "INSERT INTO textmessages(text, text_date, author_id) VALUES(?, ?, ?)";
         Long result;
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, message.getText());
             stmt.setDate(2, new java.sql.Date(message.getDate().getTime()));
+            stmt.setLong(3, message.getSenderId());
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new StorageException("No rows affected");
@@ -124,11 +127,11 @@ public class MessageStoreImplementation implements MessageStore {
             throw new StorageException(e);
         }
 
-        //insert message in chat
-        sql = "INSERT INTO chat_messages(chat_id, message_id) VALUES(?, ?)";
+        sql = "INSERT INTO chat_messages(chat_id, message_id, text) VALUES(?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, chatId);
             stmt.setLong(2, result);
+            stmt.setString(3, message.getText());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new StorageException(e);

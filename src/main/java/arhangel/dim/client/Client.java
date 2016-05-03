@@ -49,8 +49,8 @@ public class Client implements ConnectionHandler {
     /**
      * С каждым сокетом связано 2 канала in/out
      */
-    private DataInputStream in;
-    private DataOutputStream out;
+    private InputStream in;
+    private OutputStream out;
 
     public Client() {
         port = 9000;
@@ -86,6 +86,7 @@ public class Client implements ConnectionHandler {
         Socket socket = new Socket(host, port);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
+        user = new ClientUser();
 
         /**
          * Инициализируем поток-слушатель. Синтаксис лямбды скрывает создание анонимного класса Runnable
@@ -125,8 +126,11 @@ public class Client implements ConnectionHandler {
             if (status.getUsername() != null) {
                 user.login(status.getId(), status.getUsername());
                 log.info("Successfully logged in with id = " + user.getId());
+            } else {
+                log.info(status.getText());
             }
         }
+        /*
         if (msg.getId() != null) {
             if (user.isLoginned()) {
                 if (msg.getId().equals(user.getId())) {
@@ -134,6 +138,7 @@ public class Client implements ConnectionHandler {
                 }
             }
         }
+        */
     }
 
     /**
@@ -142,21 +147,24 @@ public class Client implements ConnectionHandler {
      */
     public boolean processInput(String line) throws IOException, ProtocolException {
         String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
                 if (tokens.length < 3) {
-                    log.error("Not enough arguments for login");
-                    return false;
+                    log.error("Not enough arguments");
+                    return true;
                 } else if (tokens.length > 3) {
-                    log.error("Too many arguments for login");
-                    return false;
+                    log.error("Too many arguments");
+                    return true;
                 }
                 LoginMessage message = new LoginMessage(tokens[1], tokens[2]);
                 message.setType(Type.MSG_LOGIN);
-                message.setSenderId(user.getId());
+                //message.setSenderId(user.getId());
+                /*
+                 * TODO: обрабатывать ситуацию неверного пароля как-то
+                 */
                 send(message);
+
                 return true;
             case "/help":
                 // TODO: реализация
@@ -164,11 +172,11 @@ public class Client implements ConnectionHandler {
             case "/text":
                 if (tokens.length < 3) {
                     log.error("Not enough arguments for message");
-                    return false;
+                    return true;
                 }
                 if (!user.isLoginned()) {
                     log.error("Please, log in");
-                    return false;
+                    return true;
                 }
                 Long chatId = Long.parseUnsignedLong(tokens[1]);
                 StringBuilder stringBuilder = new StringBuilder();
@@ -181,35 +189,37 @@ public class Client implements ConnectionHandler {
                 String text = stringBuilder.toString();
                 TextMessage sendMessage = new TextMessage(chatId, text);
                 sendMessage.setType(Type.MSG_TEXT);
+                sendMessage.setSenderId(user.getId());
                 send(sendMessage);
-                //sendMessage.setSenderId(user.getId());
                 break;
             case "/info":
-                Long userId;
+                Long userId = user.getId();;
                 if (tokens.length == 1) {
                     userId = user.getId();
                 } else if (tokens.length == 2) {
                     userId = Long.parseUnsignedLong(tokens[1]);
                 } else {
                     log.error("Too many arguments");
+                    return true;
                 }
                 if (!user.isLoginned()) {
                     log.error("Please, log in");
-                    return false;
+                    return true;
                 }
                 InfoMessage info = new InfoMessage();
                 info.setType(Type.MSG_INFO);
-                info.setId(Long.getLong(tokens[1]));
-                info.setSenderId(user.getId());
+                info.setId(user.getId());
+                info.setSenderId(userId);
                 send(info);
                 return true;
             case "/chat_create":
                 if (tokens.length < 2) {
-                    System.out.println("Not enough args");
+                    System.out.println("Not enough arguments");
+                    return true;
                 }
                 if (!user.isLoginned()) {
                     System.out.println("Please, log in");
-                    return false;
+                    return true;
                 }
                 List<Long> participants = new LinkedList<>();
                 if (tokens.length == 2) {
@@ -233,7 +243,7 @@ public class Client implements ConnectionHandler {
             case "/chat_list":
                 if (!user.isLoginned()) {
                     System.out.println("Please, log in");
-                    return false;
+                    return true;
                 }
                 ChatListMessage chatListMessage = new ChatListMessage();
                 chatListMessage.setType(Type.MSG_CHAT_LIST);
@@ -241,17 +251,19 @@ public class Client implements ConnectionHandler {
                 send(chatListMessage);
                 return true;
             case "/user_create":
+                if (tokens.length < 3) {
+                    System.out.println("Not enough arguments");
+                    return true;
+                }
                 String username = tokens[1];
                 String password = tokens[2];
                 UserCreateMessage userCreateMessage = new UserCreateMessage(username, password);
                 userCreateMessage.setType(Type.MSG_USER_CREATE);
-                //userCreateMessage.setSenderId(user.getId());
                 send(userCreateMessage);
-                //user.setId(userCreateMessage.getId());
                 return true;
             default:
                 log.error("Unknown input command: " + line);
-                return false;
+                return true;
         }
         return true;
     }
@@ -262,7 +274,7 @@ public class Client implements ConnectionHandler {
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
         log.info(msg.toString());
-        System.out.println(protocol);
+        //System.out.println(protocol);
         protocol.encode(msg);
         out.write(protocol.encode(msg));
         out.flush(); // принудительно проталкиваем буфер с данными

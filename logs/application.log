@@ -1,0 +1,11 @@
+2016-05-03 05:06:58 INFO  Client:96 - Starting listener thread...
+2016-05-03 05:07:04 INFO  Client:285 - {Message{id=null, senderId=null, type=MSG_LOGIN}, logi2016-05-03 05:07:04 INF2016-05-03 05:07:04 INFO  Client:123 - Message received: {Message{id=1, senderId=null, type=MSG_STATUS}, text="Logged in as sonya, id#1" }
+2016-05-03 05:07:04 INFO  Client:131 - Successfully logged in with id = 1
+2016-05-03 05:07:10 INFO  Client:285 - TextMessage{text='hello world'}
+2016-05-03 05:07:10 INFO  Client:123 - Message received: {Message{id=6, senderId=null, type=MSG_STATUS}, text="Message sent" }
+2016-05-03 05:07:10 INFO  Client:133 - Message sent
+04 INFO  Session:73 - Sending message: {Message{id=1, senderId=null, type=MSG_STATUS}, text="Logged in as sonya, id#1" }
+2016-05-03 05:07:10 INFO  Session:80 - Handling message: TextMessage{text='hello world'}
+2016-05-03 05:07:10 INFO  GenericCommand:33 - Handling message TextMessage{text='hello world'} with class arhangel.dim.core.commands.TextCommand
+2016-05-03 05:07:10 INFO  GenericCommand:35 - Sending answer: {Message{id=6, senderId=null, type=MSG_STATUS}, text="Message sent" }
+2016-05-03 05:07:10 INFO  Session:73 - Sending message: {Message{id=6, senderId=null, type=MSG_STATUS}, text="Message sent" }
