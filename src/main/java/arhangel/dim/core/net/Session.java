@@ -21,7 +21,7 @@ import arhangel.dim.server.Server;
  * - объект User - описание пользователя
  * - сокеты на чтение/запись данных в канал пользователя
  */
-public class Session implements ConnectionHandler {
+public class Session implements ConnectionHandler, Runnable {
 
     /**
      * Пользователь сессии, пока не прошел логин, user == null
@@ -81,5 +81,10 @@ public class Session implements ConnectionHandler {
 
     public void authUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public void run() {
+
     }
 }
