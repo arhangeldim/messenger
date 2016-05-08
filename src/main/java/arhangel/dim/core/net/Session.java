@@ -9,9 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.CommandException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.*;
 import arhangel.dim.core.messages.commands.ComChatList;
 import arhangel.dim.core.messages.commands.ComInfo;
 import arhangel.dim.core.messages.commands.ComLogin;
@@ -61,8 +59,6 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
         this.out = socket.getOutputStream();
         this.server = server;
         this.protocol = server.getProtocol();
-
-        Class.forName("org.postgresql.Driver");
         this.connection = DriverManager.getConnection(server.getDbLoc(), server.getDbLogin(),
                 server.getDbPassword());
         this.userStore = new UserStoreImpl(connection);
@@ -80,28 +76,34 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
     public void onMessage(Message msg) throws IOException, ProtocolException {
         log.info("Process message: {}", msg.getType());
         try {
+            Command cmd;
             switch (msg.getType()) {
                 case MSG_LOGIN:
-                    ComLogin.execute(this, msg);
+                    cmd = new ComLogin();
+                    cmd.execute(this, msg);
                     break;
                 case MSG_TEXT:
                     ComText.execute(this, msg);
                     break;
                 case MSG_INFO:
-                    ComInfo.execute(this, msg);
+                    cmd = new ComInfo();
+                    cmd.execute(this, msg);
                     break;
                 case MSG_CHAT_LIST:
-                    ComChatList.execute(this, msg);
+                    cmd = new ComChatList();
+                    cmd.execute(this, msg);
                     break;
                 case MSG_CHAT_CREATE:
                     ComChatCreate.execute(this, msg);
                     break;
                 case MSG_CHAT_HIST:
-                    ComChatHist.execute(this, msg);
+                    cmd = new ComChatHist();
+                    cmd.execute(this, msg);
                     break;
                 default:
                     log.info("Unknown command");
                     StatusMessage response = new StatusMessage();
+                    response.setStatus(StatusCode.UnknownCommand);
                     send(response);
             }
         } catch (CommandException e) {
@@ -156,6 +158,11 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
     }
 
     public void authUser(User user) {
+        log.info("User authenticated: " + user.toString());
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

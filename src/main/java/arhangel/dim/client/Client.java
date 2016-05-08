@@ -10,15 +10,16 @@ import java.util.List;
 import java.util.Scanner;
 
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.StatusCode;
-import arhangel.dim.core.messages.StatusMessage;
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.ChatMessage;
-import arhangel.dim.core.messages.InfoMessage;
 import arhangel.dim.core.messages.ChatCreateMessage;
 import arhangel.dim.core.messages.ChatHistMessage;
 import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusCode;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
+
 
 /**
  * Клиент для тестирования серверного приложения
@@ -121,19 +123,41 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
-        if (msg.getType() == Type.MSG_STATUS) {
-            StatusMessage status = (StatusMessage) msg;
-            log.info(status.getText());
-            if (status.getStatusCode() == StatusCode.LoggingInSucceed) {
-                user.setName(status.getUserName());
-                user.setId(status.getUserId());
-            }
-            if (status.getStatusCode() == StatusCode.LoggingInFailed) {
-                System.out.println("Can't recognize you, try to login again");
-            }
-            if (status.getStatusCode() == StatusCode.UnknownCommand) {
-                System.out.println("Got the command of unknown type, see the list of commands here /help");
-            }
+        switch (msg.getType()) {
+            case MSG_STATUS:
+                StatusMessage status = (StatusMessage) msg;
+                log.info(status.getText());
+                if (status.getStatusCode() == StatusCode.LoggingInSucceed) {
+                    user.setName(status.getUserName());
+                    user.setId(status.getUserId());
+                }
+                if (status.getStatusCode() == StatusCode.LoggingInFailed) {
+                    System.out.println("Can't recognize you, try to login again");
+                }
+                if (status.getStatusCode() == StatusCode.UnknownCommand) {
+                    System.out.println("Got the command of unknown type, see the list of commands here /help");
+                }
+                if (status.getStatusCode() == StatusCode.AuthenticationRequired) {
+                    System.out.println("You need to /login to use this command");
+                }
+                break;
+            case MSG_CHAT_LIST_RESULT:
+                TextMessage answ = (TextMessage) msg;
+                System.out.println("Your chats:");
+                System.out.println(answ.getText());
+                break;
+            case MSG_CHAT_HIST_RESULT:
+                answ = (TextMessage) msg;
+                System.out.println("History of the chat:");
+                System.out.print(answ.getText());
+                break;
+            case MSG_INFO_RESULT:
+                answ = (TextMessage) msg;
+                System.out.println("See info about user (or about yourself):");
+                System.out.print(answ.getText());
+                break;
+            default:
+                break;
         }
     }
 
@@ -216,8 +240,8 @@ public class Client implements ConnectionHandler {
                     }
                     InfoMessage info = new InfoMessage();
                     info.setType(Type.MSG_INFO);
-                    info.setId(user.getId());
-                    info.setSenderId(userId);
+                    info.setSenderId(user.getId());
+                    info.setUserId(userId);
                     send(info);
                 } else {
                     System.out.println("You must be logged in");

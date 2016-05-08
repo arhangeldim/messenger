@@ -86,13 +86,17 @@ public class MessageStoreImpl implements MessageStore {
 
     @Override
     public Message getMessageById(Long messageId) {
-        String sql = "SELECT chat_id, text FROM Message WHERE Message.id = ?";
+        String sql = "SELECT * FROM Message WHERE Message.id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, messageId);
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {
-                return new ChatMessage(resultSet.getLong("chat_id"), resultSet.getString("text"));
+                ChatMessage resp = new ChatMessage(resultSet.getLong("chat_id"), resultSet.getString("text"));
+                resp.setId(resultSet.getLong("id"));
+                resp.setSenderId(resultSet.getLong("user_id"));
+                resp.setTimestamp(resultSet.getTimestamp("timestamp"));
+                return resp;
             } else {
                 return null;
             }
@@ -138,5 +142,59 @@ public class MessageStoreImpl implements MessageStore {
             log.error("Caught SQLException in addUserToChat");
             e.printStackTrace();
         }
+    }
+
+    public Integer countMessagesByUserId(Long userId) {
+        String sql = "SELECT COUNT(*) as 'amount' FROM Message WHERE user_id = ?";
+        Integer res = 0;
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                res = resultSet.getInt("amount");
+                return res;
+            }
+
+        } catch (SQLException e) {
+            log.error("Caught SQLException in countMessagesByUserId");
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public Integer countChatsByUserId(Long userId) {
+        String sql = "SELECT COUNT(*) as 'amount' FROM Chat_User WHERE user_id = ?";
+        Integer res = 0;
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                res = resultSet.getInt("amount");
+                return res;
+            }
+
+        } catch (SQLException e) {
+            log.error("Caught SQLException in countChatsByUserId");
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public Integer countChatsByOwnerId(Long ownerId) {
+        String sql = "SELECT COUNT(*) as 'amount' FROM Chat WHERE owner_id = ?";
+        Integer res = 0;
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, ownerId);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                res = resultSet.getInt("amount");
+                return res;
+            }
+
+        } catch (SQLException e) {
+            log.error("Caught SQLException in countChatsByUserId");
+            e.printStackTrace();
+        }
+        return res;
     }
 }

@@ -28,18 +28,11 @@ public class Server {
     private int port;
     private Protocol protocol;
     private int maxConnection = DEFAULT_MAX_CONNECT;
-    private ExecutorService threadPool = Executors.newFixedThreadPool(1);
+    private ExecutorService threadPool = Executors.newFixedThreadPool(maxConnection);
     private String dbLoc;
     private String dbLogin;
     private String dbPassword;
-    private UserStore userStore;
-    private MessageStore messageStore;
     private static Logger log = LoggerFactory.getLogger(Server.class);
-
-    public Server() {
-        port = 19000;
-        protocol = new BinaryProtocol();
-    }
 
     public static void main(String[] args) throws Exception {
         Server server;

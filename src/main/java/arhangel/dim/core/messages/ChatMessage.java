@@ -1,5 +1,6 @@
 package arhangel.dim.core.messages;
 
+import java.sql.Timestamp;
 import java.util.Objects;
 
 /**
@@ -7,10 +8,19 @@ import java.util.Objects;
  */
 public class ChatMessage extends TextMessage {
     private Long chatId;
+    private Timestamp timestamp;
 
     public ChatMessage(Long chatId, String text) {
         this.chatId = chatId;
         this.text = text;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
     @Override
@@ -35,4 +45,5 @@ public class ChatMessage extends TextMessage {
                 "text='" + text + '\'' +
                 '}';
     }
+
 }

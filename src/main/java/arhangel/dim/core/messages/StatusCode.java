@@ -8,5 +8,6 @@ public enum StatusCode {
     OK,
     UnknownCommand,
     LoggingInSucceed,
-    LoggingInFailed
+    LoggingInFailed,
+    AuthenticationRequired
 }

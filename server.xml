@@ -1,13 +1,9 @@
 <root>
 
-    <bean id="protocol" class="arhangel.dim.core.net.StringProtocol"/>
-    <bean id="userStore" class="arhangel.dim.core.store.UserStore"/>
-    <bean id="messageStore" class="arhangel.dim.core.store.MessageStore"/>
+    <bean id="protocol" class="arhangel.dim.core.net.BinaryProtocol"/>
     <bean id="server" class="arhangel.dim.server.Server">
         <property name="port" val="19000"/>
         <property name="host" val="localhost"/>
-        <property name="userStore" ref="userStore"/>
-        <property name="messageStore" ref="messageStore"/>
         <property name="dbLocation" val="jdbc:postgresql://178.62.140.149:5432/zzzzzzzzzzzzz"/>
         <property name="dbLogin" val="trackuser"/>
         <property name="dbPassword" val="trackuser"/>
