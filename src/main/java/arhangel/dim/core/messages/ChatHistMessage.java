@@ -5,12 +5,15 @@ import java.util.Objects;
 /**
  * Created by dmitriy on 08.05.16.
  */
-public class ChatMessage extends TextMessage {
+public class ChatHistMessage extends Message {
     private Long chatId;
 
-    public ChatMessage(Long chatId, String text) {
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public ChatHistMessage(Long chatId) {
         this.chatId = chatId;
-        this.text = text;
     }
 
     @Override
@@ -24,15 +27,14 @@ public class ChatMessage extends TextMessage {
         if (!super.equals(other)) {
             return false;
         }
-        ChatMessage message = (ChatMessage) other;
-        return Objects.equals(text, message.text) && Objects.equals(chatId, message.chatId);
+        ChatHistMessage message = (ChatHistMessage) other;
+        return Objects.equals(chatId, message.chatId);
     }
 
     @Override
     public String toString() {
-        return "ChatMessage{" +
+        return "ChatHistMessage{" +
                 "chatId='" + chatId + '\'' +
-                "text='" + text + '\'' +
                 '}';
     }
 }

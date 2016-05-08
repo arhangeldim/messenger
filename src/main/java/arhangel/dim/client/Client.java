@@ -17,6 +17,8 @@ import arhangel.dim.core.messages.LoginMessage;
 import arhangel.dim.core.messages.ChatMessage;
 import arhangel.dim.core.messages.InfoMessage;
 import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistMessage;
+import arhangel.dim.core.messages.ChatListMessage;
 import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,26 +225,64 @@ public class Client implements ConnectionHandler {
                 }
                 break;
             case "/chat_create":
-                if (tokens.length < 2) {
-                    System.out.println("Not enough arguments");
-                    return;
+                if (user != null) {
+                    if (tokens.length < 2) {
+                        System.out.println("Not enough arguments");
+                        return;
+                    }
+                    /*Добавляем в конец списка, лучше ArrayList*/
+                    List<Long> participants = new ArrayList<>();
+                    String[] users = tokens[1].split(",");
+                    for (String strUser : users) {
+                        try {
+                            participants.add(Long.parseUnsignedLong(strUser));
+                        } catch (NumberFormatException e) {
+                            log.error("Wrong format of user_id, must be long");
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                    participants.add(user.getId());
+                    ChatCreateMessage chatCreateMessage = new ChatCreateMessage(participants);
+                    chatCreateMessage.setType(Type.MSG_CHAT_CREATE);
+                    chatCreateMessage.setSenderId(user.getId());
+                    send(chatCreateMessage);
+                } else {
+                    System.out.println("You must be logged in");
                 }
-                List<Long> participants = new ArrayList<>();
-                String[] users = tokens[1].split(",");
-                for (String strUser : users) {
+                break;
+            case "/chat_history":
+                if (user != null) {
+                    if (tokens.length < 2) {
+                        System.out.println("Not enough arguments");
+                        return;
+                    }
+                    Long chatId;
                     try {
-                        participants.add(Long.parseUnsignedLong(strUser));
+                        chatId = Long.parseUnsignedLong(tokens[1]);
                     } catch (NumberFormatException e) {
-                        log.error("Wrong format of user_id, must be long");
+                        log.error("Wrong format of chat_id, must be long");
                         e.printStackTrace();
                         return;
                     }
+                    ChatHistMessage chatHistMessage = new ChatHistMessage(chatId);
+                    chatHistMessage.setType(Type.MSG_CHAT_HIST);
+                    chatHistMessage.setSenderId(user.getId());
+                    send(chatHistMessage);
+
+                } else {
+                    System.out.println("You must be logged in");
                 }
-                participants.add(user.getId());
-                ChatCreateMessage chatCreateMessage = new ChatCreateMessage(participants);
-                chatCreateMessage.setType(Type.MSG_CHAT_CREATE);
-                chatCreateMessage.setSenderId(user.getId());
-                send(chatCreateMessage);
+                break;
+            case "/chat_list":
+                if (user != null) {
+                    ChatListMessage chatListMessage = new ChatListMessage();
+                    chatListMessage.setType(Type.MSG_CHAT_LIST);
+                    chatListMessage.setSenderId(user.getId());
+                    send(chatListMessage);
+                } else {
+                    System.out.println("You must be logged in");
+                }
                 break;
             default:
                 log.error("Invalid input: " + line);
