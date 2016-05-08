@@ -19,7 +19,7 @@ public class ComText implements Command {
     }
 
     @Override
-    public void execute(Session session, Message message) throws CommandException {
+    public static void execute(Session session, Message message) throws CommandException {
 
     }
 }

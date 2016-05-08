@@ -16,22 +16,12 @@ import java.io.IOException;
  * Created by dmitriy on 25.04.16.
  */
 public class ComInfo implements Command {
-    private int userId;
-
-    public ComInfo(int id) {
-        this.userId = id;
-    }
-
-    public ComInfo() { //info command without parameters
-        this.userId = -1;
-    }
-
     @Override
-    public void execute(Session session, Message message) throws CommandException, IOException, ProtocolException {
+    public static void execute(Session session, Message message) throws CommandException, IOException, ProtocolException {
         //если пользователь аутентифицирован?
         TextMessage mes = (TextMessage) message;
         String[] tokens = mes.getText().split(" ");
-        UserStoreImpl storage = (UserStoreImpl) session.getUserStorage();
+        UserStoreImpl storage = (UserStoreImpl) session.getUserStore();
         if (tokens.length > 0) {
             try {
                 String id = tokens[0];

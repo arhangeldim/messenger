@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class ComLogin implements Command {
     @Override
-    public void execute(Session session, Message message) throws CommandException, IOException, ProtocolException {
+    public static void execute(Session session, Message message) throws CommandException, IOException, ProtocolException {
         TextMessage mes = (TextMessage) message;
         String[] tokens = mes.getText().split(" ");
         String name = tokens[0];

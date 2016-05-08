@@ -5,9 +5,7 @@ import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.net.BinaryProtocol;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.Session;
-import arhangel.dim.core.store.Db;
-import arhangel.dim.core.store.MessageStore;
-import arhangel.dim.core.store.UserStore;
+import arhangel.dim.core.store.*;
 import arhangel.dim.lections.socket.IoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,7 @@ public class Server {
     private String dbLoc;
     private String dbLogin;
     private String dbPassword;
-    private UserStore userStorage;
+    private UserStore userStore;
     private MessageStore messageStore;
     private static Logger log = LoggerFactory.getLogger(Server.class);
 
@@ -54,19 +52,20 @@ public class Server {
         }
 
         log.info("Server created");
-
+        /* Create database if doesn't exist */
         Db dataBase = new Db(server.getDbLoc(), server.getDbLogin(), server.getDbPassword());
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(server.getPort());
             log.info("Server started, waiting for connection");
-            Socket clientSocket = serverSocket.accept();
-            log.info("Accepted, " + clientSocket.getInetAddress());
-            log.info("Starting new session");
+            while (!serverSocket.isClosed()) {
+                Socket clientSocket = serverSocket.accept();
+                log.info("Accepted, " + clientSocket.getInetAddress());
+                log.info("Starting new session");
 
-            Session session = new Session(clientSocket, server);
-            server.threadPool.execute(session);
-
+                Session session = new Session(clientSocket, server);
+                server.threadPool.execute(session);
+            }
 
         } finally {
             IoUtil.closeQuietly(serverSocket);
