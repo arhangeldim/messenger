@@ -31,16 +31,16 @@ public class Db {
 
         stmt = connection.createStatement();
         sql = "CREATE TABLE IF NOT EXISTS Message " +
-                "(id SERIAL PRIMARY KEY," +
-                " text         TEXT    NOT NULL," +
-                " timestamp             TIMESTAMP    NOT NULL," +
-                " chat_id SERIAL references Chat(id)" +
-                " user_id SERIAL references User(id))";
+                "(id      SERIAL PRIMARY KEY," +
+                " text    TEXT    NOT NULL," +
+                " chat_id SERIAL references Chat(id)," +
+                " user_id SERIAL references User(id)," +
+                " timestamp TIMESTAMP NOT NULL DEFAULT current_timestamp)";
         stmt.executeUpdate(sql);
         stmt.close();
 
         stmt = connection.createStatement();
-        sql = "CREATE TABLE IF NOT EXISTS chat_user " +
+        sql = "CREATE TABLE IF NOT EXISTS Chat_User " +
                 "(chat_id SERIAL references Chat(id)" +
                 " user_id SERIAL references User(id))";
         stmt.executeUpdate(sql);

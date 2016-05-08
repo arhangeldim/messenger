@@ -202,7 +202,6 @@ public class Client implements ConnectionHandler {
                     System.out.println("You must be logged in");
                 }
                 break;
-            // TODO: implement another types from wiki
             case "/info":
                 if (user != null) {
                     Long userId = user.getId();
@@ -301,7 +300,14 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+        try {
+            in.close();
+            out.close();
+            socketThread.interrupt();
+        } catch (IOException e) {
+            log.error("Can't close in or out in Client");
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws Exception {
