@@ -122,7 +122,6 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
                     Message received = protocol.decode(buf);
                     onMessage(received);
                 }
-                //String line = new String(buf, 0, readBytes);
 
             } catch (IOException | ProtocolException e) {
                 log.error("Server error occured: " + e.getCause().toString());

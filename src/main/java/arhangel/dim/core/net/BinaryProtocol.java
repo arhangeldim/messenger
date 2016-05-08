@@ -2,18 +2,50 @@ package arhangel.dim.core.net;
 
 import arhangel.dim.core.messages.Message;
 
-/**
- * TODO: реализовать здесь свой протокол
- */
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.nio.ByteBuffer;
+
 public class BinaryProtocol implements Protocol {
 
     @Override
     public Message decode(byte[] bytes) throws ProtocolException {
-        return null;
+        try {
+            ByteBuffer buffer = ByteBuffer.wrap(bytes);
+            int size = buffer.getInt();
+            byte[] messageBytes = new byte[size];
+            buffer.get(messageBytes);
+            try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(messageBytes))) {
+                return (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new ProtocolException(e);
+            }
+        } catch (Exception e) {
+            throw new ProtocolException(e);
+        }
     }
 
     @Override
     public byte[] encode(Message msg) throws ProtocolException {
-        return new byte[0];
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(msg);
+            oos.flush();
+
+            byte[] messageBytes = baos.toByteArray();
+            int size = messageBytes.length;
+
+            ByteBuffer buffer = ByteBuffer.allocate(size + 4);
+            buffer.putInt(size);
+            buffer.put(messageBytes);
+
+            return buffer.array();
+        } catch (IOException e) {
+            throw new ProtocolException(e);
+        }
     }
 }
