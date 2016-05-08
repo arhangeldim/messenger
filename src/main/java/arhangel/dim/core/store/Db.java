@@ -17,7 +17,7 @@ public class Db {
         stmt = connection.createStatement();
         sql = "CREATE TABLE IF NOT EXISTS User " +
                 "(id SERIAL PRIMARY KEY," +
-                " login             VARCHAR(255)    NOT NULL," +
+                " login             VARCHAR(255)    NOT NULL UNIQUE," +
                 " password          VARCHAR(255)    NOT NULL)";
         stmt.executeUpdate(sql);
         stmt.close();

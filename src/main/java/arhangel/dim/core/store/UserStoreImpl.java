@@ -4,8 +4,9 @@ import arhangel.dim.core.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,22 +26,91 @@ public class UserStoreImpl implements UserStore {
 
     @Override
     public User addUser(User user) {
-        return null;
+        String sql = "INSERT INTO User(login, password) VALUES(?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getPassword());
+            stmt.executeUpdate();
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    Long newId = generatedKeys.getLong(1);
+                    user.setId(newId);
+                } else {
+                    throw new SQLException("Couldn't get the id of the new user");
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Caught SQLException in addUser");
+            e.printStackTrace();
+        }
+        return user;
     }
 
     @Override
-    public User updateUser(User user) {
-        return null;
+    public boolean updateUser(User user) {
+        String sql = "UPDATE User SET login = ?, password = ? WHERE User.id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getPassword());
+            stmt.setLong(3, user.getId());
+            Integer affected = stmt.executeUpdate();
+            log.info("Affected" + affected.toString() + " rows in table User");
+            if (affected > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            log.error("Caught SQLException in updateUser");
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     @Override
     public User getUser(String login, String pass) {
-        return null;
+        String sql = "SELECT id FROM User WHERE login = ? AND password = ?";
+        User user = new User();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, login);
+            statement.setString(2, pass);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                user.setId(resultSet.getLong("id"));
+                user.setName(login);
+                user.setPassword(pass);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            log.error("Caught SQLException in getUser");
+            e.printStackTrace();
+        }
+        return user;
     }
 
     @Override
     public User getUserById(Long id) {
-        return null;
+        String sql = "SELECT login,password FROM User WHERE id = ?";
+        User user = new User();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                user.setName(resultSet.getString("login"));
+                user.setId(id);
+                user.setPassword(resultSet.getString("password"));
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            log.error("Caught SQLException in getUserById");
+            e.printStackTrace();
+        }
+        return user;
     }
 
     public List<Long> getUsersByChatId(Long chatId) {

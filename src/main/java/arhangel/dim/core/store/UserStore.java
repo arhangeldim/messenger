@@ -16,7 +16,7 @@ public interface UserStore {
     /**
      * Обновить информацию о пользователе
      */
-    User updateUser(User user);
+    boolean updateUser(User user);
 
     /**
      *
