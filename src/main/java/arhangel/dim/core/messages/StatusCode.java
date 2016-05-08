@@ -6,5 +6,7 @@ package arhangel.dim.core.messages;
  */
 public enum StatusCode {
     OK,
-    UnknownCommand
+    UnknownCommand,
+    LoggingInSucceed,
+    LoggingInFailed
 }

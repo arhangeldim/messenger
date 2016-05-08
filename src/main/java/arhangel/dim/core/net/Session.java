@@ -9,11 +9,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.Command;
 import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
-import arhangel.dim.core.messages.commands.*;
+import arhangel.dim.core.messages.commands.ComChatList;
+import arhangel.dim.core.messages.commands.ComInfo;
+import arhangel.dim.core.messages.commands.ComLogin;
+import arhangel.dim.core.messages.commands.ComText;
+import arhangel.dim.core.messages.commands.ComChatCreate;
+import arhangel.dim.core.messages.commands.ComChatHist;
 import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.core.store.MessageStoreImpl;
 import arhangel.dim.core.store.UserStore;
@@ -67,7 +71,6 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
 
     @Override
     public void send(Message msg) throws ProtocolException, IOException {
-        // TODO: Отправить клиенту сообщение
         log.info("Sending message: {}", msg);
         out.write(protocol.encode(msg));
         out.flush();
@@ -75,7 +78,6 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
 
     @Override
     public void onMessage(Message msg) throws IOException, ProtocolException {
-        // TODO: Пришло некое сообщение от клиента, его нужно обработать
         log.info("Process message: {}", msg.getType());
         try {
             switch (msg.getType()) {
@@ -100,7 +102,6 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
                 default:
                     log.info("Unknown command");
                     StatusMessage response = new StatusMessage();
-                    response.setText(String.format("Info about user, %s", user.getName()));
                     send(response);
             }
         } catch (CommandException e) {

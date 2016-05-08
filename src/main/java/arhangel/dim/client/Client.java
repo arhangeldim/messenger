@@ -4,17 +4,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
+import arhangel.dim.core.User;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusCode;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.ChatMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -47,6 +55,7 @@ public class Client implements ConnectionHandler {
      */
     private InputStream in;
     private OutputStream out;
+    private User user;
 
     public Protocol getProtocol() {
         return protocol;
@@ -110,6 +119,20 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
+        if (msg.getType() == Type.MSG_STATUS) {
+            StatusMessage status = (StatusMessage) msg;
+            log.info(status.getText());
+            if (status.getStatusCode() == StatusCode.LoggingInSucceed) {
+                user.setName(status.getUserName());
+                user.setId(status.getUserId());
+            }
+            if (status.getStatusCode() == StatusCode.LoggingInFailed) {
+                System.out.println("Can't recognize you, try to login again");
+            }
+            if (status.getStatusCode() == StatusCode.UnknownCommand) {
+                System.out.println("Got the command of unknown type, see the list of commands here /help");
+            }
+        }
     }
 
     /**
@@ -122,20 +145,105 @@ public class Client implements ConnectionHandler {
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
-                // TODO: реализация
+                if (tokens.length < 3) {
+                    log.error("Expected 3 tokens, got {}", tokens.length);
+                    System.out.println("Few arguments, type /help for more info");
+                    return;
+                }
+                LoginMessage msg = new LoginMessage(tokens[1], tokens[2]);
+                msg.setType(Type.MSG_LOGIN);
+                send(msg);
                 break;
             case "/help":
-                // TODO: реализация
+                System.out.println("Hello comrade!");
+                System.out.println("Behold! See the commands list!");
+                System.out.println("/login <your_login> <your_password> | login to chat");
+                System.out.println("/info [id] | information about user with id = [id]");
+                System.out.println("/info | information about you");
+                System.out.println("/chat_list | get the list of chats (you must be logged in)");
+                System.out.println("/chat_create <user_id list>{format: [id_1],[id_2],...,[id_n]} " +
+                        "| creates the new chat with <user_id list> users");
+                System.out.println("/chat_history [chat_id] | show messages from chat with id = [chat_id]");
+                System.out.println("/text [chat_id] <message> | send <message> to chat with chat_id = [chat_id]");
+                System.out.println("<xxx> means text and [xxx] means integer");
+                System.out.println("Enjoy!");
                 break;
             case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
-                send(sendMessage);
+                if (tokens.length < 3) {
+                    log.error("Expected 3 tokens, got {}", tokens.length);
+                    System.out.println("Few arguments, type /help for more info");
+                    return;
+                }
+
+                if (user != null) {
+                    Long chatId;
+                    try {
+                        chatId = Long.parseUnsignedLong(tokens[1]);
+                    } catch (NumberFormatException e) {
+                        log.error("Wrong format of chat_id, must be long");
+                        e.printStackTrace();
+                        return;
+                    }
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (int i = 2; i < tokens.length; ++i) {
+                        stringBuilder.append(tokens[i]);
+                        if (i + 1 != tokens.length) {
+                            stringBuilder.append(" ");
+                        }
+                    }
+                    String text = stringBuilder.toString();
+                    ChatMessage sendMessage = new ChatMessage(chatId, text);
+                    sendMessage.setType(Type.MSG_TEXT);
+                    sendMessage.setSenderId(user.getId());
+                    send(sendMessage);
+                } else {
+                    System.out.println("You must be logged in");
+                }
                 break;
             // TODO: implement another types from wiki
-
+            case "/info":
+                if (user != null) {
+                    Long userId = user.getId();
+                    if (tokens.length > 1) {
+                        try {
+                            userId = Long.parseUnsignedLong(tokens[1]);
+                        } catch (NumberFormatException e) {
+                            log.error("Wrong format of user_id, must be long");
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                    InfoMessage info = new InfoMessage();
+                    info.setType(Type.MSG_INFO);
+                    info.setId(user.getId());
+                    info.setSenderId(userId);
+                    send(info);
+                } else {
+                    System.out.println("You must be logged in");
+                }
+                break;
+            case "/chat_create":
+                if (tokens.length < 2) {
+                    System.out.println("Not enough arguments");
+                    return;
+                }
+                List<Long> participants = new ArrayList<>();
+                String[] users = tokens[1].split(",");
+                for (String strUser : users) {
+                    try {
+                        participants.add(Long.parseUnsignedLong(strUser));
+                    } catch (NumberFormatException e) {
+                        log.error("Wrong format of user_id, must be long");
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+                participants.add(user.getId());
+                ChatCreateMessage chatCreateMessage = new ChatCreateMessage(participants);
+                chatCreateMessage.setType(Type.MSG_CHAT_CREATE);
+                chatCreateMessage.setSenderId(user.getId());
+                send(chatCreateMessage);
+                break;
             default:
                 log.error("Invalid input: " + line);
         }
