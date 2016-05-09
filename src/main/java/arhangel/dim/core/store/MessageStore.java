@@ -11,8 +11,16 @@ import arhangel.dim.core.messages.Message;
 public interface MessageStore {
 
     /**
+     * Добавление чата
+     * @param users - участники чата
+     * @return возвращает id созданного или существующего чата
+     */
+    Long addChat(List<Long> users);
+
+    /**
      * получаем список ид пользователей заданного чата
      */
+
     List<Long> getChatsByUserId(Long userId);
 
     /**
@@ -33,7 +41,7 @@ public interface MessageStore {
     /**
      * Добавить сообщение в чат
      */
-    void addMessage(Long chatId, Message message);
+    boolean addMessage(Long chatId, Message message);
 
     /**
      * Добавить пользователя к чату

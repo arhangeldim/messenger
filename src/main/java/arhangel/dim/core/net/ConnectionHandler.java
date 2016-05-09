@@ -21,7 +21,7 @@ public interface ConnectionHandler {
     /**
      * Реакция на сообщение, пришедшее из сети
      */
-    void onMessage(Message msg);
+    void onMessage(Message msg) throws IOException, ProtocolException;
 
     /**
      * Молча (без проброса ошибок) закрываем соединение и освобождаем ресурсы

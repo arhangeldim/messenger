@@ -7,7 +7,7 @@ import java.io.Closeable;
  */
 public class IoUtil {
 
-    static void closeQuietly(Closeable res) {
+    public static void closeQuietly(Closeable res) {
         if (res != null) {
             try {
                 res.close();
