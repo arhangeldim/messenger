@@ -41,8 +41,9 @@ public class Db {
 
         stmt = connection.createStatement();
         sql = "CREATE TABLE IF NOT EXISTS Chat_User " +
-                "(chat_id SERIAL references Chat(id)" +
-                " user_id SERIAL references User(id))";
+                "(chat_id SERIAL references Chat(id)," +
+                " user_id SERIAL references User(id)," +
+                "PRIMARY KEY(chat_id, user_id))";
         stmt.executeUpdate(sql);
         stmt.close();
 

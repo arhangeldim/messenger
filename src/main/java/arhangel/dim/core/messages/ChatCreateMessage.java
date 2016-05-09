@@ -13,6 +13,10 @@ public class ChatCreateMessage extends Message{
         this.usersList = usersList;
     }
 
+    public List<Long> getUsersList(){
+        return usersList;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

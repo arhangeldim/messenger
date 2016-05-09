@@ -23,6 +23,10 @@ public class ChatMessage extends TextMessage {
         return timestamp;
     }
 
+    public Long getChatId() {
+        return chatId;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

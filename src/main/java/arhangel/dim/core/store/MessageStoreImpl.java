@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,55 @@ public class MessageStoreImpl implements MessageStore {
 
     public MessageStoreImpl(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public Long addChat(List<Long> users) {
+        Long chatId = null;
+        if (users.size() == 2) {
+            String sqlDialog = "SELECT chat_id FROM" +
+                    "(SELECT chat_id FROM" +
+                    "(SELECT chat_id, COUNT(*) as 'numUsers' " +
+                    "FROM Chat_User GROUP BY chat_id) WHERE numUsers = 2) as t1," +
+                    "(SELECT temp1.chat_id" +
+                    "FROM (SELECT chat_id FROM Chat_User WHERE user_id = ?) as temp1," +
+                    "(SELECT chat_id FROM Chat_User WHERE used_id = ?) as temp2" +
+                    "WHERE temp1.chat_id = temp2.chat_id) as t2" +
+                    "WHERE t1.chat_id = t2.chat_id";
+            try (PreparedStatement stmt = connection.prepareStatement(sqlDialog)) {
+                stmt.setLong(1, users.get(0));
+                stmt.setLong(2, users.get(1));
+                ResultSet result = stmt.executeQuery();
+                if (result.next()) {
+                    chatId = result.getLong("chat_id");
+                    return chatId;
+                }
+
+            } catch (SQLException e) {
+                log.error("Caught SQLException in addChat");
+                e.printStackTrace();
+            }
+
+        }
+        String newChatSql = "INSERT INTO Chat(owner_id) VALUES(?)";
+        try (PreparedStatement inputStmt = connection.prepareStatement(newChatSql, Statement.RETURN_GENERATED_KEYS)) {
+            inputStmt.setLong(1, users.get(users.size() - 1));
+            Integer affectedRows = inputStmt.executeUpdate();
+            log.info("Added" + affectedRows.toString() + " rows to Chat");
+            ResultSet keys = inputStmt.getGeneratedKeys();
+            if (keys.next()) {
+                chatId = keys.getLong("chat_id");
+                for (int i = 0; i < users.size(); i++) {
+                    addUserToChat(users.get(i), chatId);
+                }
+            } else {
+                throw new SQLException("Couldn't create new Chat");
+            }
+        } catch (SQLException e) {
+            log.error("Caught SQLException in addChat");
+            e.printStackTrace();
+        }
+        return chatId;
     }
 
     @Override
@@ -108,7 +158,7 @@ public class MessageStoreImpl implements MessageStore {
     }
 
     @Override
-    public void addMessage(Long chatId, Message message) {
+    public boolean addMessage(Long chatId, Message message) {
         String sql = "INSERT INTO Message(text, chat_id, user_id) VALUES(?, ?, ?)";
 
         if (message.getType() == Type.MSG_TEXT) {
@@ -119,13 +169,15 @@ public class MessageStoreImpl implements MessageStore {
                 stmt.setLong(3, msg.getSenderId());
                 Integer affectedRows = stmt.executeUpdate();
                 log.info("Added" + affectedRows.toString() + " rows to Message");
+                return true;
 
             } catch (SQLException e) {
                 log.error("Caught SQLException in addMessage");
                 e.printStackTrace();
+                return false;
             }
         }
-
+        return false;
     }
 
     @Override

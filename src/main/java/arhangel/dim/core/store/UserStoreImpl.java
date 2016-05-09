@@ -34,7 +34,7 @@ public class UserStoreImpl implements UserStore {
             stmt.executeUpdate();
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    Long newId = generatedKeys.getLong(1);
+                    Long newId = generatedKeys.getLong("id");
                     user.setId(newId);
                 } else {
                     throw new SQLException("Couldn't get the id of the new user");

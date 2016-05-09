@@ -9,5 +9,9 @@ public enum StatusCode {
     UnknownCommand,
     LoggingInSucceed,
     LoggingInFailed,
-    AuthenticationRequired
+    AuthenticationRequired,
+    MessageSent,
+    MessageNotSent,
+    ChatAvailable,
+    ChatIsNotAvailable
 }

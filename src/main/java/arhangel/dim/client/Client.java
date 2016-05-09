@@ -140,6 +140,18 @@ public class Client implements ConnectionHandler {
                 if (status.getStatusCode() == StatusCode.AuthenticationRequired) {
                     System.out.println("You need to /login to use this command");
                 }
+                if (status.getStatusCode() == StatusCode.MessageSent) {
+                    System.out.println("Your message was sent successfully");
+                }
+                if (status.getStatusCode() == StatusCode.MessageNotSent) {
+                    System.out.println("Something went wrong on, try later");
+                }
+                if (status.getStatusCode() == StatusCode.ChatAvailable) {
+                    System.out.println("Your chat is ready for usage");
+                }
+                if (status.getStatusCode() == StatusCode.ChatIsNotAvailable) {
+                    System.out.println("Something went wrong while creating or finding your chat, try later");
+                }
                 break;
             case MSG_CHAT_LIST_RESULT:
                 TextMessage answ = (TextMessage) msg;

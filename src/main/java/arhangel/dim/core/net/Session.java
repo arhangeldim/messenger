@@ -9,7 +9,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.Command;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusCode;
+import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.messages.commands.ComChatList;
 import arhangel.dim.core.messages.commands.ComInfo;
 import arhangel.dim.core.messages.commands.ComLogin;
@@ -83,7 +87,8 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
                     cmd.execute(this, msg);
                     break;
                 case MSG_TEXT:
-                    ComText.execute(this, msg);
+                    cmd = new ComText();
+                    cmd.execute(this, msg);
                     break;
                 case MSG_INFO:
                     cmd = new ComInfo();
@@ -94,7 +99,8 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
                     cmd.execute(this, msg);
                     break;
                 case MSG_CHAT_CREATE:
-                    ComChatCreate.execute(this, msg);
+                    cmd = new ComChatCreate();
+                    cmd.execute(this, msg);
                     break;
                 case MSG_CHAT_HIST:
                     cmd = new ComChatHist();
@@ -105,6 +111,7 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
                     StatusMessage response = new StatusMessage();
                     response.setStatus(StatusCode.UnknownCommand);
                     send(response);
+                    break;
             }
         } catch (CommandException e) {
             log.error("Caught command exception");
