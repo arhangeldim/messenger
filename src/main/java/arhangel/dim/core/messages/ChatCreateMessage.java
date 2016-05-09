@@ -6,14 +6,14 @@ import java.util.Objects;
 /**
  * Created by dmitriy on 08.05.16.
  */
-public class ChatCreateMessage extends Message{
+public class ChatCreateMessage extends Message {
     private List<Long> usersList;
 
     public ChatCreateMessage(List<Long> usersList) {
         this.usersList = usersList;
     }
 
-    public List<Long> getUsersList(){
+    public List<Long> getUsersList() {
         return usersList;
     }
 

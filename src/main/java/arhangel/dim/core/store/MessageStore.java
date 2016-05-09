@@ -16,9 +16,11 @@ public interface MessageStore {
      * @return возвращает id созданного или существующего чата
      */
     Long addChat(List<Long> users);
+
     /**
      * получаем список ид пользователей заданного чата
      */
+
     List<Long> getChatsByUserId(Long userId);
 
     /**
