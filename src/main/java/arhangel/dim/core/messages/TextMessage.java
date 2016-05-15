@@ -7,13 +7,26 @@ import java.util.Objects;
  */
 public class TextMessage extends Message {
     private String text;
+    private long chatId;
+
+    public TextMessage() {
+        this.setType(Type.MSG_TEXT);
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
+    public long getChatId() {
+        return chatId;
     }
 
     @Override
@@ -38,8 +51,6 @@ public class TextMessage extends Message {
 
     @Override
     public String toString() {
-        return "TextMessage{" +
-                "text='" + text + '\'' +
-                '}';
+        return "Message:" + text + '\'';
     }
 }
