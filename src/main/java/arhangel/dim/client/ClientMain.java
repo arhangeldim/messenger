@@ -1,5 +1,7 @@
 package arhangel.dim.client;
 
+import arhangel.dim.container.Container;
+import arhangel.dim.container.beans.WebConnection;
 import arhangel.dim.core.message.Message;
 
 import java.io.BufferedReader;
@@ -43,9 +45,11 @@ public class ClientMain {
 
     public void init() {
         try {
-            //TODO: хост и порт из конфига
-            int port = 9000;
-            socket = new Socket("localhost", port);
+            Container container = new Container("C:\\Users\\Дмитрий\\Documents\\technotrack\\java\\messenger\\config.xml");
+            WebConnection portAndHost = (WebConnection)container.getByClass("arhangel.dim.container.beans.WebConnection");
+            int port = portAndHost.getPort();
+            String host = portAndHost.getHost();
+            socket = new Socket(host, port);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
             messagesToWrite = new ArrayBlockingQueue<>(10);

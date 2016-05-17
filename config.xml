@@ -1,16 +1,12 @@
 <root>
 
-    <bean id="gearBean" class="arhangel.dim.container.beans.Gear">
-        <property name="count" val="6"/>
+    <bean id="port" class="arhangel.dim.container.beans.WebConnection">
+        <property name="port" val="9000"/>
     </bean>
 
-    <bean id="engineBean" class="arhangel.dim.container.beans.Engine">
-        <property name="power" val="200"/>
+    <bean id="host" class="arhangel.dim.container.beans.WebConnection">
+        <property name="host" val="0"/>
     </bean>
 
-    <bean id="carBean" class="arhangel.dim.container.beans.Car">
-        <property name="gear" ref="gearBean"/>
-        <property name="engine" ref="engineBean"/>
-    </bean>
 
 </root>

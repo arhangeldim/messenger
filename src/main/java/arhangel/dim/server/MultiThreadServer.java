@@ -1,5 +1,7 @@
 package arhangel.dim.server;
 
+import arhangel.dim.container.Container;
+import arhangel.dim.container.beans.WebConnection;
 import arhangel.dim.core.store.DataBaseUserStore;
 import arhangel.dim.core.jdbc.DataBaseOrganizer;
 import arhangel.dim.core.store.DataBaseChatStore;
@@ -40,10 +42,11 @@ public class MultiThreadServer implements Runnable, AutoCloseable {
     private SessionManager sessionManager;
 
 
-    // TODO: Прочитать порт с конфига
     public MultiThreadServer() {
         try {
-            this.serverPort = 9000;
+            Container container = new Container("C:\\Users\\Дмитрий\\Documents\\technotrack\\java\\messenger\\config.xml");
+            WebConnection portAndHost = (WebConnection)container.getByClass("arhangel.dim.container.beans.WebConnection");
+            this.serverPort = portAndHost.getPort();
             isStopped = false;
             clientThreads = new ArrayList<>();
             DataBaseOrganizer.reorganizeDataBase(null);

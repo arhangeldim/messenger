@@ -20,7 +20,7 @@ public class HelpCommand implements Command {
                 "  /info <nick> - get the information about \'nick\'\n" +
                 "  /chat_list - list of all chats\n" +
                 "  /chat_create <user_id list> - create chat with participants in list\n" +
-                //"  /chat_history <chat_id> - show messages in \'id\' chat\n" +
+                "  /chat_history <chat_id> - show messages in \'id\' chat\n" +
                 "  /text <id> <message> send message in 'id' chat\n" +
                 "  /exit - exit the program\n" +
                 "  /help - show the list of commands";
