@@ -6,10 +6,12 @@ import java.util.Map;
  * Представляет тег bean из конфига
  */
 public class Bean {
-
     private String name; // Уникально имя бина
     private String className; // Класс бина
     private Map<String, Property> properties; // Набор полей бина ИмяПоля-Значение
+    private Object object;
+
+    public Bean() {}
 
     public Bean(String name, String className, Map<String, Property> properties) {
         this.name = name;
@@ -48,5 +50,13 @@ public class Bean {
                 ", className='" + className + '\'' +
                 ", properties=" + properties +
                 '}';
+    }
+
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
     }
 }
