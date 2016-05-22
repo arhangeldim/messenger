@@ -4,6 +4,7 @@ import arhangel.dim.core.User;
 import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.store.dao.AbstractJDBCDao;
+import arhangel.dim.core.store.dao.MessageDao;
 import arhangel.dim.core.store.dao.PersistException;
 
 import java.sql.*;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * Created by olegchuikin on 01/05/16.
  */
-public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> {
+public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> implements MessageDao {
 
     public static final String ID_ = "id";
     public static final String ADMIN_ = "admin_id";
@@ -122,5 +123,10 @@ public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> {
         TextMessage msg = new TextMessage();
         msg.setType(Type.MSG_TEXT);
         return persist(msg);
+    }
+
+    @Override
+    public List<TextMessage> getMessagesWithChatId(Long chatId) throws PersistException {
+        return getByLongFieldValue(CHAT_, chatId);
     }
 }

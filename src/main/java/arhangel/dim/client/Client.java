@@ -139,6 +139,11 @@ public class Client implements ConnectionHandler {
                         .append(".");
                 System.out.println(sb.toString());
                 break;
+            case MSG_CHAT_HIST_RESULT:
+                ChatHistResultMessage chatHistResultMessage = (ChatHistResultMessage) msg;
+                chatHistResultMessage.getMessages().stream()
+                        .forEach(tm -> System.out.println(tm.getSenderId() + ":" + tm.getText()));
+                break;
             default:
                 log.error("unsupported type of message");
                 break;
@@ -173,11 +178,15 @@ public class Client implements ConnectionHandler {
                         .stringArrToLongList(tokens[1].replaceAll("[\\s]+", "").split(",")));
                 send(chatCreateMessage);
                 break;
+            case "/chat_history":
+                ChatHistMessage chatHistMessage = new ChatHistMessage();
+                chatHistMessage.setChatId(Long.parseLong(tokens[1]));
+                send(chatHistMessage);
+                break;
             case "/help":
                 System.out.println(helpInfo());
                 break;
             case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setType(MSG_TEXT);
                 sendMessage.setChatId(Long.parseLong(tokens[1]));
@@ -187,7 +196,7 @@ public class Client implements ConnectionHandler {
             case "/info":
                 InfoMessage infoMessage = new InfoMessage();
                 infoMessage.setType(MSG_INFO);
-                if (tokens.length == 1){
+                if (tokens.length == 1) {
                     infoMessage.setTarget(-1L);
                 } else {
                     infoMessage.setTarget(Long.parseLong(tokens[1]));
@@ -226,14 +235,16 @@ public class Client implements ConnectionHandler {
         // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
     }
 
-    private String helpInfo(){
+    private String helpInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("Usage: /command [arg...]").append("\n");
         sb.append("Available commands:").append("\n");
         sb.append("\t/login <login> <password>").append("\n");
         sb.append("\t/chat_list").append("\n");
         sb.append("\t/chat_create <user_id...>").append("\n");
-        sb.append("\t/text <chat_id> <text>");
+        sb.append("\t/text <chat_id> <text>").append("\n");
+        sb.append("\t/chat_history <chat_id>").append("\n");
+        sb.append("\t/info");
         return sb.toString();
     }
 

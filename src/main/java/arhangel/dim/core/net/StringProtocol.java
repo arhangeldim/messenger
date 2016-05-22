@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -17,6 +18,7 @@ public class StringProtocol implements Protocol {
     static Logger log = LoggerFactory.getLogger(StringProtocol.class);
 
     public static final String DELIMITER = ";";
+    public static final String DELIMITER2 = "&";
 
     @Override
     public Message decode(byte[] bytes) throws ProtocolException {
@@ -91,9 +93,34 @@ public class StringProtocol implements Protocol {
                 }
                 return infoResultMessage;
 
+            case MSG_CHAT_HIST:
+                ChatHistMessage chatHistMessage = new ChatHistMessage();
+                chatHistMessage.setType(type);
+                chatHistMessage.setSenderId(parseLong(tokens[1]));
+                chatHistMessage.setChatId(parseLong(tokens[2]));
+                return chatHistMessage;
+
+            case MSG_CHAT_HIST_RESULT:
+                ChatHistResultMessage chatHistResultMessage = new ChatHistResultMessage();
+                chatHistResultMessage.setType(type);
+                chatHistResultMessage.setSenderId(parseLong(tokens[1]));
+
+                List<TextMessage> messages = Arrays.asList(tokens[2].split(",")).stream()
+                        .map(this::stringToTextMessage)
+                        .collect(Collectors.toList());
+                chatHistResultMessage.setMessages(messages);
+                return chatHistResultMessage;
             default:
                 throw new ProtocolException("Invalid type: " + type);
         }
+    }
+
+    private TextMessage stringToTextMessage(String str) {
+        TextMessage result = new TextMessage();
+        String[] split = str.split(DELIMITER2);
+        result.setSenderId(parseLong(split[0]));
+        result.setText(split[1]);
+        return result;
     }
 
     @Override
@@ -154,6 +181,20 @@ public class StringProtocol implements Protocol {
                 }
                 builder.append(DELIMITER);
                 break;
+
+            case MSG_CHAT_HIST:
+                ChatHistMessage chatHistMessage = (ChatHistMessage) msg;
+                builder.append(String.valueOf(chatHistMessage.getChatId())).append(DELIMITER);
+                break;
+
+            case MSG_CHAT_HIST_RESULT:
+                ChatHistResultMessage chatHistResultMessage = (ChatHistResultMessage) msg;
+                builder.append(String.join(",",
+                        chatHistResultMessage.getMessages().stream()
+                                .map(StringProtocol::convertMessage)
+                                .collect(Collectors.toList())));
+                break;
+
             default:
                 throw new ProtocolException("Invalid type: " + type);
 
@@ -161,6 +202,10 @@ public class StringProtocol implements Protocol {
         }
         log.info("encoded: {}", builder.toString());
         return builder.toString().getBytes();
+    }
+
+    private static String convertMessage(TextMessage msg) {
+        return msg.getSenderId() + DELIMITER2 + msg.getText();
     }
 
     private Long parseLong(String str) {

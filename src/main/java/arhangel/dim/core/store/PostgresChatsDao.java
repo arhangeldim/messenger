@@ -34,7 +34,7 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
         //todo where should it be
         Statement statement = null;
         try {
-            clearTables();
+//            clearTables();
 
             String sql;
 
@@ -170,6 +170,24 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
         return result;
     }
 
+    private List<Long> getChatsOfUserWithId(Long userId) throws PersistException {
+        String sql = "SELECT chat_id FROM chats_users WHERE user_id = ?";
+
+        List<Long> result = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, userId);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                result.add(rs.getLong("chat_id"));
+            }
+        } catch (Exception e) {
+            throw new PersistException(e);
+        }
+        return result;
+    }
+
     private void addParticipantsToTable(Chat chat) throws PersistException {
         String sql = "INSERT INTO chats_users (chat_id, user_id) \nVALUES (?, ?);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -189,7 +207,11 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
 
     @Override
     public List<Chat> getChatsByAdmin(User admin) throws PersistException {
-        List<Chat> chats = getByLongFieldValue(ADMIN_, admin.getId());
+        List<Long> chatsId = getChatsOfUserWithId(admin.getId());
+        List<Chat> chats = new ArrayList<>();
+        for (Long aLong : chatsId) {
+            chats.add(getByPK(aLong));
+        }
         return chats;
     }
 }

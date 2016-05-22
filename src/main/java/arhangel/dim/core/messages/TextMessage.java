@@ -12,6 +12,10 @@ public class TextMessage extends Message implements Identified<Long>{
     private String text;
     private Long chatId;
 
+    public TextMessage() {
+        super(Type.MSG_TEXT);
+    }
+
     public String getText() {
         return text;
     }
