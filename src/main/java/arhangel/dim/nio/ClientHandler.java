@@ -48,6 +48,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelDisconnected(ctx, e);
+        server.getSessionsManager().removeSession(session);
         log.info("channel disconnected");
     }
 

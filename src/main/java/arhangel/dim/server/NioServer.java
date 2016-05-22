@@ -43,6 +43,7 @@ public class NioServer implements Server {
     public static final long MAX_CHANNEL_MEMORY_SIZE = 400000000L;
     public static final long MAX_TOTAL_MEMORY_SIZE = 2000000000L;
     public static final long KEEP_ALIVE_TIME = 60;
+    public static final int WORKING_THREADS_COUNT = 4;
 
     @Override
     public DaoFactory getDbFactory() {
@@ -69,11 +70,11 @@ public class NioServer implements Server {
         ExecutorService bossExec = new OrderedMemoryAwareThreadPoolExecutor(1,
                 MAX_CHANNEL_MEMORY_SIZE, MAX_TOTAL_MEMORY_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS);
 
-        ExecutorService ioExec = new OrderedMemoryAwareThreadPoolExecutor(4 /* число рабочих потоков */,
+        ExecutorService ioExec = new OrderedMemoryAwareThreadPoolExecutor(WORKING_THREADS_COUNT,
                 MAX_CHANNEL_MEMORY_SIZE, MAX_TOTAL_MEMORY_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS);
 
         ServerBootstrap networkServer = new ServerBootstrap(
-                new NioServerSocketChannelFactory(bossExec, ioExec, 4 /* то же самое число рабочих потоков */));
+                new NioServerSocketChannelFactory(bossExec, ioExec, WORKING_THREADS_COUNT));
 
         networkServer.setOption("backlog", 500);
         networkServer.setOption("connectTimeoutMillis", 10000);

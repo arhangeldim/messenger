@@ -208,6 +208,11 @@ public class Client implements ConnectionHandler {
         }
     }
 
+    private void incorrectInput(){
+        System.out.println("Incorrect input");
+        System.out.println(helpInfo());
+    }
+
     /**
      * Отправка сообщения в сокет клиент -> сервер
      */
@@ -249,7 +254,6 @@ public class Client implements ConnectionHandler {
     }
 
     public static void main(String[] args) throws Exception {
-
         Client client = null;
         // Пользуемся механизмом контейнера
         try {

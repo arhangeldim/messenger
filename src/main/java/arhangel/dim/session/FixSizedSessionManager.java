@@ -49,7 +49,11 @@ public class FixSizedSessionManager implements SessionsManager {
 
     @Override
     public synchronized void removeSession(Session session) {
+        if (session == null){
+            return;
+        }
         if (sessions.contains(session)) {
+            log.info("Session deleted from session manager");
             sessions.remove(session);
         }
     }

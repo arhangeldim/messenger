@@ -17,7 +17,7 @@ public class NioSession extends Session {
     }
 
     @Override
-    public void send(Message msg) throws ProtocolException, IOException {
+    public synchronized void send(Message msg) throws ProtocolException, IOException {
         channel.write(msg);
     }
 }
