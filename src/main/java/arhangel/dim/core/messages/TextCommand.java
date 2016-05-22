@@ -14,8 +14,9 @@ public class TextCommand implements Command {
     public void execute(Session session, Message message) throws CommandException {
         if (session.userAuthenticated()) {
             TextMessage textMessage = (TextMessage) message;
-            MessageStore messageStore = PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL)
-                    .getMessageDao();
+            MessageStore messageStore = session.getServer().getMessageStore();
+            // PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL)
+                    //.getMessageDao();
             messageStore.addMessage(textMessage.getChatId(), textMessage);
             log.info("Message saved {}", textMessage);
             for (Session session1 : session.getServer().getSessions()) {

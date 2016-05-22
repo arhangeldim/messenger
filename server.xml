@@ -2,10 +2,18 @@
 
     <bean id="protocol" class="arhangel.dim.core.net.StringProtocol"/>
 
+    <bean id="daoFactory" class="arhangel.dim.core.store.PostgresqlDaoFactory">
+        <property name="DRIVER" val="org.postgresql.Driver"/>
+        <property name="DBURL" val="jdbc:postgresql://178.62.140.149:5432/gafusss"/>
+        <property name="DBUSER" val="trackuser"/>
+        <property name="DBPASS" val="trackuser"/>
+    </bean>
+
     <bean id="server" class="arhangel.dim.server.Server">
         <property name="port" val="19000"/>
         <property name="protocol" ref="protocol"/>
         <property name="maxConnection" val="16"/>
+        <property name="daoFactory" ref="daoFactory"/>
     </bean>
 
 </root>

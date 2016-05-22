@@ -17,6 +17,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import arhangel.dim.core.net.Session;
+import arhangel.dim.core.store.DaoFactory;
+import arhangel.dim.core.store.MessageStore;
+import arhangel.dim.core.store.UserStore;
 import arhangel.dim.lections.exception.ExceptionDemo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +36,21 @@ public class Server {
     // Засетить из конфига
     private int port;
     private Protocol protocol;
+
+    private DaoFactory daoFactory;
+
     private int maxConnection = DEFAULT_MAX_CONNECT;
 
     private ServerSocket socket;
     private ExecutorService service;
+
+    public UserStore getUserStore() {
+        return daoFactory.getUserDao();
+    }
+
+    public MessageStore getMessageStore() {
+        return daoFactory.getMessageDao();
+    }
 
     //FIXME: concurrent
     private List<Session> sessions;
