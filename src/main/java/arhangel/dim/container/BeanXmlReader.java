@@ -1,5 +1,6 @@
 package arhangel.dim.container;
 
+<<<<<<< HEAD
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,6 +17,12 @@ import java.util.List;
 
 /**
  * Created by valeriyasin on 3/15/16.
+=======
+import java.util.List;
+
+/**
+ *
+>>>>>>> 5044e64aedcc627f70c5d919734be1e8583b899e
  */
 public class BeanXmlReader {
     private static final String TAG_BEAN = "bean";
@@ -25,6 +32,7 @@ public class BeanXmlReader {
     private static final String ATTR_REF = "ref";
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
+<<<<<<< HEAD
     private static final String TAG_GEAR = "gear";
     private static final String TAG_ENGINE = "engine";
 
@@ -88,4 +96,11 @@ public class BeanXmlReader {
         }
         return graphWithoutEdges;
     }
+=======
+
+    public List<Bean> parseBeans(String pathToFile) {
+        return null;
+    }
+
+>>>>>>> 5044e64aedcc627f70c5d919734be1e8583b899e
 }
