@@ -8,7 +8,7 @@ import  org.junit.Assert;
 import arhangel.dim.container.beans.Car;
 import arhangel.dim.container.beans.Engine;
 import arhangel.dim.container.beans.Gear;
-
+import arhangel.dim.container.exceptions.InvalidConfigurationException;
 /**
  *
  */

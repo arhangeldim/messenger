@@ -1,16 +1,24 @@
 package arhangel.dim.core.messages;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 /**
  * Базовый класс для всех сообщений
  */
-public abstract class Message implements Serializable {
+public class Message implements Serializable {
 
     private Long id;
     private Long senderId;
     private Type type;
+    private String message;
+    private String messageId;
+    private String time;
+
+    public Message() {
+        time = new Date().toString();
+    }
 
     public Long getId() {
         return id;
@@ -34,6 +42,22 @@ public abstract class Message implements Serializable {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
     }
 
     @Override
