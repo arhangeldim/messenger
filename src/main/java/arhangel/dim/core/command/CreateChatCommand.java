@@ -39,7 +39,7 @@ public class CreateChatCommand implements Command {
                 return;
             }
 
-            MessageStore messageStore = server.getMessageStore();
+            MessageStore messageStore = session.getMessageStore();
 
             List<Long> participants = ((CreateChatMessage) message).getUsersIds();
             if (participants.size() == 1) {

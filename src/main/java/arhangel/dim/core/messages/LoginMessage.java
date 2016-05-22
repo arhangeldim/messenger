@@ -50,7 +50,7 @@ public class LoginMessage extends Message {
     @Override
     public String toString() {
         return "LoginMessage: " +
-                "login: '" + getLogin() + '\n' +
-                "password: '" + getPassword() + '\n';
+                "login: " + getLogin() + '\n' +
+                "password: " + getPassword() + '\n';
     }
 }

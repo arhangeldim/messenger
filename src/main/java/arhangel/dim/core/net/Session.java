@@ -10,10 +10,17 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 import arhangel.dim.core.User;
+import arhangel.dim.core.command.CreateChatCommand;
+import arhangel.dim.core.command.HistChatCommand;
+import arhangel.dim.core.command.InfoCommand;
+import arhangel.dim.core.command.ListChatCommand;
+import arhangel.dim.core.command.LoginCommand;
+import arhangel.dim.core.command.TextCommand;
 import arhangel.dim.core.dbservice.dao.UsersDao;
 import arhangel.dim.core.messages.CommandException;
 import arhangel.dim.core.messages.CommandExecutor;
 import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.core.store.MessageStoreImpl;
 import arhangel.dim.core.store.UserStore;
@@ -33,6 +40,7 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
 
     // сокет на клиента
     private Socket socket;
+    private Server server;
 
     /**
      * С каждым сокетом связано 2 канала in/out
@@ -50,17 +58,20 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
 
     private static Logger log = LoggerFactory.getLogger(Session.class);
 
-    public Session(Socket socket, Protocol protocol) throws IOException, SQLException, ClassNotFoundException {
+    public Session(Socket socket, Protocol protocol, CommandExecutor commandExecutor, UsersDao usersDao) throws IOException, SQLException, ClassNotFoundException {
         this.socket = socket;
         in = socket.getInputStream();
         out = socket.getOutputStream();
         this.protocol = protocol;
+        this.server = server;
 
-        this.usersDao = new UsersDao();
-        usersDao.init();
+        this.usersDao =  usersDao;
 
         this.messageStore = new MessageStoreImpl(usersDao);
         this.userStore = new UserStoreImpl(usersDao);
+
+        this.commandExecutor = commandExecutor;
+
     }
 
     @Override
@@ -95,19 +106,22 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
     @Override
     public void run() {
         final byte[] buf = new byte[1024 * 64];
+        log.info("Running client section");
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 int read = in.read(buf);
+                log.info("read some data: " + read);
                 if (read > 0) {
                     Message message = protocol.decode(Arrays.copyOf(buf, read));
+                    log.info("Message decoded:" + message);
                     onMessage(message);
                 } else {
                     if (read == -1) {
                         close();
                     }
                 }
-            } catch (ProtocolException | IOException e) {
-                log.error(e.getMessage());
+            } catch (Exception e) {
+                log.error("Failed to process client connection:", e);
                 Thread.currentThread().interrupt();
             }
         }

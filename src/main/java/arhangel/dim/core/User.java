@@ -20,7 +20,7 @@ public class User {
 
     public User(final String name, final String password) {
         this.name = name;
-        hash = (new BigInteger(AuthorizationService.calculateHash(password))).toString();
+        hash = password;
     }
 
     public Long getId() {
@@ -48,7 +48,7 @@ public class User {
     }
 
     public void setPass(final String password) {
-        hash = (new BigInteger(AuthorizationService.calculateHash(password))).toString();
+        hash = password;
     }
 
     @Override

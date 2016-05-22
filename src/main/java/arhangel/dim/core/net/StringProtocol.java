@@ -38,7 +38,8 @@ public class StringProtocol implements Protocol {
             case MSG_TEXT:
                 TextMessage textMsg = new TextMessage();
                 textMsg.setSenderId(parseLong(tokens[1]));
-                textMsg.setText(tokens[2]);
+                textMsg.setChatId(parseLong(tokens[2]));
+                textMsg.setText(tokens[3]);
                 return textMsg;
             case MSG_INFO:
                 InfoMessage infoMessage = new InfoMessage();
@@ -99,10 +100,12 @@ public class StringProtocol implements Protocol {
             case MSG_TEXT:
                 TextMessage sendMessage = (TextMessage) msg;
                 builder.append(String.valueOf(sendMessage.getSenderId())).append(DELIMITER);
+                builder.append(sendMessage.getChatId()).append(DELIMITER);
                 builder.append(sendMessage.getText()).append(DELIMITER);
                 break;
             case MSG_LOGIN:
                 LoginMessage loginMessage = (LoginMessage) msg;
+                builder.append(String.valueOf(loginMessage.getSenderId())).append(DELIMITER);
                 builder.append(loginMessage.getLogin()).append(DELIMITER);
                 builder.append(loginMessage.getPassword()).append(DELIMITER);
                 break;
@@ -113,15 +116,18 @@ public class StringProtocol implements Protocol {
                 for (int i = 0; i < userIds.size(); ++i) {
                     userIdsStr.add(String.valueOf(userIds.get(i)));
                 }
+                builder.append(String.valueOf(chatCreateMessage.getSenderId())).append(DELIMITER);
                 builder.append(String.join(",",
                         userIdsStr)).append(DELIMITER);
                 break;
             case MSG_STATUS:
                 StatusMessage statusMessage = (StatusMessage) msg;
+                builder.append(String.valueOf(statusMessage.getSenderId())).append(DELIMITER);
                 builder.append(statusMessage.getStatus()).append(DELIMITER);
                 break;
             case MSG_CHAT_LIST_RESULT:
                 ListChatResultMessage listChatResultMessage = (ListChatResultMessage) msg;
+                builder.append(String.valueOf(listChatResultMessage.getSenderId())).append(DELIMITER);
                 builder.append(String.join(",",
                         listChatResultMessage.getChatIds().stream()
                                 .map(Object::toString)
@@ -129,10 +135,12 @@ public class StringProtocol implements Protocol {
                 break;
             case MSG_INFO:
                 InfoMessage infoMessage = (InfoMessage) msg;
+                builder.append(String.valueOf(infoMessage.getSenderId())).append(DELIMITER);
                 builder.append(infoMessage.getInfo()).append(DELIMITER);
                 break;
             case MSG_CHAT_LIST:
                 ListChatMessage listChatMessage = new ListChatMessage();
+                builder.append(String.valueOf(listChatMessage.getSenderId())).append(DELIMITER);
                 builder.append(listChatMessage.getChatsList()).append(DELIMITER);
                 break;
             default:

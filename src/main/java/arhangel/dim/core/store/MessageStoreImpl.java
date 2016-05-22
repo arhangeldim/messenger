@@ -40,9 +40,9 @@ public class MessageStoreImpl implements MessageStore {
             chat.addParticipant(userId);
         }
 
-        for (Long messageId : messagesIds) {
+        /*for (Long messageId : messagesIds) {
             chat.addMessage(messageId);
-        }
+        }*/
 
         chat.setId(chatId);
 

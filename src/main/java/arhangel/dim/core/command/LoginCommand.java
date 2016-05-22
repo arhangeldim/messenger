@@ -10,6 +10,9 @@ import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 import arhangel.dim.core.store.MessageStoreImpl;
 import arhangel.dim.core.store.UserStoreImpl;
+import arhangel.dim.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -17,6 +20,14 @@ import java.io.IOException;
  * Created by tatiana on 19.04.16.
  */
 public class LoginCommand implements Command {
+
+    private Server server;
+
+    static Logger log = LoggerFactory.getLogger(CreateChatCommand.class);
+
+    public LoginCommand(Server server) {
+        this.server = server;
+    }
 
     @Override
     public void execute(Session session, Message message) throws CommandException {
@@ -43,7 +54,8 @@ public class LoginCommand implements Command {
         if (user == null) {
             result.setText("Login or password is incorrect");
         } else {
-            result.setText(String.format("Success: userid: %d, name: %d", user.getId(), user.getName()));
+            session.setUser(user);
+            result.setText(String.format("Success: userid: %d, name: %s", user.getId(), user.getName()));
         }
 
         try {

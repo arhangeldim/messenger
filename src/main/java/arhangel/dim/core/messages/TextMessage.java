@@ -51,6 +51,6 @@ public class TextMessage extends Message {
 
     @Override
     public String toString() {
-        return "Message:" + text + '\'';
+        return "Message:" + text;
     }
 }

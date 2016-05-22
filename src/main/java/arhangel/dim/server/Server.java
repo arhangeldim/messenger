@@ -1,11 +1,17 @@
 package arhangel.dim.server;
 
+import arhangel.dim.core.command.CreateChatCommand;
+import arhangel.dim.core.command.HistChatCommand;
+import arhangel.dim.core.command.InfoCommand;
+import arhangel.dim.core.command.ListChatCommand;
 import arhangel.dim.core.command.LoginCommand;
+import arhangel.dim.core.command.TextCommand;
 import arhangel.dim.core.dbservice.dao.UsersDao;
 import arhangel.dim.core.messages.CommandExecutor;
 import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.Session;
+import arhangel.dim.core.net.StringProtocol;
 import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.core.store.MessageStoreImpl;
 import arhangel.dim.core.store.UserStore;
@@ -40,7 +46,7 @@ public class Server {
 
     private ServerSocket serverSocket;
     private Set<Session> sessions = new HashSet<>();
-    private CommandExecutor executor = new CommandExecutor();
+    private CommandExecutor commandExecutor = new CommandExecutor();
 
     private UsersDao usersDao = new UsersDao();
 
@@ -48,10 +54,20 @@ public class Server {
     private UserStore userStore = new UserStoreImpl(usersDao);
 
     public Server(int port) throws IOException {
-        this.port = port;
-        serverSocket = new ServerSocket(port);
+        try {
+            this.port = port;
+            serverSocket = new ServerSocket(port);
+            usersDao.init();
 
-        executor.addCommand(Type.MSG_LOGIN, new LoginCommand());
+            this.commandExecutor.addCommand(Type.MSG_LOGIN, new LoginCommand(this));
+            this.commandExecutor.addCommand(Type.MSG_INFO, new InfoCommand(this));
+            this.commandExecutor.addCommand(Type.MSG_CHAT_CREATE, new CreateChatCommand(this));
+            this.commandExecutor.addCommand(Type.MSG_CHAT_HIST, new HistChatCommand(this));
+            this.commandExecutor.addCommand(Type.MSG_TEXT, new TextCommand(this));
+            this.commandExecutor.addCommand(Type.MSG_CHAT_LIST, new ListChatCommand(this));
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void start() {
@@ -81,11 +97,11 @@ public class Server {
                     } catch (SocketException e) {
                         log.error(e.getMessage());
                     }
-                    Session session = new Session(newClientSocket, protocol);
+                    Session session = new Session(newClientSocket, protocol, commandExecutor, usersDao);
                     sessions.add(session);
                     threadPool.submit(session);
                 }
-            } catch (IOException | SQLException | ClassNotFoundException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage());
             }
             if (!serverSocket.isClosed()) {
@@ -111,11 +127,11 @@ public class Server {
     }
 
     public void  setExecutor(CommandExecutor executor) {
-        this.executor = executor;
+        this.commandExecutor = executor;
     }
 
     public CommandExecutor getExecutor() {
-        return executor;
+        return commandExecutor;
     }
 
     public void setUsersDao(UsersDao usersDao) {
@@ -151,7 +167,9 @@ public class Server {
     }
 
     public static void main(String[] args) throws Exception {
+        Protocol stringProtocol = new StringProtocol();
         Server server = new Server(8000);
+        server.setIProtocol(stringProtocol);
         server.start();
     }
 

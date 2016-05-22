@@ -28,13 +28,15 @@ public class UsersDao {
     public UsersDao() {}
 
 // database access test
-//    public static void main(String[] args) throws Exception {
-//        UsersDao usersDao = new UsersDao();
-//        usersDao.init();
-//
-//        Long num = new Long(0);
-//        System.out.println(usersDao.getUserById(num));
-//    }
+    public static void main(String[] args) throws Exception {
+        UsersDao usersDao = new UsersDao();
+        usersDao.init();
+
+        //Long num = new Long(0);
+        usersDao.createUserchats();
+        usersDao.addUserToChat(new Long(0),new Long(1));
+
+    }
 
     public void init() throws SQLException, ClassNotFoundException {
 
@@ -55,6 +57,18 @@ public class UsersDao {
 
     }
 
+    public void createUserchats() {
+        try {
+            String sql = "DROP TABLE userchats;";
+            queryExecutor.updateQuery(sql);
+            sql = "" +
+                    "CREATE TABLE userchats(user_id BIGINT, chat_id BIGINT);";
+            queryExecutor.updateQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public User getUser(String userName) throws Exception {
 
         String sql = "" +
@@ -73,7 +87,7 @@ public class UsersDao {
                     String hash = resultSet.getString("password");
                     Long id = resultSet.getLong("id");
                     User user = new User(login);
-                    user.setHash(hash);
+                    user.setPass(hash);
                     user.setId(id);
                     return user;
                 }
@@ -128,7 +142,7 @@ public class UsersDao {
 
     public void addChat(Chat chat) {
 
-        String sqlInsert = "INSERT INTO chats (user_id) VALUES " +
+        String sqlInsert = "INSERT INTO chats (chat_id) VALUES " +
                 "(?) ;";
 
         Map<Integer, Object> prepared = new HashMap<>();

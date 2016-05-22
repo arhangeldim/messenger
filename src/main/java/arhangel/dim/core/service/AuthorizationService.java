@@ -2,6 +2,8 @@ package arhangel.dim.core.service;
 
 import arhangel.dim.core.User;
 import arhangel.dim.core.store.UserStoreImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,14 +19,15 @@ public class AuthorizationService {
     private boolean success = false;
 
     User user = null;
+    private static Logger log = LoggerFactory.getLogger(AuthorizationService.class);
 
     public AuthorizationService(UserStoreImpl store, InputStream is, OutputStream os) {
         this.store = store;
     }
 
-    public static byte[] calculateHash(final String str) {
+    public static String calculateHash(final String str) {
 
-        try {
+      /*  try {
             if (md == null) {
                 md = MessageDigest.getInstance("SHA-256");
             }
@@ -33,6 +36,8 @@ public class AuthorizationService {
             System.err.println("can't get instance of hashing algo SHA-256");
         }
         return md.digest();
+        */
+        return str;
     }
 
     public static boolean isCorrect(User user, String word) {
@@ -42,8 +47,9 @@ public class AuthorizationService {
         }
 
         String hash = user.getHash();
-        String newHash = (new BigInteger(AuthorizationService.calculateHash(word))).toString();
-
+        String newHash = AuthorizationService.calculateHash(word);
+        log.info(hash);
+        log.info(newHash);
         return hash.equals(newHash);
     }
 }
