@@ -22,7 +22,11 @@ public class PacketFrameDecoder extends ReplayingDecoder<VoidEnum> {
 
     static Logger log = LoggerFactory.getLogger(PacketFrameDecoder.class);
 
-    Protocol protocol = new StringProtocol();
+    Protocol protocol;
+
+    public PacketFrameDecoder(Protocol protocol) {
+        this.protocol = protocol;
+    }
 
     @Override
     public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {

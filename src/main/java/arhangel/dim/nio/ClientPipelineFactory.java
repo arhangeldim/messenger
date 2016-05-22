@@ -24,8 +24,8 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         log.info("getPipeLine");
-        PacketFrameDecoder decoder = new PacketFrameDecoder();
-        PacketFrameEncoder encoder = new PacketFrameEncoder();
+        PacketFrameDecoder decoder = new PacketFrameDecoder(server.getProtocol());
+        PacketFrameEncoder encoder = new PacketFrameEncoder(server.getProtocol());
         return Channels.pipeline(decoder, encoder, new ClientHandler(decoder, encoder, server));
     }
 }
