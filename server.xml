@@ -25,6 +25,7 @@
 
     <bean id="server" class="arhangel.dim.server.Server">
         <property name="port" val="19000"/>
+        <property name="bufferSize" val="8192"/>
         <property name="protocol" ref="protocol"/>
         <property name="maxConnection" val="16"/>
         <property name="userStore" ref="userDao"/>

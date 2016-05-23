@@ -45,6 +45,7 @@ public class Client implements ConnectionHandler {
     /**
      * С каждым сокетом связано 2 канала in/out
      */
+    private Socket socket;
     private InputStream in;
     private OutputStream out;
 
@@ -73,7 +74,7 @@ public class Client implements ConnectionHandler {
     }
 
     public void initSocket() throws IOException {
-        Socket socket = new Socket(host, port);
+        socket = new Socket(host, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
 
@@ -191,6 +192,11 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
     }
 

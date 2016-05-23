@@ -28,6 +28,10 @@ public class PostgresqlMessageDao implements MessageStore {
     public PostgresqlMessageDao(PostgresqlDaoFactory parentFactory) throws SQLException {
         this.parentFactory = parentFactory;
         Connection connection = parentFactory.getConnection();
+        connection.prepareStatement("CREATE TABLE IF NOT EXISTS chats (" +
+                "id BIGINT PRIMARY KEY NOT NULL," +
+                "users BIGINT[]" +
+                ");").execute();
         connection.prepareStatement("CREATE TABLE IF NOT EXISTS messages (" +
                 "id BIGSERIAL PRIMARY KEY," +
                 "chat_id BIGINT REFERENCES chats (id)," +

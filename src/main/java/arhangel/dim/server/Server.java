@@ -3,26 +3,21 @@ package arhangel.dim.server;
 import arhangel.dim.container.Context;
 import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.net.Protocol;
-import arhangel.dim.core.net.ProtocolException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import arhangel.dim.core.net.Session;
-import arhangel.dim.core.store.DaoFactory;
 import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.core.store.UserStore;
-import arhangel.dim.lections.exception.ExceptionDemo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
+import java.nio.channels.AsynchronousChannelGroup;
+import java.nio.channels.AsynchronousServerSocketChannel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Основной класс для сервера сообщений
@@ -38,17 +33,29 @@ public class Server {
     private Protocol protocol;
     private UserStore userStore;
     private MessageStore messageStore;
+    private int bufferSize = 256 * 32;
     private int maxConnection = DEFAULT_MAX_CONNECT;
 
-
-    private ServerSocket socket;
     private ExecutorService service;
-    //FIXME: concurrent
     private List<Session> sessions;
+    private AsynchronousChannelGroup channelGroup;
+    private AsynchronousServerSocketChannel serverSocketChannel;
 
+
+    public int getBufferSize() {
+        return bufferSize;
+    }
 
     public UserStore getUserStore() {
         return userStore;
+    }
+
+    public AsynchronousServerSocketChannel getServerSocketChannel() {
+        return serverSocketChannel;
+    }
+
+    public AsynchronousChannelGroup getChannelGroup() {
+        return channelGroup;
     }
 
     public MessageStore getMessageStore() {
@@ -69,37 +76,25 @@ public class Server {
     }
 
     public void init() throws Exception {
-        socket = new ServerSocket(port);
         service = Executors.newFixedThreadPool(maxConnection);
         sessions = new ArrayList<>();
+
+        channelGroup = AsynchronousChannelGroup.withThreadPool(service);
+        serverSocketChannel = AsynchronousServerSocketChannel.open(channelGroup);
+        serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        serverSocketChannel.bind(new InetSocketAddress(port));
 
         userStore.init();
         messageStore.init();
     }
 
     public void run() throws IOException {
-        while (true) {
-            Socket clientSocket = socket.accept();
-            log.info("Accepted " + clientSocket.getInetAddress());
-
-            service.submit(() -> {
-                Session session = new Session(this);
-                session.setUser(null);
-                session.setSocket(clientSocket);
-                try {
-                    session.setIn(clientSocket.getInputStream());
-                    session.setOut(clientSocket.getOutputStream());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                sessions.add(session);
-                byte[] buf = new byte[256 * 64];
-                while (true) {
-                    /*int size = */session.getIn().read(buf);
-                    //FIXME: check for closed socket and remove session from session list
-                    session.onMessage(protocol.decode(buf));
-                }
-            });
+        AcceptCompletionHandler acceptCompletionHandler = new AcceptCompletionHandler(this, serverSocketChannel);
+        serverSocketChannel.accept(null, acceptCompletionHandler);
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            log.info("[run] Main thread interrupted");
         }
     }
 
