@@ -11,4 +11,10 @@ public class StatusMessage extends Message {
         this.text = text;
     }
 
+    @Override
+    public String toString() {
+        return "StatusMessage{" +
+                "text='" + text + '\'' +
+                "} " + super.toString();
+    }
 }

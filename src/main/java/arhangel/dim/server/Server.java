@@ -62,7 +62,6 @@ public class Server {
         return messageStore;
     }
 
-
     public List<Session> getSessions() {
         return sessions;
     }
@@ -96,42 +95,24 @@ public class Server {
         } catch (InterruptedException e) {
             log.info("[run] Main thread interrupted");
         }
+        //FIXME: Is it ok?
     }
 
     public static void main(String[] args) {
-
         Server server = null;
         // Пользуемся механизмом контейнера
         try {
             Context context = new Context("server.xml");
             server = (Server) context.getBeanByName("server");
         } catch (InvalidConfigurationException e) {
-            log.error("Failed to create server: configuration error", e);
+            log.error("[main] Failed to create server: configuration error", e);
             return;
         }
         try {
-
             server.init();
             server.run();
-            /*
-            client.initSocket();
-
-            // Цикл чтения с консоли
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("$");
-            while (true) {
-                String input = scanner.nextLine();
-                if ("q".equals(input)) {
-                    return;
-                }
-                try {
-                    client.processInput(input);
-                } catch (ProtocolException | IOException e) {
-                    log.error("Failed to process user input", e);
-                }
-            }*/
         } catch (Exception e) {
-            log.error("Application failed.", e);
+            log.error("[main] Application failed.", e);
         } finally {
             if (server != null) {
                 server.stop();

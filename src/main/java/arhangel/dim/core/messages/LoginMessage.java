@@ -1,7 +1,6 @@
 package arhangel.dim.core.messages;
 
 public class LoginMessage extends Message {
-
     private String login;
     private String secret;
 
@@ -21,4 +20,11 @@ public class LoginMessage extends Message {
         this.login = login;
     }
 
+    @Override
+    public String toString() {
+        return "LoginMessage{" +
+                "login='" + login + '\'' +
+                ", secret='" + secret + '\'' +
+                "} " + super.toString();
+    }
 }
