@@ -82,6 +82,10 @@ public class Session implements ConnectionHandler, Runnable, AutoCloseable {
             interpreter.handleMessage(msg, this);
         } catch (CommandException e) {
             e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

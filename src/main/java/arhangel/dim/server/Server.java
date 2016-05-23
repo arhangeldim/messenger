@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,13 +36,16 @@ import java.util.concurrent.Executors;
 public class Server {
 
     public static final int DEFAULT_MAX_CONNECT = 16;
+    private static ServerSocket serverSocket;
 
     // Засетить из конфига
     private int port;
     private Protocol protocol;
     private int maxConnection = DEFAULT_MAX_CONNECT;
-    private ExecutorService threadPool = Executors.newFixedThreadPool(1);
+    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
     private static Logger log = LoggerFactory.getLogger(Server.class);
+
+    private List<Session> sessions = new ArrayList<>();
 
     public Server() {
         port = 9000;
@@ -62,6 +67,8 @@ public class Server {
 
         log.info("Server created");
 
+        Server server = new Server();
+
         Map<Type, GenericCommand> command = new HashMap<>();
         command.put(Type.MSG_CHAT_CREATE, new ChatCreateCommand());
         command.put(Type.MSG_USER_CREATE, new UserCreateCommand());
@@ -69,19 +76,22 @@ public class Server {
         command.put(Type.MSG_CHAT_HIST, new ChatHistoryCommand());
         command.put(Type.MSG_CHAT_LIST, new ChatListCommand());
         command.put(Type.MSG_INFO, new InfoCommand());
-        command.put(Type.MSG_TEXT, new TextCommand());
+        command.put(Type.MSG_TEXT, new TextCommand(server));
 
         Interpreter interpreter = new Interpreter(command);
         DataBase db = new DataBase();
 
-        Server server = new Server();
+        //Server server = new Server();
 
         try {
-            ServerSocket serverSocket = new ServerSocket(server.getPort());
+            serverSocket = new ServerSocket(server.getPort());
+
             while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
                 log.info("New session");
                 Session session = new Session(clientSocket, server, interpreter);
+                server.getSessions().add(session);
+                //addSession(session);
                 server.threadPool.execute(session);
             }
         } catch (IOException | SQLException | ClassNotFoundException e) {
@@ -96,7 +106,12 @@ public class Server {
 
 
     public void stop() {
-        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        threadPool.shutdown();
     }
 
     public int getPort() {
@@ -113,6 +128,13 @@ public class Server {
 
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
+    }
+
+    public List<Session> getSessions() {
+        return this.sessions;
+    }
+    public void addSession(Session session) {
+        this.sessions.add(session);
     }
 
 }

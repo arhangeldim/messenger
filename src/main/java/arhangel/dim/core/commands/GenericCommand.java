@@ -15,7 +15,7 @@ public abstract class GenericCommand implements Command {
     private static Logger log = LoggerFactory.getLogger(GenericCommand.class);
     private Type type;
 
-    abstract Message handleMessage(Session session, Message message) throws CommandException;
+    abstract Message handleMessage(Session session, Message message) throws CommandException, IOException, ProtocolException;
 
     String getCommandName() {
         return this.getClass().toString();
@@ -29,7 +29,7 @@ public abstract class GenericCommand implements Command {
     }
 
     @Override
-    public void execute(Session session, Message message) throws CommandException {
+    public void execute(Session session, Message message) throws CommandException, IOException, ProtocolException {
         log.info("Handling message {} with {}", message, getCommandName());
         Message answer = handleMessage(session, message);
         log.info("Sending answer: {}", answer);

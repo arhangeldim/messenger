@@ -1,22 +1,30 @@
 package arhangel.dim.client;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-import arhangel.dim.core.messages.LoginMessage;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.LoginMessage;
 import arhangel.dim.core.messages.UserCreateMessage;
-import arhangel.dim.core.messages.ChatListMessage;
-import arhangel.dim.core.messages.ChatCreateMessage;
-import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
 import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatListMessage;
 import arhangel.dim.core.messages.Type;
-import arhangel.dim.core.net.*;
+import arhangel.dim.core.net.BinaryProtocol;
+import arhangel.dim.core.net.ConnectionHandler;
+import arhangel.dim.core.net.Protocol;
+import arhangel.dim.core.net.ProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,9 +168,6 @@ public class Client implements ConnectionHandler {
                 LoginMessage message = new LoginMessage(tokens[1], tokens[2]);
                 message.setType(Type.MSG_LOGIN);
                 //message.setSenderId(user.getId());
-                /*
-                 * TODO: обрабатывать ситуацию неверного пароля как-то
-                 */
                 send(message);
 
                 return true;
@@ -239,6 +244,15 @@ public class Client implements ConnectionHandler {
                 send(chatCreateMessage);
                 return true;
             case "/chat_history":
+                if (tokens.length < 2) {
+                    System.out.println("Not enough arguments");
+                    return true;
+                }
+                Long chatHistId = Long.parseUnsignedLong(tokens[1]);
+                ChatHistoryMessage chatHistoryMessage = new ChatHistoryMessage(chatHistId);
+                chatHistoryMessage.setType(Type.MSG_CHAT_HIST);
+                chatHistoryMessage.setSenderId(user.getId());
+                send(chatHistoryMessage);
                 return true;
             case "/chat_list":
                 if (!user.isLoginned()) {
