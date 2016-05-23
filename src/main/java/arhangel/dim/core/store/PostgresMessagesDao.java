@@ -2,7 +2,7 @@ package arhangel.dim.core.store;
 
 import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.messages.Type;
-import arhangel.dim.core.store.dao.AbstractJdbcDao;
+import arhangel.dim.core.store.dao.BaseJdbcDao;
 import arhangel.dim.core.store.dao.MessageDao;
 import arhangel.dim.core.store.dao.PersistException;
 
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by olegchuikin on 01/05/16.
  */
-public class PostgresMessagesDao extends AbstractJdbcDao<TextMessage, Long> implements MessageDao {
+public class PostgresMessagesDao extends BaseJdbcDao<TextMessage, Long> implements MessageDao {
 
     public static final String ID_ = "id";
     public static final String ADMIN_ = "admin_id";

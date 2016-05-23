@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * Абстрактный класс предоставляющий базовую реализацию CRUD операций с использованием JDBC.
  *
- * @param <T>  тип объекта персистенции
+ * @param <T> тип объекта персистенции
  * @param <K> тип первичного ключа
  */
-public abstract class AbstractJdbcDao<T extends Identified<K>, K extends Long> implements GenericDao<T, K> {
+public abstract class BaseJdbcDao<T extends Identified<K>, K extends Long> implements GenericDao<T, K> {
 
     protected String tableName;
 
@@ -195,7 +195,7 @@ public abstract class AbstractJdbcDao<T extends Identified<K>, K extends Long> i
         }
     }
 
-    public AbstractJdbcDao(Connection connection) {
+    public BaseJdbcDao(Connection connection) {
         this.connection = connection;
     }
 

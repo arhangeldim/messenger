@@ -1,7 +1,7 @@
 package arhangel.dim.core.store;
 
 import arhangel.dim.core.User;
-import arhangel.dim.core.store.dao.AbstractJdbcDao;
+import arhangel.dim.core.store.dao.BaseJdbcDao;
 import arhangel.dim.core.store.dao.PersistException;
 import arhangel.dim.core.store.dao.UserDao;
 
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by olegchuikin on 19/04/16.
  */
-public class PostgresUserDao extends AbstractJdbcDao<User, Long> implements UserDao {
+public class PostgresUserDao extends BaseJdbcDao<User, Long> implements UserDao {
 
     private static final String ID_ = "id";
     private static final String NAME_ = "name";

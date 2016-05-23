@@ -2,7 +2,7 @@ package arhangel.dim.core.store;
 
 import arhangel.dim.core.Chat;
 import arhangel.dim.core.User;
-import arhangel.dim.core.store.dao.AbstractJdbcDao;
+import arhangel.dim.core.store.dao.BaseJdbcDao;
 import arhangel.dim.core.store.dao.ChatDao;
 import arhangel.dim.core.store.dao.DaoFactory;
 import arhangel.dim.core.store.dao.GenericDao;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by olegchuikin on 01/05/16.
  */
-public class PostgresChatsDao extends AbstractJdbcDao<Chat, Long> implements ChatDao {
+public class PostgresChatsDao extends BaseJdbcDao<Chat, Long> implements ChatDao {
 
     private DaoFactory daoFactory;
 
