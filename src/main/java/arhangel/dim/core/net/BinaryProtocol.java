@@ -2,12 +2,8 @@ package arhangel.dim.core.net;
 
 import arhangel.dim.core.messages.Message;
 
-import java.awt.color.ProfileDataException;
 import java.io.*;
 
-/**
- * TODO: реализовать здесь свой протокол
- */
 public class BinaryProtocol implements Protocol {
 
     @Override

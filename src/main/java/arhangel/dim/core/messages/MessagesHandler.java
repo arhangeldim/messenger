@@ -23,6 +23,7 @@ public class MessagesHandler {
         commands.put(ChatCreateMessage.class, new ChatCreateMessageCommand(server));
         commands.put(InfoMessage.class, new InfoMessageCommand(server));
         commands.put(ChatHistMessage.class, new ChatHistMessageCommand(server));
+        commands.put(ChatInfoMessage.class, new ChatInfoMessageCommand(server));
     }
 
     public void execute(Session session, Message message) throws CommandException {

@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -97,13 +99,13 @@ public class Client implements ConnectionHandler {
                     }
                 } catch (Exception e) {
                     log.error("Failed to process connection: {}", e);
-                    e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
             }
         });
 
         socketThread.start();
+        System.out.println("You are connected");
     }
 
     /**
@@ -144,6 +146,14 @@ public class Client implements ConnectionHandler {
                 chatHistResultMessage.getMessages().stream()
                         .forEach(tm -> System.out.println(tm.getSenderId() + ":" + tm.getText()));
                 break;
+            case MSG_CHAT_INFO_RESULT:
+                ChatInfoResultMessage chatInfoResultMessage = (ChatInfoResultMessage) msg;
+
+                System.out.println("Users of chat " + chatInfoResultMessage.getChatId() + ": "
+                        + String.join(",", chatInfoResultMessage.getUserIds().stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList())));
+                break;
             default:
                 log.error("unsupported type of message");
                 break;
@@ -156,60 +166,98 @@ public class Client implements ConnectionHandler {
      * Формат строки можно посмотреть в вики проекта
      */
     public void processInput(String line) throws IOException, ProtocolException {
-        String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
-        String cmdType = tokens[0];
-        switch (cmdType) {
-            case "/login":
-                LoginMessage loginMessage = new LoginMessage();
-                loginMessage.setType(MSG_LOGIN);
-                loginMessage.setLogin(tokens[1]);
-                loginMessage.setPassword(tokens[2]);
-                send(loginMessage);
-                break;
-            case "/chat_list":
-                ChatListMessage chatListMessage = new ChatListMessage();
-                chatListMessage.setType(MSG_CHAT_LIST);
-                send(chatListMessage);
-                break;
-            case "/chat_create":
-                ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
-                chatCreateMessage.setUserIds(ParseUtils
-                        .stringArrToLongList(tokens[1].replaceAll("[\\s]+", "").split(",")));
-                send(chatCreateMessage);
-                break;
-            case "/chat_history":
-                ChatHistMessage chatHistMessage = new ChatHistMessage();
-                chatHistMessage.setChatId(Long.parseLong(tokens[1]));
-                send(chatHistMessage);
-                break;
-            case "/help":
-                System.out.println(helpInfo());
-                break;
-            case "/text":
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(MSG_TEXT);
-                sendMessage.setChatId(Long.parseLong(tokens[1]));
-                sendMessage.setText(line.replace(tokens[0] + " " + tokens[1] + " ", ""));
-                send(sendMessage);
-                break;
-            case "/info":
-                InfoMessage infoMessage = new InfoMessage();
-                infoMessage.setType(MSG_INFO);
-                if (tokens.length == 1) {
-                    infoMessage.setTarget(-1L);
-                } else {
-                    infoMessage.setTarget(Long.parseLong(tokens[1]));
-                }
-                send(infoMessage);
-                break;
-            default:
-                log.error("Invalid input: " + line);
+        try {
+            String[] tokens = line.split(" ");
+            log.info("Tokens: {}", Arrays.toString(tokens));
+            String cmdType = tokens[0];
+            switch (cmdType) {
+                case "/login":
+                    if (tokens.length != 3) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    LoginMessage loginMessage = new LoginMessage();
+                    loginMessage.setType(MSG_LOGIN);
+                    loginMessage.setLogin(tokens[1]);
+                    loginMessage.setPassword(tokens[2]);
+                    send(loginMessage);
+                    break;
+                case "/chat_list":
+                    if (tokens.length != 1) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    ChatListMessage chatListMessage = new ChatListMessage();
+                    chatListMessage.setType(MSG_CHAT_LIST);
+                    send(chatListMessage);
+                    break;
+                case "/chat_create":
+                    if (tokens.length < 2) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
+                    chatCreateMessage.setUserIds(ParseUtils
+                            .stringArrToLongList(line.replace(tokens[0], "").replaceAll("[\\s]+", "").split(",")));
+                    send(chatCreateMessage);
+                    break;
+                case "/chat_history":
+                    if (tokens.length != 2) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    ChatHistMessage chatHistMessage = new ChatHistMessage();
+                    chatHistMessage.setChatId(Long.parseLong(tokens[1]));
+                    send(chatHistMessage);
+                    break;
+                case "/help":
+                    System.out.println(helpInfo());
+                    break;
+                case "/text":
+                    if (tokens.length < 3) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    TextMessage sendMessage = new TextMessage();
+                    sendMessage.setType(MSG_TEXT);
+                    sendMessage.setChatId(Long.parseLong(tokens[1]));
+                    sendMessage.setText(line.replace(tokens[0] + " " + tokens[1] + " ", ""));
+                    send(sendMessage);
+                    break;
+                case "/info":
+                    if (tokens.length > 2) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    InfoMessage infoMessage = new InfoMessage();
+                    infoMessage.setType(MSG_INFO);
+                    if (tokens.length == 1) {
+                        infoMessage.setTarget(-1L);
+                    } else {
+                        infoMessage.setTarget(Long.parseLong(tokens[1]));
+                    }
+                    send(infoMessage);
+                    break;
+                case "/chat_info":
+                    if (tokens.length != 2) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    ChatInfoMessage chatInfoMessage = new ChatInfoMessage();
+                    chatInfoMessage.setChatId(Long.parseLong(tokens[1]));
+                    send(chatInfoMessage);
+                    break;
+                case "/reconnect":
+                    if (tokens.length != 1) {
+                        throw new WrongArgumentsNumberException();
+                    }
+                    close();
+                    initSocket();
+                    break;
+                default:
+                    invalidInput(line);
+                    log.error("Invalid input: " + line);
+            }
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException | WrongArgumentsNumberException e) {
+            invalidInput(line);
         }
     }
 
-    private void incorrectInput(){
-        System.out.println("Incorrect input");
+    private void invalidInput(String line) {
+        System.out.println("Invalid input: " + line);
         System.out.println(helpInfo());
     }
 
@@ -230,14 +278,18 @@ public class Client implements ConnectionHandler {
     @Override
     public void close() {
         try {
-            in.close();
-            out.close();
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        socketThread.interrupt();
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+        if (socketThread != null && !socketThread.isInterrupted()) {
+            socketThread.interrupt();
+        }
     }
 
     private String helpInfo() {
@@ -249,7 +301,10 @@ public class Client implements ConnectionHandler {
         sb.append("\t/chat_create <user_id...>").append("\n");
         sb.append("\t/text <chat_id> <text>").append("\n");
         sb.append("\t/chat_history <chat_id>").append("\n");
-        sb.append("\t/info");
+        sb.append("\t/info [<user_id>]").append("\n");
+        sb.append("\t/chat_info [<chat_id>]").append("\n");
+        sb.append("\t/reconnect");
+
         return sb.toString();
     }
 
@@ -278,7 +333,7 @@ public class Client implements ConnectionHandler {
                 try {
                     client.processInput(input);
                 } catch (ProtocolException | IOException e) {
-                    log.error("Failed to process user input", e);
+                    System.out.println("Error occurred during connection to server.");
                 }
             }
         } catch (Exception e) {
@@ -287,6 +342,19 @@ public class Client implements ConnectionHandler {
             if (client != null) {
                 client.close();
             }
+        }
+    }
+
+    private static class WrongArgumentsNumberException extends RuntimeException {
+        public WrongArgumentsNumberException() {
+        }
+
+        public WrongArgumentsNumberException(String message) {
+            super(message);
+        }
+
+        public WrongArgumentsNumberException(Throwable cause) {
+            super(cause);
         }
     }
 }

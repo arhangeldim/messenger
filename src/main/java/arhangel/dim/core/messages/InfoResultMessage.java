@@ -51,7 +51,7 @@ public class InfoResultMessage extends Message {
 
     @Override
     public String toString() {
-        return "LoginMessage{" +
+        return "InfoResultMessage{" +
                 "id='" + getId() + '\'' +
                 "name='" + name + '\'' +
                 "name='" + ((chats == null) ? "" : String.join(" ", chats

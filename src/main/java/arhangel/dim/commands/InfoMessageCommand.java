@@ -32,6 +32,13 @@ public class InfoMessageCommand implements Command {
     @Override
     public void execute(Session session, Message message) throws CommandException {
         try {
+            if (session.getUser() == null) {
+                StatusMessage errorMessage = new StatusMessage();
+                errorMessage.setText("You should login before you can get info");
+                session.send(errorMessage);
+                return;
+            }
+
             InfoMessage msg = (InfoMessage) message;
             if (msg.getTarget().equals(-1L)) {
                 msg.setTarget(session.getUser().getId());

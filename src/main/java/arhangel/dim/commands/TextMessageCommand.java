@@ -29,7 +29,7 @@ public class TextMessageCommand implements Command {
     public void execute(Session session, Message message) throws CommandException {
         try {
             if (session.getUser() == null) {
-                sendError(session, "You should login before you can create chat");
+                sendError(session, "You should login before you can send message");
                 return;
             }
 

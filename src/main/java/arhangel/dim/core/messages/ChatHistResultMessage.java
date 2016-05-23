@@ -40,7 +40,7 @@ public class ChatHistResultMessage extends Message{
 
     @Override
     public String toString() {
-        return "ChatCreateMessage{" +
+        return "ChatHistResultMessage{" +
                 "chats='" +
                 String.join(",", messages.stream().map(Object::toString).collect(Collectors.toList())) + '\'' +
                 '}';

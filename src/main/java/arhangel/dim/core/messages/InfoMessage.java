@@ -36,7 +36,7 @@ public class InfoMessage extends Message {
 
     @Override
     public String toString() {
-        return "LoginMessage{" +
+        return "InfoMessage{" +
                 "id='" + getId() + '\'' +
                 "target='" + target + '\'' +
                 '}';
