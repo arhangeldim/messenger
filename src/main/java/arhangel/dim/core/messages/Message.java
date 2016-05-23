@@ -8,8 +8,8 @@ import java.util.Objects;
  */
 public abstract class Message implements Serializable {
 
-    private Long id;
-    private Long senderId;
+    private Long id; //id, встречающийся в сообщении
+    private Long senderId; //id отправителя
     private Type type;
 
     public Long getId() {
