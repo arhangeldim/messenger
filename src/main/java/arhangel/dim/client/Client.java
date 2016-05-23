@@ -7,16 +7,13 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.*;
 import arhangel.dim.core.net.BinaryProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -143,6 +140,12 @@ public class Client implements ConnectionHandler {
                 sendMessage.setText(tokens[2]);
                 send(sendMessage);
                 break;
+            case "/chat_list":
+                ChatListMessage msg = new ChatListMessage();
+                send(msg);
+                break;
+            case "/info":
+
             // TODO: implement another types from wiki
 
             default:

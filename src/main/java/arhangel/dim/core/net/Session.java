@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import arhangel.dim.core.Chat;
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.commands.*;
 import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.server.Server;
 
@@ -23,11 +22,29 @@ import arhangel.dim.server.Server;
  */
 public class Session implements ConnectionHandler, Runnable {
 
+    private static HashMap<Type, Command> messageToCommand;
+
+    static {
+        messageToCommand = new HashMap<>();
+        messageToCommand.put(Type.MSG_LOGIN, new LoginMessageCommand());
+        messageToCommand.put(Type.MSG_TEXT, new TextMessageCommand());
+        messageToCommand.put(Type.MSG_CHAT_LIST, new ChatListMessageCommand());
+    }
+
     /**
      * Пользователь сессии, пока не прошел логин, user == null
      * После логина устанавливается реальный пользователь
      */
     static final int MAX_MESSAGE_SIZE = 65536;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     private User user;
 
     // сокет на клиента
@@ -38,6 +55,15 @@ public class Session implements ConnectionHandler, Runnable {
      */
     private InputStream in;
     private OutputStream out;
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
     private Server server;
 
     @Override
@@ -45,87 +71,18 @@ public class Session implements ConnectionHandler, Runnable {
         if (user == null) {
             return;
         }
+        out.write(server.getProtocol().encode(msg));
+        out.flush();
         // TODO: Отправить клиенту сообщение
     }
 
     @Override
     public void onMessage(Message msg) {
         System.out.println(msg);
-        switch (msg.getType()) {
-            case MSG_LOGIN:
-                System.out.println("LOGIN");
-                if (user != null) {
-                    TextMessage sendMessage = new TextMessage();
-                    sendMessage.setType(Type.MSG_STATUS);
-                    sendMessage.setText("already logged in");
-                    try {
-                        send(sendMessage);
-                    } catch (ProtocolException | IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    LoginMessage loginMessage = (LoginMessage) msg;
-                    try {
-
-                    } catch (ClassCastException e) {
-//                        ...
-                    }
-
-                    user = new User();
-                    user.setName(loginMessage.getLogin());
-                    user.setPassword(loginMessage.getPassword());
-                    user = server.getUserStore().getUser(loginMessage.getLogin(),
-                            loginMessage.getPassword());
-                    if (user == null) {
-                        user = server.getUserStore().addUser(user);
-                    }
-                    server.getActiveUsers().put(user.getId(), this);
-                    System.out.println("LOGIN SUCCESS");
-                }
-                break;
-            case MSG_TEXT:
-                if (user == null) {
-                    TextMessage sendMessage = new TextMessage();
-                    sendMessage.setType(Type.MSG_STATUS);
-                    sendMessage.setText("Log in first");
-                    try {
-                        send(sendMessage);
-                    } catch (ProtocolException | IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    msg.setSenderId(user.getId());
-
-                    TextMessage textMessage = (TextMessage) msg;
-
-                    Chat chat = server.getMessageStore()
-                            .getChatById(textMessage.getChatId());
-
-                    msg = server.getMessageStore()
-                            .addMessage(textMessage.getChatId(), msg);
-
-                    for (Long userId: chat.getUsers()) {
-                        if (server.getActiveUsers().containsValue(userId)) {
-                            try {
-                                server.getActiveUsers().get(userId).send(msg);
-                                //NPE
-                            } catch (ProtocolException | IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-                break;
-            case MSG_INFO:
-                break;
-            case MSG_CHAT_LIST:
-                break;
-            case MSG_CHAT_CREATE:
-                break;
-            case MSG_CHAT_HIST:
-                break;
-            default:
-                break;
+        try {
+            messageToCommand.get(msg.getType()).execute(this, msg);
+        } catch (CommandException e) {
+            e.printStackTrace();
         }
         // TODO: Пришло некое сообщение от клиента, его нужно обработать
     }

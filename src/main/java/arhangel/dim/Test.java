@@ -1,34 +1,94 @@
 package arhangel.dim;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+class MyThreadPool {
+    private MyBlockingQueue<Runnable> queue;
+    private static int DEFAULT_SIZE = 10;
+    private Worker[] workers;
 
-/**
- * Created by thefacetakt on 19.04.16.
- */
-public class Test {
-    public static void main(String[] args) throws ClassNotFoundException,
-            SQLException {
-        Class.forName("org.postgresql.Driver");
-        try (Connection connection
-                    = DriverManager.getConnection("jdbc:postgresql://"
-                                                  + "178.62.140.149:5432/"
-                                                  + "thefacetakt",
-                                                  "trackuser", "trackuser")) {
+    class Worker implements Runnable {
 
-            DatabaseMetaData md = connection.getMetaData();
-            try (ResultSet rs = md.getTables(null, null, "%", null)) {
-                while (rs.next()) {
-                    System.out.println(rs.getString(3));
+        @Override
+        public void run() {
+            while (!Thread.interrupted()) {
+                try {
+                    Runnable task = queue.take();
+                    task.run();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
-
-
     }
 
+    public MyThreadPool(int size) {
+        queue = new MyBlockingQueue<>(DEFAULT_SIZE);
+        workers = new Worker[size];
+    }
+
+    public void submit(Runnable task) {
+        try {
+            queue.put(task);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+
+
+public class Test {
+    public MyBlockingQueue<Integer> mbq;
+
+    public class Putter implements Runnable {
+        @Override
+        public void run() {
+            for (int i = 0; i < 1000; ++i) {
+                try {
+                    mbq.put(i);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public class Getter implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Integer x = mbq.poll(1000000l);
+                    if (x == null) {
+                        break;
+                    }
+                    System.out.println(x);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    static int one = 0;
+    static int two = 0;
+    static class Stupid implements Runnable {
+
+        @Override
+        public void run() {
+            
+        }
+    }
+
+    public static void main(String[] args) {
+//        Test x = new Test();
+//        x.mbq = new MyBlockingQueue<>(100);
+//        for (int i = 0; i < 5; ++i) {
+//            new Thread(x.new Putter()).start();
+//        }
+//        new Thread(x.new Getter()).start();
+        MyThreadPool pool = new MyThreadPool(2);
+
+    }
 }

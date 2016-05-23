@@ -6,6 +6,7 @@ import arhangel.dim.core.messages.TextMessage;
 
 import javax.xml.soap.Text;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +101,8 @@ public class PgMessageStore implements MessageStore {
         result[0].setId(messageId);
         Object[] args = {messageId};
         try {
-            executor.execQuery("SELECT CHAT_ID, USER_ID, CONTENT FROM MESSAGES"
+            executor.execQuery("SELECT CHAT_ID, USER_ID, CONTENT, TIME"
+                                + " FROM MESSAGES"
                                 + "WHERE ID = ?", args, rs -> {
                 try {
                     //if !rs.next()
@@ -123,11 +125,12 @@ public class PgMessageStore implements MessageStore {
     @Override
     public Message addMessage(Long chatId, Message message) {
         TextMessage tm = (TextMessage) message;
-        Object[] args = {tm.getChatId(), tm.getSenderId(), tm.getText()};
+        Object[] args = {tm.getChatId(), tm.getSenderId(), tm.getText(),
+                         Timestamp.valueOf(tm.getTimestamp())};
         try {
             tm.setId(executor.execUpdate(
-                    "INSERT INTO MESSAGES(CHAT_ID, USER_ID, CONTENT)"
-                            + "VALUES (?, ?, ?)", args));
+                    "INSERT INTO MESSAGES(CHAT_ID, USER_ID, CONTENT, TIME)"
+                            + "VALUES (?, ?, ?, ?)", args));
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
