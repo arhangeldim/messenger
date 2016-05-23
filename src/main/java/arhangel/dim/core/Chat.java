@@ -9,6 +9,13 @@ public class Chat {
     private Long id;
     private List<Long> userIds;
 
+    public Chat(){}
+
+    public Chat(Long id, List<Long> userIds) {
+        this.id = id;
+        this.userIds = userIds;
+    }
+
     public Long getId() {
         return id;
     }

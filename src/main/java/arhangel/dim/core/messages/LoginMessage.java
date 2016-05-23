@@ -2,7 +2,6 @@ package arhangel.dim.core.messages;
 
 public class LoginMessage extends Message {
 
-
     private String login;
     private String secret;
 

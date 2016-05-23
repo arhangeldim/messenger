@@ -4,37 +4,22 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.postgresql.ds.PGPoolingDataSource;
+
 public class PostgresqlDaoFactory extends DaoFactory {
-    public static final String DRIVER =
-            "org.postgresql.Driver";
-    public static final String DBURL =
-            "jdbc:postgresql://178.62.140.149:5432/gafusss";
-    public static final String DBUSER =
-            "trackuser";
-    public static final String DBPASS =
-            "trackuser";
+    PGPoolingDataSource dataSource;
 
-    // method to create Cloudscape connections
-    public static Connection createConnection() {
-        // Use DRIVER and DBURL to create a connection
-        // Recommend connection pool implementation/usage
-        Connection connection = null;
-        try {
-            Class.forName(DRIVER);
-            connection = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return connection;
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
     @Override
-    public PostgresqlUserDao getUserDao() {
-        return new PostgresqlUserDao();
+    public PostgresqlUserDao getUserDao() throws SQLException {
+        return new PostgresqlUserDao(this);
     }
 
     @Override
-    public PostgresqlMessageDao getMessageDao() {
-        return new PostgresqlMessageDao();
+    public PostgresqlMessageDao getMessageDao() throws SQLException {
+        return new PostgresqlMessageDao(this);
     }
 }

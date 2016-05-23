@@ -1,10 +1,6 @@
 package arhangel.dim.core.net;
 
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.RegisterMessage;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +41,11 @@ public class StringProtocol implements Protocol {
                 textMsg.setText(tokens[3]);
                 textMsg.setType(type);
                 return textMsg;
+            case MSG_STATUS:
+                StatusMessage statusMessage = new StatusMessage();
+                statusMessage.setType(type);
+                statusMessage.setText(tokens[1]);
+                return statusMessage;
             default:
                 throw new ProtocolException("Invalid type: " + type);
         }
@@ -73,6 +74,10 @@ public class StringProtocol implements Protocol {
                 builder.append(String.valueOf(sendMessage.getSenderId())).append(DELIMITER);
                 builder.append(String.valueOf(sendMessage.getChatId())).append(DELIMITER);
                 builder.append(sendMessage.getText()).append(DELIMITER);
+                break;
+            case MSG_STATUS:
+                StatusMessage statusMessage = (StatusMessage) msg;
+                builder.append(String.valueOf(statusMessage.getText())).append(DELIMITER);
                 break;
             default:
                 throw new ProtocolException("Invalid type: " + type);

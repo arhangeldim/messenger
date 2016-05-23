@@ -36,24 +36,25 @@ public class Server {
     // Засетить из конфига
     private int port;
     private Protocol protocol;
-
-    private DaoFactory daoFactory;
-
+    private UserStore userStore;
+    private MessageStore messageStore;
     private int maxConnection = DEFAULT_MAX_CONNECT;
+
 
     private ServerSocket socket;
     private ExecutorService service;
+    //FIXME: concurrent
+    private List<Session> sessions;
+
 
     public UserStore getUserStore() {
-        return daoFactory.getUserDao();
+        return userStore;
     }
 
     public MessageStore getMessageStore() {
-        return daoFactory.getMessageDao();
+        return messageStore;
     }
 
-    //FIXME: concurrent
-    private List<Session> sessions;
 
     public List<Session> getSessions() {
         return sessions;
@@ -67,10 +68,13 @@ public class Server {
         // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
     }
 
-    public void init() throws IOException {
+    public void init() throws Exception {
         socket = new ServerSocket(port);
         service = Executors.newFixedThreadPool(maxConnection);
         sessions = new ArrayList<>();
+
+        userStore.init();
+        messageStore.init();
     }
 
     public void run() throws IOException {

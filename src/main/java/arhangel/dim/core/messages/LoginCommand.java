@@ -13,19 +13,36 @@ public class LoginCommand implements Command {
 
     @Override
     public void execute(Session session, Message message) throws CommandException {
+        StatusMessage response = new StatusMessage();
+        response.setType(Type.MSG_STATUS);
         if (!session.userAuthenticated()) {
             LoginMessage loginMessage = (LoginMessage) message;
             UserStore userStore = session.getServer().getUserStore();
-            // PostgresqlDaoFactory.getDaoFactory(DaoFactory.DaoTypes.PostgreSQL).getUserDao();
             User user = userStore.getUser(loginMessage.getLogin(), loginMessage.getSecret());
             if (user != null) {
                 session.setUser(user);
                 log.info("{} logged in", user.getLogin());
+                response.setText(String.format("Successfully logged in as %s with id %d\n" +
+                        "In chats: %s", user.getLogin(), user.getId(), session.getServer().getMessageStore().getChatsByUserId(user.getId())));
             } else {
-                log.error("User with supplied credentials doesn't exist {}", loginMessage.getLogin());
+                log.info("User with supplied credentials doesn't exist {}", loginMessage.getLogin());
+                response.setText("User with supplied credentials doesn't exist");
+            }
+            try {
+                session.send(response);
+            } catch (Exception e) {
+                log.error("Couldn't reply to login command", e);
+                throw new CommandException("Couldn't reply to login command");
             }
             return;
         }
-        log.error("Already logged in {}", session.getUser().getLogin());
+        log.info("Already logged in {}", session.getUser().getLogin());
+        response.setText(String.format("Already logged in as %s", session.getUser().getLogin()));
+        try {
+            session.send(response);
+        } catch (Exception e) {
+            log.error("Couldn't reply to login command", e);
+            throw new CommandException("Couldn't reply to login command");
+        }
     }
 }

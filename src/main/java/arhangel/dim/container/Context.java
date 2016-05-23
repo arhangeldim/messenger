@@ -90,7 +90,15 @@ public class Context {
             for (String name : bean.getProperties().keySet()) {
                 // ищем поле с таким именен внутри класса
                 // учитывая приватные
-                Field field = clazz.getDeclaredField(name);
+                Field field = null;
+                Class superclazz = clazz;
+                while ((field == null) && (superclazz != null)) {
+                    try {
+                        field = superclazz.getDeclaredField(name);
+                    } catch (NoSuchFieldException e) {
+                        superclazz = superclazz.getSuperclass();
+                    }
+                }
                 if (field == null) {
                     throw new InvalidConfigurationException("Failed to set field [" + name + "] for class " + clazz.getName());
                 }

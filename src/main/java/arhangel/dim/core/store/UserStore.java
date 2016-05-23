@@ -33,4 +33,6 @@ public interface UserStore {
     User getUserById(Long id);
 
     User getUserByLogin(String login);
+
+    void init() throws Exception;
 }

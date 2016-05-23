@@ -7,11 +7,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.RegisterMessage;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +110,15 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
+
+        switch (msg.getType()) {
+            case MSG_STATUS:
+                StatusMessage statusMessage = (StatusMessage) msg;
+                System.out.println(statusMessage.getText());
+                break;
+            default:
+                return;
+        }
     }
 
     /**
@@ -124,7 +129,6 @@ public class Client implements ConnectionHandler {
         String[] tokens = line.split(" ");
         log.info("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
-        //FIXME: Change to protocol.encode()
         switch (cmdType) {
             case "/register":
                 if (tokens.length != 3) {

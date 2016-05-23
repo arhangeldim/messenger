@@ -4,6 +4,7 @@ import java.util.List;
 
 import arhangel.dim.core.Chat;
 import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.TextMessage;
 
 /**
  * Хранилище информации о сообщениях
@@ -11,7 +12,7 @@ import arhangel.dim.core.messages.Message;
 public interface MessageStore {
 
     /**
-     * получаем список ид пользователей заданного чата
+     * получаем список ид чатов с заданным пользователем
      */
     List<Long> getChatsByUserId(Long userId);
 
@@ -28,17 +29,18 @@ public interface MessageStore {
     /**
      * Получить информацию о сообщении
      */
-    Message getMessageById(Long messageId);
+    TextMessage getMessageById(Long messageId);
 
     /**
      * Добавить сообщение в чат
      */
-    Message addMessage(Long chatId, Message message);
+    TextMessage addMessage(Long chatId, TextMessage message);
 
     /**
      * Добавить пользователя к чату
      */
     void addUserToChat(Long userId, Long chatId);
 
+    void init() throws Exception;
 
 }
