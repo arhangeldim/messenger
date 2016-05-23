@@ -1,6 +1,6 @@
 <root>
 
-    <bean id="protocol" class="arhangel.dim.core.net.StringProtocol"/>
+    <bean id="protocol" class="arhangel.dim.core.net.BinaryProtocol"/>
 
     <bean id="poolingDataSource" class="org.postgresql.ds.PGPoolingDataSource">
         <property name="dataSourceName" val="Data source"/>
