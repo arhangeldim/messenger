@@ -2,6 +2,8 @@ package arhangel.dim.core.store;
 
 import arhangel.dim.core.User;
 
+import java.util.List;
+
 /**
  * Хранилище информации о пользователе
  */
@@ -24,6 +26,8 @@ public interface UserStore {
      * return null if user not found
      */
     User getUser(String login, String pass);
+
+//    List<Long> getUserByChat(Long chatId);
 
     /**
      *
