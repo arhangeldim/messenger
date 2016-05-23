@@ -63,6 +63,7 @@ public class InfoMessageCommand implements Command {
             if (chatsByAdmin != null && chatsByAdmin.size() > 0) {
                 response.setChats(chatsByAdmin.stream().map(Chat::getId).collect(Collectors.toList()));
             }
+            response.setUserId(target.getId());
             session.send(response);
 
         } catch (Exception e) {

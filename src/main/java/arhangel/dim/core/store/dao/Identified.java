@@ -11,4 +11,6 @@ public interface Identified<PK extends Serializable> {
      * Возвращает идентификатор объекта
      */
     PK getId();
+
+    void setId(PK pk);
 }

@@ -1,5 +1,6 @@
 package arhangel.dim.nio;
 
+import arhangel.dim.core.messages.ErrorMessage;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.session.AddSessionToManagerException;
 import arhangel.dim.session.NioSession;
@@ -40,6 +41,9 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
             server.getSessionsManager().addSession(session);
         } catch (AddSessionToManagerException exception){
             log.info("Close channel: " + exception.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage();
+            errorMessage.setText(exception.getMessage());
+            session.send(errorMessage);
             channel.close();
         }
 
@@ -75,9 +79,9 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
         super.exceptionCaught(ctx, e);
+        ctx.getChannel().close();
 
         log.info("exception caught");
 
-        ctx.getChannel().close();
     }
 }

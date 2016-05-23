@@ -22,7 +22,14 @@ public class PostgresDaoFactory implements DaoFactory<Connection> {
 
     private Map<Class, GenericDao> daos;
 
-    public PostgresDaoFactory() throws PersistException {
+    private String dbUrl;
+    private String dbLogin;
+    private String dbPassword;
+
+    public PostgresDaoFactory(String dbUrl, String dbLogin, String dbPassword) throws PersistException {
+        this.dbUrl = dbUrl;
+        this.dbLogin = dbLogin;
+        this.dbPassword = dbPassword;
         try {
             Class.forName("org.postgresql.Driver");
 
@@ -39,7 +46,8 @@ public class PostgresDaoFactory implements DaoFactory<Connection> {
     public Connection getContext() throws PersistException {
         if (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/ochuikin", "trackuser", "trackuser");
+//                connection = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/ochuikin", "trackuser", "trackuser");
+                connection = DriverManager.getConnection(dbUrl, dbLogin, dbPassword);
             } catch (SQLException e) {
                 throw new PersistException(e);
             }

@@ -10,6 +10,8 @@ public class InfoResultMessage extends Message {
 
     private String name;
 
+    private Long userId;
+
     private List<Long> chats;
 
     public String getName() {
@@ -26,6 +28,14 @@ public class InfoResultMessage extends Message {
 
     public void setChats(List<Long> chats) {
         this.chats = chats;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     @Override

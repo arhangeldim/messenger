@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +42,9 @@ public class Client implements ConnectionHandler {
     private int port;
     private String host;
 
+    private String login;
+    private String password;
+
     /**
      * Тред "слушает" сокет на наличие входящих сообщений от сервера
      */
@@ -49,6 +53,7 @@ public class Client implements ConnectionHandler {
     /**
      * С каждым сокетом связано 2 канала in/out
      */
+    private Socket socket;
     private InputStream in;
     private OutputStream out;
 
@@ -76,8 +81,24 @@ public class Client implements ConnectionHandler {
         this.host = host;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void initSocket() throws IOException {
-        Socket socket = new Socket(host, port);
+        socket = new Socket(host, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
 
@@ -105,7 +126,21 @@ public class Client implements ConnectionHandler {
         });
 
         socketThread.start();
-        System.out.println("You are connected");
+
+        if (login != null && password != null) {
+            LoginMessage loginMessage = new LoginMessage();
+            loginMessage.setLogin(login);
+            loginMessage.setPassword(password);
+            try {
+                if (!socket.isClosed()) {
+                    send(loginMessage);
+                }
+            } catch (ProtocolException e) {
+                System.out.println("Authentication failed!");
+            } catch (SocketException e){
+                System.out.println("Connection problems. Authentication failed!");
+            }
+        }
     }
 
     /**
@@ -134,11 +169,13 @@ public class Client implements ConnectionHandler {
             case MSG_INFO_RESULT:
                 InfoResultMessage infoResultMessage = (InfoResultMessage) msg;
                 StringBuilder sb = new StringBuilder();
-                sb.append("Info. User: ").append(infoResultMessage.getName())
-                        .append(", chats: ").append(String.join(",", infoResultMessage.getChats()
-                        .stream()
+                sb.append("Info.\n")
+                        .append("Name: ").append(infoResultMessage.getName()).append("\n")
+                        .append("Id: ").append(infoResultMessage.getUserId()).append("\n")
+                        .append("Chats: ").append(String.join(",", infoResultMessage.getChats().stream()
                         .map(Object::toString).collect(Collectors.toList())))
                         .append(".");
+
                 System.out.println(sb.toString());
                 break;
             case MSG_CHAT_HIST_RESULT:
@@ -154,6 +191,10 @@ public class Client implements ConnectionHandler {
                         .map(Object::toString)
                         .collect(Collectors.toList())));
                 break;
+            case MSG_ERROR:
+                ErrorMessage errorMessage = (ErrorMessage) msg;
+                System.out.println(errorMessage.getText());
+                close();
             default:
                 log.error("unsupported type of message");
                 break;
@@ -265,7 +306,7 @@ public class Client implements ConnectionHandler {
      * Отправка сообщения в сокет клиент -> сервер
      */
     @Override
-    public void send(Message msg) throws IOException, ProtocolException {
+    public synchronized void send(Message msg) throws IOException, ProtocolException {
         log.info(msg.toString());
         byte[] bytes = protocol.encode(msg);
 //        Integer size = bytes.length;
@@ -283,6 +324,9 @@ public class Client implements ConnectionHandler {
             }
             if (out != null) {
                 out.close();
+            }
+            if (socket != null){
+                socket.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -308,18 +352,9 @@ public class Client implements ConnectionHandler {
         return sb.toString();
     }
 
-    public static void main(String[] args) throws Exception {
-        Client client = null;
-        // Пользуемся механизмом контейнера
+    public void start() {
         try {
-            Container context = new Container("client.xml");
-            client = (Client) context.getByName("client");
-        } catch (InvalidConfigurationException e) {
-            log.error("Failed to create client", e);
-            return;
-        }
-        try {
-            client.initSocket();
+            initSocket();
 
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
@@ -331,7 +366,7 @@ public class Client implements ConnectionHandler {
                     return;
                 }
                 try {
-                    client.processInput(input);
+                    processInput(input);
                 } catch (ProtocolException | IOException e) {
                     System.out.println("Error occurred during connection to server.");
                 }
@@ -339,22 +374,25 @@ public class Client implements ConnectionHandler {
         } catch (Exception e) {
             log.error("Application failed.", e);
         } finally {
-            if (client != null) {
-                client.close();
-            }
+            close();
         }
     }
 
+    public static void main(String[] args) throws Exception {
+        Client client = null;
+        // Пользуемся механизмом контейнера
+        try {
+            Container context = new Container("client.xml");
+            client = (Client) context.getByName("client");
+        } catch (InvalidConfigurationException e) {
+            log.error("Failed to create client", e);
+            return;
+        }
+
+        client.start();
+
+    }
+
     private static class WrongArgumentsNumberException extends RuntimeException {
-        public WrongArgumentsNumberException() {
-        }
-
-        public WrongArgumentsNumberException(String message) {
-            super(message);
-        }
-
-        public WrongArgumentsNumberException(Throwable cause) {
-            super(cause);
-        }
     }
 }

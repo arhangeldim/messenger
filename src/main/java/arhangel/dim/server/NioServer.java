@@ -33,8 +33,14 @@ public class NioServer implements Server {
     private Protocol protocol;
     private int maxConnection = DEFAULT_MAX_CONNECT;
 
+    private String dbUrl;
+    private String dbLogin;
+    private String dbPassword;
+
     private DaoFactory dbFactory;
     private SessionsManager sessionsManager;
+
+    private Channel channel;
 
     static Logger log = LoggerFactory.getLogger(NioServer.class);
 
@@ -59,9 +65,10 @@ public class NioServer implements Server {
     public void start() {
 
         try {
-            dbFactory = new PostgresDaoFactory();
+            dbFactory = new PostgresDaoFactory(dbUrl, dbLogin, dbPassword);
         } catch (PersistException e) {
-            e.printStackTrace();
+            System.out.println("You should set dbUrl, dbLogin, dbPassword settings!");
+//            e.printStackTrace();
             return;
         }
 
@@ -80,9 +87,16 @@ public class NioServer implements Server {
         networkServer.setOption("connectTimeoutMillis", 10000);
         networkServer.setPipelineFactory(new ClientPipelineFactory(this));
 
-        Channel channel = networkServer.bind(new InetSocketAddress(address, port));
+        channel = networkServer.bind(new InetSocketAddress(address, port));
         log.info("Nio SyncServer started");
         log.info("Sesseions limit: " + maxConnection);
+    }
+
+    @Override
+    public void stop() {
+        if (channel != null){
+            channel.close();
+        }
     }
 
 
@@ -117,6 +131,30 @@ public class NioServer implements Server {
 
     public void setSessionsManager(SessionsManager sessionsManager) {
         this.sessionsManager = sessionsManager;
+    }
+
+    public String getDbUrl() {
+        return dbUrl;
+    }
+
+    public void setDbUrl(String dbUrl) {
+        this.dbUrl = dbUrl;
+    }
+
+    public String getDbLogin() {
+        return dbLogin;
+    }
+
+    public void setDbLogin(String dbLogin) {
+        this.dbLogin = dbLogin;
+    }
+
+    public String getDbPassword() {
+        return dbPassword;
+    }
+
+    public void setDbPassword(String dbPassword) {
+        this.dbPassword = dbPassword;
     }
 
     public static void main(String[] args) {

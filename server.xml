@@ -3,8 +3,11 @@
     <bean id="protocol" class="arhangel.dim.core.net.BinaryProtocol"/>
 
     <bean id="server" class="arhangel.dim.server.NioServer">
-        <property name="maxConnection" val="4"/>
+        <property name="maxConnection" val="10"/>
         <property name="port" val="19000"/>
+        <property name="dbUrl" val="jdbc:postgresql://178.62.140.149:5432/ochuikin"/>
+        <property name="dbLogin" val="trackuser"/>
+        <property name="dbPassword" val="trackuser"/>
         <property name="protocol" ref="protocol"/>
     </bean>
 

@@ -10,6 +10,8 @@ public interface Server {
 
     void start();
 
+    void stop();
+
     DaoFactory getDbFactory();
 
     SessionsManager getSessionsManager();

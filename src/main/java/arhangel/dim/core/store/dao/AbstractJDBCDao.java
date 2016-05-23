@@ -133,31 +133,29 @@ public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Long>
         if (object.getId() != null) {
             throw new PersistException("Object is already persist.");
         }
-        T persistInstance;
         // Добавляем запись
         String sql = getCreateQuery();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             prepareStatementForInsert(statement, object);
+
             int count = statement.executeUpdate();
             if (count != 1) {
                 throw new PersistException("On persist modify more then 1 record: " + count);
             }
-        } catch (Exception e) {
-            throw new PersistException(e);
-        }
-        // Получаем только что вставленную запись
-        sql = getSelectQuery() + " WHERE id = (select currval('" + TABLE_NAME + "_id_seq'));";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            ResultSet rs = statement.executeQuery();
-            List<T> list = parseResultSet(rs);
-            if ((list == null) || (list.size() != 1)) {
-                throw new PersistException("Exception on findByPK new persist data.");
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    Long pk = generatedKeys.getLong(1);
+                    object.setId((PK) pk);
+                    return object;
+                } else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
             }
-            persistInstance = list.iterator().next();
         } catch (Exception e) {
             throw new PersistException(e);
         }
-        return persistInstance;
     }
 
     @Override
