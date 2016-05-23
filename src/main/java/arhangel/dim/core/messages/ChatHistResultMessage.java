@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 /**
  * Created by olegchuikin on 22/05/16.
  */
-public class ChatHistResultMessage extends Message{
+public class ChatHistResultMessage extends Message {
 
     private List<TextMessage> messages;
 
@@ -23,11 +23,15 @@ public class ChatHistResultMessage extends Message{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
 
-        ChatHistResultMessage that = (ChatHistResultMessage) o;
+        ChatHistResultMessage that = (ChatHistResultMessage) object;
 
         return !(messages != null ? !messages.equals(that.messages) : that.messages != null);
 

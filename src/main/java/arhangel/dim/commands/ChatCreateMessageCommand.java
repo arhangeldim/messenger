@@ -54,8 +54,8 @@ public class ChatCreateMessageCommand implements Command {
                     for (Chat chat : chatsByUser) {
                         log.info("CHAT " + chat.toString());
                         if (chat.getParticipants().size() == 2 &&
-                                chat.getParticipants().contains(session.getUser().getId())
-                                && chat.getParticipants().contains(participants.get(0))) {
+                                chat.getParticipants().contains(session.getUser().getId()) &&
+                                chat.getParticipants().contains(participants.get(0))) {
                             StatusMessage response = new StatusMessage();
                             response.setText(String.format(
                                     "You already have chat with user %d. Chat id: %d",

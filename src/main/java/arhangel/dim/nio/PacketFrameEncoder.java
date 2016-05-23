@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 /**
  * Created by olegchuikin on 24/04/16.
  */
-public class PacketFrameEncoder extends OneToOneEncoder{
+public class PacketFrameEncoder extends OneToOneEncoder {
 
     Protocol protocol;
 

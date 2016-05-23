@@ -7,12 +7,24 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistMessage;
+import arhangel.dim.core.messages.ChatHistResultMessage;
+import arhangel.dim.core.messages.ChatInfoMessage;
+import arhangel.dim.core.messages.ChatInfoResultMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatListResultMessage;
+import arhangel.dim.core.messages.ErrorMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.InfoResultMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.utils.ParseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +35,6 @@ import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
 
-import static arhangel.dim.core.messages.Type.*;
 
 /**
  * Клиент для тестирования серверного приложения
@@ -137,7 +148,7 @@ public class Client implements ConnectionHandler {
                 }
             } catch (ProtocolException e) {
                 System.out.println("Authentication failed!");
-            } catch (SocketException e){
+            } catch (SocketException e) {
                 System.out.println("Connection problems. Authentication failed!");
             }
         }
@@ -186,15 +197,16 @@ public class Client implements ConnectionHandler {
             case MSG_CHAT_INFO_RESULT:
                 ChatInfoResultMessage chatInfoResultMessage = (ChatInfoResultMessage) msg;
 
-                System.out.println("Users of chat " + chatInfoResultMessage.getChatId() + ": "
-                        + String.join(",", chatInfoResultMessage.getUserIds().stream()
-                        .map(Object::toString)
-                        .collect(Collectors.toList())));
+                System.out.println("Users of chat " + chatInfoResultMessage.getChatId() + ": " +
+                        String.join(",", chatInfoResultMessage.getUserIds().stream()
+                                .map(Object::toString)
+                                .collect(Collectors.toList())));
                 break;
             case MSG_ERROR:
                 ErrorMessage errorMessage = (ErrorMessage) msg;
                 System.out.println(errorMessage.getText());
                 close();
+                break;
             default:
                 log.error("unsupported type of message");
                 break;
@@ -217,7 +229,7 @@ public class Client implements ConnectionHandler {
                         throw new WrongArgumentsNumberException();
                     }
                     LoginMessage loginMessage = new LoginMessage();
-                    loginMessage.setType(MSG_LOGIN);
+                    loginMessage.setType(Type.MSG_LOGIN);
                     loginMessage.setLogin(tokens[1]);
                     loginMessage.setPassword(tokens[2]);
                     send(loginMessage);
@@ -227,7 +239,7 @@ public class Client implements ConnectionHandler {
                         throw new WrongArgumentsNumberException();
                     }
                     ChatListMessage chatListMessage = new ChatListMessage();
-                    chatListMessage.setType(MSG_CHAT_LIST);
+                    chatListMessage.setType(Type.MSG_CHAT_LIST);
                     send(chatListMessage);
                     break;
                 case "/chat_create":
@@ -255,7 +267,7 @@ public class Client implements ConnectionHandler {
                         throw new WrongArgumentsNumberException();
                     }
                     TextMessage sendMessage = new TextMessage();
-                    sendMessage.setType(MSG_TEXT);
+                    sendMessage.setType(Type.MSG_TEXT);
                     sendMessage.setChatId(Long.parseLong(tokens[1]));
                     sendMessage.setText(line.replace(tokens[0] + " " + tokens[1] + " ", ""));
                     send(sendMessage);
@@ -265,7 +277,7 @@ public class Client implements ConnectionHandler {
                         throw new WrongArgumentsNumberException();
                     }
                     InfoMessage infoMessage = new InfoMessage();
-                    infoMessage.setType(MSG_INFO);
+                    infoMessage.setType(Type.MSG_INFO);
                     if (tokens.length == 1) {
                         infoMessage.setTarget(-1L);
                     } else {
@@ -325,7 +337,7 @@ public class Client implements ConnectionHandler {
             if (out != null) {
                 out.close();
             }
-            if (socket != null){
+            if (socket != null) {
                 socket.close();
             }
         } catch (IOException e) {

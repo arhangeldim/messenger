@@ -1,17 +1,21 @@
 package arhangel.dim.core.store.dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 /**
  * Абстрактный класс предоставляющий базовую реализацию CRUD операций с использованием JDBC.
  *
  * @param <T>  тип объекта персистенции
- * @param <PK> тип первичного ключа
+ * @param <K> тип первичного ключа
  */
-public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Long> implements GenericDao<T, PK> {
+public abstract class AbstractJdbcDao<T extends Identified<K>, K extends Long> implements GenericDao<T, K> {
 
-    protected String TABLE_NAME;
+    protected String tableName;
 
     protected Connection connection;
 
@@ -59,7 +63,7 @@ public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Long>
     protected abstract void prepareStatementForUpdate(PreparedStatement statement, T object) throws PersistException;
 
     @Override
-    public T getByPK(Long key) throws PersistException {
+    public T getByPk(Long key) throws PersistException {
         List<T> list;
         String sql = getSelectQuery();
         sql += " WHERE id = ?";
@@ -147,7 +151,7 @@ public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Long>
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     Long pk = generatedKeys.getLong(1);
-                    object.setId((PK) pk);
+                    object.setId((K) pk);
                     return object;
                 } else {
                     throw new SQLException("Creating user failed, no ID obtained.");
@@ -191,7 +195,7 @@ public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Long>
         }
     }
 
-    public AbstractJDBCDao(Connection connection) {
+    public AbstractJdbcDao(Connection connection) {
         this.connection = connection;
     }
 
@@ -201,7 +205,7 @@ public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Long>
         Statement statement = null;
         try {
             statement = connection.createStatement();
-            sql = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
+            sql = "DROP TABLE IF EXISTS " + tableName + ";";
             statement.executeUpdate(sql);
 
         } catch (SQLException e) {

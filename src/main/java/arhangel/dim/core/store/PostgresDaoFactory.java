@@ -46,7 +46,6 @@ public class PostgresDaoFactory implements DaoFactory<Connection> {
     public Connection getContext() throws PersistException {
         if (connection == null) {
             try {
-//                connection = DriverManager.getConnection("jdbc:postgresql://178.62.140.149:5432/ochuikin", "trackuser", "trackuser");
                 connection = DriverManager.getConnection(dbUrl, dbLogin, dbPassword);
             } catch (SQLException e) {
                 throw new PersistException(e);

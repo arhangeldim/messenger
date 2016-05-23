@@ -1,7 +1,12 @@
 package arhangel.dim.commands;
 
 import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatHistMessage;
+import arhangel.dim.core.messages.ChatHistResultMessage;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.store.dao.ChatDao;
 import arhangel.dim.core.store.dao.MessageDao;
@@ -41,8 +46,8 @@ public class ChatHistMessageCommand implements Command {
             ChatDao chatDao = (ChatDao) server.getDbFactory().getDao(Chat.class);
             MessageDao messageDao = (MessageDao) server.getDbFactory().getDao(TextMessage.class);
 
-            Chat chat = chatDao.getByPK(msg.getChatId());
-            if (chat == null){
+            Chat chat = chatDao.getByPk(msg.getChatId());
+            if (chat == null) {
                 sendError(session, "There isn't chat with id " + msg.getChatId());
                 return;
             }

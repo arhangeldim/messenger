@@ -1,8 +1,5 @@
 package arhangel.dim.core.store.dao;
 
-import arhangel.dim.core.store.dao.Identified;
-import arhangel.dim.core.store.dao.PersistException;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,9 +7,9 @@ import java.util.List;
  * Унифицированный интерфейс управления персистентным состоянием объектов
  *
  * @param <T>  тип объекта персистенции
- * @param <PK> тип первичного ключа
+ * @param <K> тип первичного ключа
  */
-public interface GenericDao<T extends Identified<PK>, PK extends Serializable> {
+public interface GenericDao<T extends Identified<K>, K extends Serializable> {
 
     /**
      * Создает новую запись и соответствующий ей объект
@@ -27,7 +24,7 @@ public interface GenericDao<T extends Identified<PK>, PK extends Serializable> {
     /**
      * Возвращает объект соответствующий записи с первичным ключом key или null
      */
-    T getByPK(PK key) throws PersistException;
+    T getByPk(K key) throws PersistException;
 
     /**
      * Сохраняет состояние объекта group в базе данных

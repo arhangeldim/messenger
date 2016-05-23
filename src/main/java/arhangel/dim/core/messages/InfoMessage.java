@@ -16,12 +16,18 @@ public class InfoMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        if (!super.equals(object)) {
+            return false;
+        }
 
-        InfoMessage that = (InfoMessage) o;
+        InfoMessage that = (InfoMessage) object;
 
         return !(target != null ? !target.equals(that.target) : that.target != null);
 

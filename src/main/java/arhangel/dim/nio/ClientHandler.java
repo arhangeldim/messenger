@@ -6,7 +6,12 @@ import arhangel.dim.session.AddSessionToManagerException;
 import arhangel.dim.session.NioSession;
 import arhangel.dim.session.Session;
 import arhangel.dim.server.NioServer;
-import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,15 +36,15 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelConnected(ctx, e);
+    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
+        super.channelConnected(ctx, event);
         log.info("channel connected");
 
-        this.channel = e.getChannel();
-        session = new NioSession(e.getChannel(), server);
+        this.channel = event.getChannel();
+        session = new NioSession(event.getChannel(), server);
         try {
             server.getSessionsManager().addSession(session);
-        } catch (AddSessionToManagerException exception){
+        } catch (AddSessionToManagerException exception) {
             log.info("Close channel: " + exception.getMessage());
             ErrorMessage errorMessage = new ErrorMessage();
             errorMessage.setText(exception.getMessage());
@@ -50,25 +55,25 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelDisconnected(ctx, e);
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
+        super.channelDisconnected(ctx, event);
         server.getSessionsManager().removeSession(session);
         log.info("channel disconnected");
     }
 
     @Override
-    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelClosed(ctx, e);
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
+        super.channelClosed(ctx, event);
         log.info("channel closed");
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        super.messageReceived(ctx, e);
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent event) throws Exception {
+        super.messageReceived(ctx, event);
 
 
-        if (e.getChannel().isOpen()) {
-            Message message = (Message) e.getMessage();
+        if (event.getChannel().isOpen()) {
+            Message message = (Message) event.getMessage();
             log.info("Message receved", message);
             session.onMessage(message);
 
@@ -77,8 +82,8 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        super.exceptionCaught(ctx, e);
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent event) throws Exception {
+        super.exceptionCaught(ctx, event);
         ctx.getChannel().close();
 
         log.info("exception caught");

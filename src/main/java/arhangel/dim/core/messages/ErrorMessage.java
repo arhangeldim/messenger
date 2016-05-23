@@ -19,12 +19,18 @@ public class ErrorMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        if (!super.equals(object)) {
+            return false;
+        }
 
-        ErrorMessage that = (ErrorMessage) o;
+        ErrorMessage that = (ErrorMessage) object;
 
         return !(text != null ? !text.equals(that.text) : that.text != null);
 

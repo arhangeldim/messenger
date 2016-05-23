@@ -29,13 +29,13 @@ public class PacketFrameDecoder extends ReplayingDecoder<VoidEnum> {
     }
 
     @Override
-    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        ctx.sendUpstream(e);
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
+        ctx.sendUpstream(event);
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        ctx.sendUpstream(e);
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
+        ctx.sendUpstream(event);
     }
 
     @Override

@@ -1,20 +1,23 @@
 package arhangel.dim.core.store;
 
-import arhangel.dim.core.User;
 import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.messages.Type;
-import arhangel.dim.core.store.dao.AbstractJDBCDao;
+import arhangel.dim.core.store.dao.AbstractJdbcDao;
 import arhangel.dim.core.store.dao.MessageDao;
 import arhangel.dim.core.store.dao.PersistException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by olegchuikin on 01/05/16.
  */
-public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> implements MessageDao {
+public class PostgresMessagesDao extends AbstractJdbcDao<TextMessage, Long> implements MessageDao {
 
     public static final String ID_ = "id";
     public static final String ADMIN_ = "admin_id";
@@ -25,7 +28,7 @@ public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> impl
     public PostgresMessagesDao(Connection connection) {
         super(connection);
 
-        TABLE_NAME = "messages";
+        tableName = "messages";
 
         //todo where should it be
         Statement statement = null;
@@ -37,7 +40,7 @@ public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> impl
 //            statement.executeUpdate(sql);
 
             statement = connection.createStatement();
-            sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
+            sql = "CREATE TABLE IF NOT EXISTS " + tableName + " " +
                     "(id SERIAL PRIMARY KEY, " +
                     " text VARCHAR(1023), " +
                     " chat_id BIGINT, " +
@@ -51,13 +54,13 @@ public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> impl
 
     @Override
     public String getSelectQuery() {
-        return String.format("SELECT %s, %s, %s, %s, %s FROM %s ", ID_, TEXT_, CHAT_, TIMESTAMP_, ADMIN_, TABLE_NAME);
+        return String.format("SELECT %s, %s, %s, %s, %s FROM %s ", ID_, TEXT_, CHAT_, TIMESTAMP_, ADMIN_, tableName);
     }
 
     @Override
     public String getCreateQuery() {
         return String.format("INSERT INTO %s (%s, %s, %s, %s) \nVALUES (?, ?, ?, ?);",
-                TABLE_NAME, TEXT_, CHAT_, TIMESTAMP_, ADMIN_);
+                tableName, TEXT_, CHAT_, TIMESTAMP_, ADMIN_);
     }
 
     @Override
@@ -65,12 +68,12 @@ public class PostgresMessagesDao extends AbstractJDBCDao<TextMessage, Long> impl
         return String.format("UPDATE %s \n" +
                         "SET %s = ?, %s = ?, %s = ?, %s = ? \n" +
                         "WHERE %s = ?;",
-                TABLE_NAME, TEXT_, CHAT_, TIMESTAMP_, ADMIN_, ID_);
+                tableName, TEXT_, CHAT_, TIMESTAMP_, ADMIN_, ID_);
     }
 
     @Override
     public String getDeleteQuery() {
-        return String.format("DELETE FROM %s WHERE %s = ?;", TABLE_NAME, ID_);
+        return String.format("DELETE FROM %s WHERE %s = ?;", tableName, ID_);
     }
 
     @Override

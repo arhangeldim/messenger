@@ -94,7 +94,7 @@ public class NioServer implements Server {
 
     @Override
     public void stop() {
-        if (channel != null){
+        if (channel != null) {
             channel.close();
         }
     }

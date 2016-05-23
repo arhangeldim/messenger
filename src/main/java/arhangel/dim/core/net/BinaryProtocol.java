@@ -1,10 +1,20 @@
 package arhangel.dim.core.net;
 
 import arhangel.dim.core.messages.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 
 public class BinaryProtocol implements Protocol {
+
+    static Logger log = LoggerFactory.getLogger(BinaryProtocol.class);
 
     @Override
     public Message decode(byte[] bytes) throws ProtocolException {
@@ -13,9 +23,9 @@ public class BinaryProtocol implements Protocol {
         ObjectInput in = null;
         try {
             in = new ObjectInputStream(bis);
-            Object o = in.readObject();
-            return (Message) o;
-        }catch (Exception e){
+            Object object = in.readObject();
+            return (Message) object;
+        } catch (Exception e) {
             throw new ProtocolException(e);
         } finally {
             try {
@@ -24,6 +34,7 @@ public class BinaryProtocol implements Protocol {
                     in.close();
                 }
             } catch (IOException e) {
+                log.info("IOException");
             }
         }
     }
@@ -36,8 +47,8 @@ public class BinaryProtocol implements Protocol {
         try {
             out = new ObjectOutputStream(bos);
             out.writeObject(msg);
-            return  bos.toByteArray();
-        } catch (Exception e){
+            return bos.toByteArray();
+        } catch (Exception e) {
             throw new ProtocolException(e);
         } finally {
             try {
@@ -46,6 +57,7 @@ public class BinaryProtocol implements Protocol {
                 }
                 bos.close();
             } catch (IOException ex) {
+                log.info("IOException");
             }
         }
     }

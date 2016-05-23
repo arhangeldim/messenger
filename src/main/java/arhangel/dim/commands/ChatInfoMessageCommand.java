@@ -1,11 +1,13 @@
 package arhangel.dim.commands;
 
 import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatInfoMessage;
+import arhangel.dim.core.messages.ChatInfoResultMessage;
+import arhangel.dim.core.messages.CommandException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.store.dao.ChatDao;
-import arhangel.dim.core.store.dao.GenericDao;
-import arhangel.dim.core.store.dao.Identified;
 import arhangel.dim.server.Server;
 import arhangel.dim.session.Session;
 
@@ -33,7 +35,7 @@ public class ChatInfoMessageCommand implements Command {
             ChatInfoMessage msg = (ChatInfoMessage) message;
 
             ChatDao chatDao = (ChatDao) server.getDbFactory().getDao(Chat.class);
-            Chat chat = chatDao.getByPK(msg.getChatId());
+            Chat chat = chatDao.getByPk(msg.getChatId());
 
             ChatInfoResultMessage result = new ChatInfoResultMessage();
             result.setUserIds(chat.getParticipants());

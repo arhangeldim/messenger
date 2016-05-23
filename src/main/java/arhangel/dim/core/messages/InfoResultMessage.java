@@ -39,14 +39,22 @@ public class InfoResultMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        if (!super.equals(object)) {
+            return false;
+        }
 
-        InfoResultMessage that = (InfoResultMessage) o;
+        InfoResultMessage that = (InfoResultMessage) object;
 
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
+        }
         return !(chats != null ? !chats.equals(that.chats) : that.chats != null);
 
     }

@@ -33,14 +33,22 @@ public class ChatInfoResultMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        if (!super.equals(object)) {
+            return false;
+        }
 
-        ChatInfoResultMessage that = (ChatInfoResultMessage) o;
+        ChatInfoResultMessage that = (ChatInfoResultMessage) object;
 
-        if (chatId != null ? !chatId.equals(that.chatId) : that.chatId != null) return false;
+        if (chatId != null ? !chatId.equals(that.chatId) : that.chatId != null) {
+            return false;
+        }
         return !(userIds != null ? !userIds.equals(that.userIds) : that.userIds != null);
 
     }

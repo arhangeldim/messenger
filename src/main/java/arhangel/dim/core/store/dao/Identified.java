@@ -5,12 +5,12 @@ import java.io.Serializable;
 /**
  * Интерфейс идентифицируемых объектов.
  */
-public interface Identified<PK extends Serializable> {
+public interface Identified<K extends Serializable> {
 
     /**
      * Возвращает идентификатор объекта
      */
-    PK getId();
+    K getId();
 
-    void setId(PK pk);
+    void setId(K key);
 }

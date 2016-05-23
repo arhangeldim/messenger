@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * А над этим классом надо еще поработать
  */
-public class Chat implements Identified<Long>{
+public class Chat implements Identified<Long> {
 
     private Long id;
     private List<Long> messages = new ArrayList<>();

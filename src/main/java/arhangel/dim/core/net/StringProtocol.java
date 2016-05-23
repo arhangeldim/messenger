@@ -1,6 +1,17 @@
 package arhangel.dim.core.net;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistMessage;
+import arhangel.dim.core.messages.ChatHistResultMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatListResultMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.InfoResultMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.utils.ParseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Простейший протокол передачи данных
+ * I'm not sure It has no bugs
  */
 public class StringProtocol implements Protocol {
 

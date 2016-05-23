@@ -2,7 +2,11 @@ package arhangel.dim.core.store;
 
 import arhangel.dim.core.Chat;
 import arhangel.dim.core.User;
-import arhangel.dim.core.store.dao.*;
+import arhangel.dim.core.store.dao.AbstractJdbcDao;
+import arhangel.dim.core.store.dao.ChatDao;
+import arhangel.dim.core.store.dao.DaoFactory;
+import arhangel.dim.core.store.dao.GenericDao;
+import arhangel.dim.core.store.dao.PersistException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +19,7 @@ import java.util.List;
 /**
  * Created by olegchuikin on 01/05/16.
  */
-public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements ChatDao {
+public class PostgresChatsDao extends AbstractJdbcDao<Chat, Long> implements ChatDao {
 
     private DaoFactory daoFactory;
 
@@ -29,7 +33,7 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
     public PostgresChatsDao(Connection connection, DaoFactory daoFactory) {
         super(connection);
         this.daoFactory = daoFactory;
-        TABLE_NAME = "chats";
+        tableName = "chats";
 
         //todo where should it be
         Statement statement = null;
@@ -39,7 +43,7 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
             String sql;
 
             statement = connection.createStatement();
-            sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
+            sql = "CREATE TABLE IF NOT EXISTS " + tableName + " " +
                     "(id SERIAL PRIMARY KEY, " +
                     " admin_id BIGINT)";
             statement.executeUpdate(sql);
@@ -76,8 +80,8 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
     }
 
     @Override
-    public Chat getByPK(Long key) throws PersistException {
-        Chat chat = super.getByPK(key);
+    public Chat getByPk(Long key) throws PersistException {
+        Chat chat = super.getByPk(key);
         GenericDao<User, Long> userDao = daoFactory.getDao(User.class);
 
         chat.setParticipants(getParticipantsOfChatWithId(chat.getId()));
@@ -86,12 +90,12 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
 
     @Override
     public String getSelectQuery() {
-        return String.format("SELECT %s, %s FROM %s ", ID_, ADMIN_, TABLE_NAME);
+        return String.format("SELECT %s, %s FROM %s ", ID_, ADMIN_, tableName);
     }
 
     @Override
     public String getCreateQuery() {
-        return String.format("INSERT INTO %s (%s) \nVALUES (?);", TABLE_NAME, ADMIN_);
+        return String.format("INSERT INTO %s (%s) \nVALUES (?);", tableName, ADMIN_);
     }
 
     @Override
@@ -99,12 +103,12 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
         return String.format("UPDATE %s \n" +
                         "SET %s = ? \n" +
                         "WHERE %s = ?;",
-                TABLE_NAME, ADMIN_, ID_);
+                tableName, ADMIN_, ID_);
     }
 
     @Override
     public String getDeleteQuery() {
-        return String.format("DELETE FROM %s WHERE %s = ?;", TABLE_NAME, ID_);
+        return String.format("DELETE FROM %s WHERE %s = ?;", tableName, ID_);
     }
 
     @Override
@@ -115,7 +119,7 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
                 Chat chat = new Chat();
                 chat.setId(rs.getLong(ID_));
                 GenericDao<User, Long> userDao = daoFactory.getDao(User.class);
-                chat.setAdmin(userDao.getByPK(rs.getLong(ADMIN_)));
+                chat.setAdmin(userDao.getByPk(rs.getLong(ADMIN_)));
 
                 List<Long> participants = getParticipantsOfChatWithId(chat.getId());
                 chat.setParticipants(participants);
@@ -191,9 +195,9 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
     private void addParticipantsToTable(Chat chat) throws PersistException {
         String sql = "INSERT INTO chats_users (chat_id, user_id) \nVALUES (?, ?);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            for (Long user_id : chat.getParticipants()) {
+            for (Long userId : chat.getParticipants()) {
                 statement.setLong(1, chat.getId());
-                statement.setLong(2, user_id);
+                statement.setLong(2, userId);
 
                 int count = statement.executeUpdate();
                 if (count != 1) {
@@ -209,8 +213,8 @@ public class PostgresChatsDao extends AbstractJDBCDao<Chat, Long> implements Cha
     public List<Chat> getChatsByAdmin(User admin) throws PersistException {
         List<Long> chatsId = getChatsOfUserWithId(admin.getId());
         List<Chat> chats = new ArrayList<>();
-        for (Long aLong : chatsId) {
-            chats.add(getByPK(aLong));
+        for (Long chatId : chatsId) {
+            chats.add(getByPk(chatId));
         }
         return chats;
     }

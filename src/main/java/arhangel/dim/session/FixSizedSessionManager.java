@@ -49,7 +49,7 @@ public class FixSizedSessionManager implements SessionsManager {
 
     @Override
     public synchronized void removeSession(Session session) {
-        if (session == null){
+        if (session == null) {
             return;
         }
         if (sessions.contains(session)) {

@@ -1,6 +1,13 @@
 package arhangel.dim.core.messages;
 
-import arhangel.dim.commands.*;
+import arhangel.dim.commands.ChatCreateMessageCommand;
+import arhangel.dim.commands.ChatHistMessageCommand;
+import arhangel.dim.commands.ChatInfoMessageCommand;
+import arhangel.dim.commands.ChatListMessageCommand;
+import arhangel.dim.commands.Command;
+import arhangel.dim.commands.InfoMessageCommand;
+import arhangel.dim.commands.LoginMessageCommand;
+import arhangel.dim.commands.TextMessageCommand;
 import arhangel.dim.session.Session;
 import arhangel.dim.server.Server;
 

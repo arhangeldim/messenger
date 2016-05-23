@@ -1,6 +1,5 @@
 package arhangel.dim.core.messages;
 
-import java.util.stream.Collectors;
 
 /**
  * Created by olegchuikin on 23/05/16.
@@ -22,12 +21,18 @@ public class ChatInfoMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        if (!super.equals(object)) {
+            return false;
+        }
 
-        ChatInfoMessage that = (ChatInfoMessage) o;
+        ChatInfoMessage that = (ChatInfoMessage) object;
 
         return !(chatId != null ? !chatId.equals(that.chatId) : that.chatId != null);
 
