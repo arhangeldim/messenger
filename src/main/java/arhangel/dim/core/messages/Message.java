@@ -6,9 +6,9 @@ import java.util.Objects;
 
 public abstract class Message implements Serializable {
 
-    private Long id;
-    private Long senderId;
-    private Type type;
+    protected Long id;
+    protected Long senderId;
+    protected Type type;
 
     public Long getId() {
         return id;

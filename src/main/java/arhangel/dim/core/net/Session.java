@@ -6,11 +6,18 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
+import arhangel.dim.core.messages.ChatHistoryResultMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatListResultMessage;
+import arhangel.dim.core.messages.InfoMessage;
 import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.store.MessageDao;
 import arhangel.dim.server.Server;
 import com.sun.javafx.scene.control.skin.FXVK;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +44,10 @@ public class Session implements ConnectionHandler, Runnable {
     private InputStream in;
     private OutputStream out;
 
-    public Session(Socket socket, Server server) {
+    private UserDao userDao;
+    private MessageDao messageDao;
+
+    public Session(Socket socket, Server server) throws IOException {
         this.sessionServer = server;
         this.protocol = server.getProtocol();
         this.socket = socket;
@@ -46,7 +56,11 @@ public class Session implements ConnectionHandler, Runnable {
             this.out = socket.getOutputStream();
         } catch (IOException e) {
             e.printStackTrace();
+            throw new IOException("Can't open a socket");
         }
+
+        userDao = new UserDao();
+        messageDao = new MessageDao();
     }
 
     public InputStream getIn() {
@@ -71,8 +85,8 @@ public class Session implements ConnectionHandler, Runnable {
 
     @Override
     public void run() {
-        while (!getSocket().isClosed()) {
-            byte[] buf = new byte[1024 * 500];
+        byte[] buf = new byte[1024 * 500];
+        while (!socket.isClosed()) {
             int readBytes = 0;
             try {
                 readBytes = in.read(buf);
@@ -96,34 +110,29 @@ public class Session implements ConnectionHandler, Runnable {
     public void send(Message msg) throws ProtocolException, IOException {
         System.out.println(msg.toString());
         out.write(protocol.encode(msg));
-        out.flush(); // принудительно проталкиваем буфер с данными
-        out.write(protocol.encode(msg));
         out.flush();
     }
 
     @Override
     public void onMessage(Message msg) {
-        String type = msg.getType().toString();
         try {
-
-            switch (type) {
-                case "MSG_LOGIN":
+            switch (msg.getType()) {
+                case MSG_LOGIN:
                     LoginMessage loginMessage = (LoginMessage) msg;
                     StatusMessage statusMessage = null;
 
-                    for (Session sess : this.getSessionServer().getSessionList()) {
-                        if (sess.getUser() != null) {
-                            if (sess.getUser().getLogin().equals(loginMessage.getLogin())) {
+                    for (Session session : this.getSessionServer().getSessionList()) {
+                        if (session.getUser() != null) {
+                            if (session.getUser().getLogin().equals(loginMessage.getLogin())) {
                                 statusMessage = new StatusMessage(
                                         "User " + loginMessage.getLogin() + " already logged in");
                                 statusMessage.setType(Type.MSG_STATUS);
-                                this.send(statusMessage);
+                                send(statusMessage);
                                 return;
                             }
                         }
                     }
 
-                    UserDao userDao = new UserDao();
                     User founduser = userDao.getUser(loginMessage.getLogin(), loginMessage.getPassword());
 
                     if (founduser == null) {
@@ -131,12 +140,12 @@ public class Session implements ConnectionHandler, Runnable {
                         newuser = userDao.addUser(newuser);
                         statusMessage = new StatusMessage("User " + newuser.getLogin() + " was created");
                         statusMessage.setType(Type.MSG_STATUS);
-                        this.send(statusMessage);
+                        send(statusMessage);
                         break;
                     } else if (founduser.getPassword() == null) {
                         statusMessage = new StatusMessage("Wrong password for " + founduser.getLogin());
                         statusMessage.setType(Type.MSG_STATUS);
-                        this.send(statusMessage);
+                        send(statusMessage);
                         break;
                     }
                     user = founduser;
@@ -147,9 +156,7 @@ public class Session implements ConnectionHandler, Runnable {
                     this.send(statusMessage);
                     break;
 
-                case "MSG_TEXT":
-                    MessageDao messageDao = new MessageDao();
-
+                case MSG_TEXT:
                     //Добавление сообщения в базу
                     TextMessage textMsg = (TextMessage) msg;
                     messageDao.addMessage(textMsg.getChatId(), textMsg);
@@ -168,8 +175,44 @@ public class Session implements ConnectionHandler, Runnable {
                             }
                         }
                     }
-
                     break;
+
+                case MSG_CHAT_LIST:
+                    ChatListMessage chatListMessage = (ChatListMessage) msg;
+
+                    List<Long> chatsIdList = messageDao.getChatsByUserId(chatListMessage.getUserId());
+                    ChatListResultMessage chatListResultMessage = new ChatListResultMessage(chatsIdList);
+
+                    send(chatListResultMessage);
+                    break;
+
+                case MSG_CHAT_CREATE:
+                    ChatCreateMessage chatCreateMessage = (ChatCreateMessage) msg;
+
+                    List<Long> userIdList = chatCreateMessage.getUserIdList();
+                    Long createdChatId = messageDao.addChat(userIdList);
+                    StatusMessage chatWasCreated = new StatusMessage("Chat with id = " + createdChatId + " was created");
+                    chatWasCreated.setType(Type.MSG_STATUS);
+                    send(chatWasCreated);
+                    break;
+
+                case MSG_CHAT_HIST:
+                    ChatHistoryMessage chatHistoryMessage = (ChatHistoryMessage) msg;
+
+                    List<Long> allMessages = messageDao.getMessagesFromChat(chatHistoryMessage.getChatId());
+                    ChatHistoryResultMessage historyResult = new ChatHistoryResultMessage(allMessages);
+                    send(historyResult);
+                    break;
+
+                case MSG_INFO:
+                    InfoMessage infoMessage = (InfoMessage) msg;
+                    User infoUser = userDao.getUserById(infoMessage.getUsrId());
+
+                    InfoResultMessage infoResultMessage = new InfoResultMessage(infoUser.getId(),infoUser.getLogin(), infoUser.getPassword(), "");
+                    infoResultMessage.setType(Type.MSG_INFO_RESULT);
+                    send(infoResultMessage);
+                    break;
+
                 default: throw new CommandException("Unknown server command");
             }
         } catch (Exception e) {
@@ -179,6 +222,5 @@ public class Session implements ConnectionHandler, Runnable {
 
     @Override
     public void close() {
-        // TODO: закрыть in/out каналы и сокет. Освободить другие ресурсы, если необходимо
     }
 }

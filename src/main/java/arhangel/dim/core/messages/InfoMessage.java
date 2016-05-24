@@ -4,14 +4,14 @@ import java.util.Objects;
 
 
 public class InfoMessage extends Message {
-    private long id;
+    private long usrId;
 
-    public long getMesId() {
-        return this.id;
+    public long getUsrId() {
+        return this.usrId;
     }
 
-    public void setMesId(long id) {
-        this.id = id;
+    public void setUsrId(long usrId) {
+        this.usrId = usrId;
     }
 
     @Override

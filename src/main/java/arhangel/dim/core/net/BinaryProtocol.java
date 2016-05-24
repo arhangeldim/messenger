@@ -33,22 +33,32 @@ public class BinaryProtocol implements Protocol {
     }
 
     @Override
-    public byte[] encode(Message msg) throws ProtocolException {
+    public byte[] encode(Message msg) throws ProtocolException, IOException {
+        ByteArrayOutputStream baos = null;
+        ObjectOutput out = null;
+
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutput out = new ObjectOutputStream(baos);
+            baos = new ByteArrayOutputStream();
+            out = new ObjectOutputStream(baos);
 
             out.writeObject(msg);
             byte[] objBytes = null;
             objBytes = baos.toByteArray();
             baos.flush();
-            baos.close();
-            out.flush();
-            out.close();
             return objBytes;
 
         } catch (IOException e) {
             e.getMessage();
+        } finally {
+            if (baos != null) {
+                baos.close();
+            }
+            if (out != null) {
+                out.flush();
+            }
+            if (out != null) {
+                out.close();
+            }
         }
 
         return null;

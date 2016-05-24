@@ -28,6 +28,7 @@ public class LoginMessage extends Message {
         return Objects.hash(super.hashCode(), getLogin(), getPassword());
     }
 
+
     @Override
     public String toString() {
         return "LoginMessage{" +

@@ -4,6 +4,7 @@ import arhangel.dim.core.Chat;
 import arhangel.dim.core.User;
 import arhangel.dim.core.messages.InfoResultMessage;
 import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.messages.TextMessage;
 import org.apache.log4j.Logger;
 
@@ -21,16 +22,14 @@ import java.util.Map;
 
 public class MessageDao {
     private static Logger log = Logger.getLogger(UserDao.class.getName());
-    DaoFactory daoFactory =  DaoFactory.getInstance();
+    private DaoFactory daoFactory =  DaoFactory.getInstance();
+    private  Connection connection = daoFactory.connect();
 
     public TextMessage addMessage(Long chatId, TextMessage textMessage) {
-
         TextMessage newTextMsg = null;
         try {
-            Connection conn = daoFactory.connect();
-
             log.trace("Creating prepared statement");
-            PreparedStatement preparedStatement = conn.prepareStatement(
+            PreparedStatement preparedStatement = connection.prepareStatement(
                     "insert into Messages (user_id, msg_text, chat_id) " +
                     "values(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 
@@ -53,14 +52,29 @@ public class MessageDao {
         return newTextMsg;
     }
 
-    public List<Long> getChatsByUserId(Long userId) {
-        return null;
+    public List<Long> getChatsByUserId(Long userId) throws SQLException {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "select chat_id from user_chat where user_id = ?");
+            preparedStatement.setLong(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Long chatOfUserId = null;
+            List<Long> chatsOfUserList = new ArrayList<>();
+            while (resultSet.next()) {
+                chatOfUserId = resultSet.getLong("chat_id");
+                chatsOfUserList.add(chatOfUserId);
+            }
+            return chatsOfUserList;
+
+        } catch (SQLException e) {
+            throw new SQLException("SQLException");
+        }
     }
 
     public List<Long> getUsersByChatId(Long chatId) {
-        Connection conn = daoFactory.connect();
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement(
+            PreparedStatement preparedStatement = connection.prepareStatement(
                     "select user_id from user_chat where chat_id = ?");
 
             preparedStatement.setLong(1, chatId);
@@ -71,10 +85,40 @@ public class MessageDao {
             while (resultSet.next()) {
                 userInChatId = resultSet.getLong("user_id");
                 usersInChatList.add(userInChatId);
-
             }
             return usersInChatList;
 
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        return null;
+    }
+
+    public Long addChat(List<Long> userIdList) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "insert into Chat (info) values(?)", Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, "Some chat");
+
+            int affectedRows = preparedStatement.executeUpdate();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+
+            Long createdChatId = 0L;
+            if (generatedKeys.next()) {
+                createdChatId = generatedKeys.getLong("id");
+            }
+
+            preparedStatement = connection.prepareStatement(
+                    "insert into user_chat (user_id, chat_id) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setLong(2, createdChatId);
+
+            for (Long userId : userIdList) {
+                preparedStatement.setLong(1, userId);
+                affectedRows = preparedStatement.executeUpdate();
+            }
+
+
+            return createdChatId;
         } catch (SQLException e) {
             e.getMessage();
         }
@@ -91,8 +135,23 @@ public class MessageDao {
     /**
      * Список сообщений из чата
      */
-    public List<Long> getMessagesFromChat(Long chatId) {
-        return null;
+    public List<Long> getMessagesFromChat(Long chatId) throws SQLException {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "select id from Messages where chat_id = ?");
+
+            preparedStatement.setLong(1, chatId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Long> messageInChatId = new ArrayList<>();
+            while (resultSet.next()) {
+                messageInChatId.add(resultSet.getLong("id"));
+            }
+            return messageInChatId;
+
+        } catch (SQLException e) {
+            throw new SQLException("SQLException");
+        }
     }
 
     /**

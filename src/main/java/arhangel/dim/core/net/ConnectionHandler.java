@@ -26,6 +26,6 @@ public interface ConnectionHandler {
     /**
      * Молча (без проброса ошибок) закрываем соединение и освобождаем ресурсы
      */
-    void close() throws IOException;
+    void close() throws IOException, InterruptedException;
 
 }

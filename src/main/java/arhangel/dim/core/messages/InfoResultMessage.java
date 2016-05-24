@@ -2,16 +2,16 @@ package arhangel.dim.core.messages;
 
 
 public class InfoResultMessage extends Message {
-    private long id;
+
     private String login;
     private String password;
     private String info;
 
     public InfoResultMessage(long id, String login, String password, String info) {
-        setMesId(id);
-        setLogin(login);
-        setPassword(password);
-        setInfo(info);
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.info = info;
     }
 
     public long getMesId() {

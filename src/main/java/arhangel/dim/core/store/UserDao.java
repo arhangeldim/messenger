@@ -104,7 +104,33 @@ public class UserDao implements UserStore {
     }
 
     public User getUserById(Long id) {
-        return null;
+        Connection conn =  daoFactory.connect();
+        User founduser = null;
+
+        try {
+            conn = daoFactory.connect();
+
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "select id, login, pwd from Usertable where id = ?");
+            preparedStatement.setLong(1, id);
+            preparedStatement.execute();
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                founduser = new User(resultSet.getString("login"), resultSet.getString("pwd"));
+                founduser.setId(Long.parseLong(resultSet.getString("id")));
+                return founduser;
+            }
+
+            resultSet.close();
+
+            preparedStatement.close();
+
+            conn.close();
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        return founduser;
     }
 
     public User updateUser(User user) {

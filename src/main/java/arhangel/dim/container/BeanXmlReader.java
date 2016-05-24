@@ -21,13 +21,13 @@ import java.util.Map;
 
 public class BeanXmlReader {
 
-    final String tagBean = "bean";
-    final String tagProperty = "property";
-    final String attrName = "name";
-    final String attrValue = "val";
-    final String attrRef = "ref";
-    final String attrBeanId = "id";
-    final String attrBeanClass = "class";
+    private static final String tagBean = "bean";
+    private static final String tagProperty = "property";
+    private static final String attrName = "name";
+    private static final String attrValue = "val";
+    private static final String attrRef = "ref";
+    private static final String attrBeanId = "id";
+    private static final String attrBeanClass = "class";
 
     public List<Bean> parseBeans(String pathToFile) {
 
