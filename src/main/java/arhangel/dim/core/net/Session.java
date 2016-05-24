@@ -4,6 +4,7 @@ import arhangel.dim.core.User;
 import arhangel.dim.core.messages.ChatCreateCommand;
 import arhangel.dim.core.messages.ChatHistoryCommand;
 import arhangel.dim.core.messages.ChatListCommand;
+import arhangel.dim.core.messages.Command;
 import arhangel.dim.core.messages.InfoCommand;
 import arhangel.dim.core.messages.LoginCommand;
 import arhangel.dim.core.messages.Message;
@@ -24,7 +25,7 @@ import java.nio.channels.AsynchronousSocketChannel;
  * - сокеты на чтение/запись данных в канал пользователя
  */
 public class Session implements ConnectionHandler {
-    static Logger log = LoggerFactory.getLogger(Session.class);
+    private static Logger log = LoggerFactory.getLogger(Session.class);
 
     private Server server;
     private User user;
@@ -47,10 +48,6 @@ public class Session implements ConnectionHandler {
         return (user != null);
     }
 
-    public AsynchronousSocketChannel getAsynchronousSocketChannel() {
-        return asynchronousSocketChannel;
-    }
-
     public void setAsynchronousSocketChannel(AsynchronousSocketChannel asynchronousSocketChannel) {
         this.asynchronousSocketChannel = asynchronousSocketChannel;
     }
@@ -68,67 +65,39 @@ public class Session implements ConnectionHandler {
 
     @Override
     public void onMessage(Message msg) {
-        // TODO: Пришло некое сообщение от клиента, его нужно обработать
+        if (user != null) {
+            msg.setSenderId(user.getId());
+        }
+        Command command;
         switch (msg.getType()) {
             case MSG_REGISTER:
-                RegisterCommand registerCommand = new RegisterCommand();
-                try {
-                    registerCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new RegisterCommand();
                 break;
             case MSG_LOGIN:
-                LoginCommand loginCommand = new LoginCommand();
-                try {
-                    loginCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new LoginCommand();
                 break;
             case MSG_TEXT:
-                msg.setSenderId(user.getId());
-                TextCommand textCommand = new TextCommand();
-                try {
-                    textCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new TextCommand();
                 break;
             case MSG_INFO:
-                InfoCommand infoCommand = new InfoCommand();
-                try {
-                    infoCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new InfoCommand();
                 break;
             case MSG_CHAT_CREATE:
-                ChatCreateCommand chatCreateCommand = new ChatCreateCommand();
-                try {
-                    chatCreateCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new ChatCreateCommand();
                 break;
             case MSG_CHAT_LIST:
-                ChatListCommand chatListCommand = new ChatListCommand();
-                try {
-                    chatListCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new ChatListCommand();
                 break;
             case MSG_CHAT_HIST:
-                ChatHistoryCommand chatHistoryCommand = new ChatHistoryCommand();
-                try {
-                    chatHistoryCommand.execute(this, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                command = new ChatHistoryCommand();
                 break;
             default:
                 return;
+        }
+        try {
+            command.execute(this, msg);
+        } catch (Exception e) {
+            log.error("[onMessage] Failed to execute command", e);
         }
     }
 

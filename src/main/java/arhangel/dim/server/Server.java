@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Основной класс для сервера сообщений
@@ -50,14 +51,6 @@ public class Server {
         return userStore;
     }
 
-    public AsynchronousServerSocketChannel getServerSocketChannel() {
-        return serverSocketChannel;
-    }
-
-    public AsynchronousChannelGroup getChannelGroup() {
-        return channelGroup;
-    }
-
     public MessageStore getMessageStore() {
         return messageStore;
     }
@@ -71,7 +64,17 @@ public class Server {
     }
 
     public void stop() {
-        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
+        try {
+            channelGroup.shutdown();
+            synchronized (sessions) {
+                sessions.forEach(Session::close);
+            }
+            serverSocketChannel.close();
+            channelGroup.awaitTermination(1, TimeUnit.SECONDS);
+            channelGroup.shutdownNow();
+        } catch (Exception e) {
+            //Silent shutdown
+        }
     }
 
     public void init() throws Exception {
@@ -95,11 +98,10 @@ public class Server {
         } catch (InterruptedException e) {
             log.info("[run] Main thread interrupted");
         }
-        //FIXME: Is it ok?
     }
 
     public static void main(String[] args) {
-        Server server = null;
+        Server server;
         // Пользуемся механизмом контейнера
         try {
             Context context = new Context("server.xml");

@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
  * Простейший протокол передачи данных
  */
 public class StringProtocol implements Protocol {
-
-    static Logger log = LoggerFactory.getLogger(StringProtocol.class);
+    private static Logger log = LoggerFactory.getLogger(StringProtocol.class);
 
     public static final String DELIMITER = ";";
 

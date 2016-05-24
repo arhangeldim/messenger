@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.channels.CompletionHandler;
 
 public class WriteCompletionHandler implements CompletionHandler<Integer, Session> {
-    static Logger log = LoggerFactory.getLogger(WriteCompletionHandler.class);
+    private static Logger log = LoggerFactory.getLogger(WriteCompletionHandler.class);
 
     public WriteCompletionHandler(Server server) {
         this.server = server;

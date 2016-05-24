@@ -11,7 +11,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSocketChannel, Void> {
-    static Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
+    private static Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 
     private Server server;
     private AsynchronousServerSocketChannel asynchronousServerSocketChannel;

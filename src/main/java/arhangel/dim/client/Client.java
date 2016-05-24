@@ -1,5 +1,26 @@
 package arhangel.dim.client;
 
+import arhangel.dim.container.Context;
+import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
+import arhangel.dim.core.messages.ChatHistoryResultMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.ChatListResultMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.InfoResultMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.RegisterMessage;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
+import arhangel.dim.core.net.ConnectionHandler;
+import arhangel.dim.core.net.Protocol;
+import arhangel.dim.core.net.ProtocolException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,26 +29,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
-
-import arhangel.dim.core.messages.ChatCreateMessage;
-import arhangel.dim.core.messages.ChatHistoryMessage;
-import arhangel.dim.core.messages.ChatListMessage;
-import arhangel.dim.core.messages.InfoMessage;
-import arhangel.dim.core.messages.LoginMessage;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.RegisterMessage;
-import arhangel.dim.core.messages.StatusMessage;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import arhangel.dim.container.Context;
-import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.net.ConnectionHandler;
-import arhangel.dim.core.net.Protocol;
-import arhangel.dim.core.net.ProtocolException;
-import sun.rmi.runtime.Log;
 
 import static java.lang.Long.parseLong;
 
@@ -39,7 +40,7 @@ public class Client implements ConnectionHandler {
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
      */
-    static Logger log = LoggerFactory.getLogger(Client.class);
+    private static Logger log = LoggerFactory.getLogger(Client.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига
@@ -60,30 +61,6 @@ public class Client implements ConnectionHandler {
     private InputStream in;
     private OutputStream out;
 
-    public Protocol getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(Protocol protocol) {
-        this.protocol = protocol;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
     public void initSocket() throws IOException {
         socket = new Socket(host, port);
         in = socket.getInputStream();
@@ -99,6 +76,9 @@ public class Client implements ConnectionHandler {
                 try {
                     // Здесь поток блокируется на ожидании данных
                     int read = in.read(buf);
+                    if (Thread.currentThread().isInterrupted() || read == -1) {
+                        return;
+                    }
                     if (read > 0) {
 
                         // По сети передается поток байт, его нужно раскодировать с помощью протокола
@@ -122,14 +102,33 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
-
         switch (msg.getType()) {
             case MSG_STATUS:
                 StatusMessage statusMessage = (StatusMessage) msg;
                 System.out.println(statusMessage.getText());
                 break;
+            case MSG_INFO_RESULT:
+                InfoResultMessage infoResultMessage = (InfoResultMessage) msg;
+                System.out.println("User: " + infoResultMessage.getLogin());
+                System.out.println("ID: " + infoResultMessage.getUserId());
+                System.out.println("Chats: " + infoResultMessage.getChatIds());
+                break;
+            case MSG_CHAT_LIST_RESULT:
+                ChatListResultMessage chatListResultMessage = (ChatListResultMessage) msg;
+                System.out.println("Chats: " + chatListResultMessage.getChatIds());
+                break;
+            case MSG_CHAT_HIST_RESULT:
+                ChatHistoryResultMessage chatHistoryResultMessage = (ChatHistoryResultMessage) msg;
+                for (TextMessage message : chatHistoryResultMessage.getMessages()) {
+                    System.out.println("[" + message.getSenderLogin() + "]: " + message.getText());
+                }
+                break;
+            case MSG_TEXT:
+                TextMessage textMessage = (TextMessage) msg;
+                System.out.println("[" + textMessage.getSenderLogin() + "]: " + textMessage.getText());
+                break;
             default:
-                return;
+                log.info("Received unsupported message type {}", msg.getType());
         }
     }
 
@@ -141,6 +140,7 @@ public class Client implements ConnectionHandler {
         String[] tokens = line.split(" ");
         log.info("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
+
         switch (cmdType) {
             case "/register":
                 if (tokens.length != 3) {
@@ -179,9 +179,6 @@ public class Client implements ConnectionHandler {
                     send(infoMessage);
                 }
                 break;
-            case "/help":
-                // TODO: реализация
-                break;
             case "/chat_create":
                 if (tokens.length < 2) {
                     System.out.println("Expected at least 1 parameter");
@@ -214,24 +211,31 @@ public class Client implements ConnectionHandler {
                 send(chatHistoryMessage);
                 break;
             case "/text":
+                tokens = line.split(" ", 3);
                 if (tokens.length != 3) {
                     System.out.println("Expected 2 parameters");
                     return;
                 }
-                // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setType(Type.MSG_TEXT);
                 try {
                     sendMessage.setChatId(parseLong(tokens[1]));
                 } catch (Exception e) {
-                    System.out.println("Expected number");
+                    System.out.println("Expected number as first parameter");
                     return;
                 }
                 sendMessage.setText(tokens[2]);
                 send(sendMessage);
                 break;
-            // TODO: implement another types from wiki
-
+            case "/help":
+                System.out.println("/register <login> <password> - register and log in");
+                System.out.println("/login <login> <password> - log in");
+                System.out.println("/info [login] - get information about user, self if not specified");
+                System.out.println("/chat_list - get your chat ids");
+                System.out.println("/chat_create <login1> [login2 login3 ...] - create chat with specified users");
+                System.out.println("/chat_history <chat id> - get history of chat messages");
+                System.out.println("/text <chat id> <message> - send message to chat");
+                break;
             default:
                 log.error("Invalid input: " + line);
         }
@@ -249,17 +253,20 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
+        socketThread.interrupt();
         try {
+            socket.shutdownOutput();
+            socket.shutdownInput();
+            socketThread.join();
             socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            //Silently close
         }
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
     }
 
     public static void main(String[] args) throws Exception {
 
-        Client client = null;
+        Client client;
         // Пользуемся механизмом контейнера
         try {
             Context context = new Context("client.xml");

@@ -10,7 +10,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Session> {
-    static Logger log = LoggerFactory.getLogger(ReadCompletionHandler.class);
+    private static Logger log = LoggerFactory.getLogger(ReadCompletionHandler.class);
 
     private AsynchronousSocketChannel asynchronousSocketChannel;
     private ByteBuffer inputBuffer;

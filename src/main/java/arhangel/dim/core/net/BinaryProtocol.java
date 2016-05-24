@@ -21,7 +21,7 @@ public class BinaryProtocol implements Protocol {
         try {
             objectInputStream = new ObjectInputStream(byteArrayInputStream);
             message = (Message) objectInputStream.readObject();
-            log.info("[decode] Decoded message {}", message.getType());
+            log.info("[decode] Decoded message {}", message);
         } catch (ClassNotFoundException e) {
             log.error("[decode] Error while decoding message - class not found", e);
         } catch (IOException e) {
@@ -52,7 +52,7 @@ public class BinaryProtocol implements Protocol {
             objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             objectOutputStream.writeObject(msg);
             bytes = byteArrayOutputStream.toByteArray();
-            log.info("[encode] Encoded message {} into {} bytes", msg.getType(), bytes.length);
+            log.info("[encode] Encoded message {} into {} bytes", msg, bytes.length);
         } catch (IOException e) {
             log.error("[encode] Error while encoding message", e);
         } finally {

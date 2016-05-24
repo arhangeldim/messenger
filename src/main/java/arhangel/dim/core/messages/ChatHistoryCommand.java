@@ -44,6 +44,10 @@ public class ChatHistoryCommand implements Command {
             List<TextMessage> messages = new ArrayList<>();
             for (Long messageId : messageIds) {
                 TextMessage historyMessage = messageStore.getMessageById(messageId);
+                historyMessage.setSenderLogin(session.getServer()
+                        .getUserStore()
+                        .getUserById(historyMessage.getSenderId())
+                        .getLogin());
                 messages.add(historyMessage);
             }
             chatHistoryResultMessage.setMessages(messages);
