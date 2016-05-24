@@ -59,11 +59,11 @@ public class Test {
         public void run() {
             while (true) {
                 try {
-                    Integer x = mbq.poll(1000000l);
-                    if (x == null) {
+                    Integer xx = mbq.poll(1000000L);
+                    if (xx == null) {
                         break;
                     }
-                    System.out.println(x);
+                    System.out.println(xx);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -73,8 +73,8 @@ public class Test {
 
     static int one = 0;
     static int two = 0;
+    
     static class Stupid implements Runnable {
-
         @Override
         public void run() {
             

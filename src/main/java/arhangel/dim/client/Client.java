@@ -103,8 +103,7 @@ public class Client implements ConnectionHandler {
                         // По сети передается поток байт, его нужно раскодировать с помощью протокола
                         Message msg = protocol.decode(Arrays.copyOf(buf, read));
                         onMessage(msg);
-                    }
-                    else if (read == -1) {
+                    } else if (read == -1) {
                         close();
                     }
                 } catch (Exception e) {

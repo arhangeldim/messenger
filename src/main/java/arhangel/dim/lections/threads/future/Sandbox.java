@@ -37,16 +37,16 @@ public class Sandbox {
         public ImagePanel() throws Exception {
 
             image = ImageIO.read(new URL("https://gic6.mycdn.me/image?t=56&bid=816871160539&id=816871160539&plc=WEB&tkn=*iaoYC50VGni4tMfp7sTdPUMsBD0"));
-            Dimension d = new Dimension();
-            d.width = image.getWidth(null);
-            d.height = image.getHeight(null);
-            setPreferredSize(d);
+            Dimension dd = new Dimension();
+            dd.width = image.getWidth(null);
+            dd.height = image.getHeight(null);
+            setPreferredSize(dd);
         }
 
         @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
+        public void paintComponent(Graphics gg) {
+            super.paintComponent(gg);
+            Graphics2D g2d = (Graphics2D) gg;
             g2d.drawImage(image, 0, 0, null);
         }
     }
