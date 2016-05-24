@@ -1,0 +1,35 @@
+<root>
+
+    <bean id="protocol" class="arhangel.dim.core.net.BinaryProtocol"/>
+
+    <bean id="poolingDataSource" class="org.postgresql.ds.PGPoolingDataSource">
+        <property name="dataSourceName" val="Data source"/>
+        <property name="serverName" val="178.62.140.149"/>
+        <property name="databaseName" val="gafusss"/>
+        <property name="user" val="trackuser"/>
+        <property name="password" val="trackuser"/>
+        <property name="maxConnections" val="10"/>
+    </bean>
+
+    <bean id="daoFactory" class="arhangel.dim.core.store.PostgresqlDaoFactory">
+        <property name="dataSource" ref="poolingDataSource"/>
+    </bean>
+
+    <bean id="userDao" class="arhangel.dim.core.store.PostgresqlUserDao">
+        <property name="parentFactory" ref="daoFactory"/>
+    </bean>
+
+    <bean id="messageDao" class="arhangel.dim.core.store.PostgresqlMessageDao">
+        <property name="parentFactory" ref="daoFactory"/>
+    </bean>
+
+    <bean id="server" class="arhangel.dim.server.Server">
+        <property name="port" val="19000"/>
+        <property name="bufferSize" val="8192"/>
+        <property name="protocol" ref="protocol"/>
+        <property name="maxConnection" val="16"/>
+        <property name="userStore" ref="userDao"/>
+        <property name="messageStore" ref="messageDao"/>
+    </bean>
+
+</root>

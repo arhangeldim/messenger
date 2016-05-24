@@ -5,7 +5,13 @@ package arhangel.dim.core;
  */
 public class User {
     private Long id;
-    private String name;
+    private String login;
+    private String secret;
+
+    public User(String login, String secret) {
+        setLogin(login);
+        setSecret(secret);
+    }
 
     public Long getId() {
         return id;
@@ -15,11 +21,27 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getLogin() {
+        return login;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                '}';
     }
 }

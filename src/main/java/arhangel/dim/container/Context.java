@@ -2,6 +2,7 @@ package arhangel.dim.container;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +90,15 @@ public class Context {
             for (String name : bean.getProperties().keySet()) {
                 // ищем поле с таким именен внутри класса
                 // учитывая приватные
-                Field field = clazz.getDeclaredField(name);
+                Field field = null;
+                Class superclazz = clazz;
+                while ((field == null) && (superclazz != null)) {
+                    try {
+                        field = superclazz.getDeclaredField(name);
+                    } catch (NoSuchFieldException e) {
+                        superclazz = superclazz.getSuperclass();
+                    }
+                }
                 if (field == null) {
                     throw new InvalidConfigurationException("Failed to set field [" + name + "] for class " + clazz.getName());
                 }
@@ -102,7 +111,14 @@ public class Context {
 
                 switch (prop.getType()) {
                     case VAL:
-                        field.set(ob, convert(type.getTypeName(), prop.getValue()));
+                        if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                            Field modifiersField = Field.class.getDeclaredField("modifiers");
+                            modifiersField.setAccessible(true);
+                            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                            field.set(null, convert(type.getTypeName(), prop.getValue()));
+                        } else {
+                            field.set(ob, convert(type.getTypeName(), prop.getValue()));
+                        }
                         break;
                     case REF:
                         String refName = prop.getValue();

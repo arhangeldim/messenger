@@ -1,9 +1,10 @@
 package arhangel.dim.core.store;
 
 import java.util.List;
+import java.util.Set;
 
 import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.TextMessage;
 
 /**
  * Хранилище информации о сообщениях
@@ -11,9 +12,9 @@ import arhangel.dim.core.messages.Message;
 public interface MessageStore {
 
     /**
-     * получаем список ид пользователей заданного чата
+     * получаем список ид чатов с заданным пользователем
      */
-    List<Long> getChatsByUserId(Long userId);
+    Set<Long> getChatsByUserId(Long userId);
 
     /**
      * получить информацию о чате
@@ -28,17 +29,23 @@ public interface MessageStore {
     /**
      * Получить информацию о сообщении
      */
-    Message getMessageById(Long messageId);
+    TextMessage getMessageById(Long messageId);
 
     /**
      * Добавить сообщение в чат
      */
-    void addMessage(Long chatId, Message message);
+    TextMessage addMessage(TextMessage message);
 
     /**
      * Добавить пользователя к чату
      */
     void addUserToChat(Long userId, Long chatId);
 
+    /**
+     * Создать чат
+     */
+    Chat addChat(Chat chat);
+
+    void init() throws Exception;
 
 }

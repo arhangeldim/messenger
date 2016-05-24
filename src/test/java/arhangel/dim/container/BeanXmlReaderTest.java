@@ -13,8 +13,8 @@ public class BeanXmlReaderTest {
 
     @Test
     public void testParseBeans() throws Exception {
-        BeanXmlReader reader = new BeanXmlReader();
-        List<Bean> beans = reader.parseBeans("config.xml");
+        Context reader = new Context("config.xml");
+        List<Bean> beans = reader.getBeans();
         Assert.assertTrue(beans != null);
         Assert.assertTrue(beans.size() > 0);
 

@@ -14,7 +14,7 @@ import arhangel.dim.container.beans.Gear;
  */
 public class ContainerTest {
 
-    private static Container container;
+    private static Context container;
 
     private static Car expectedCar;
     private static Gear expectedGear;
@@ -23,7 +23,7 @@ public class ContainerTest {
     @BeforeClass
     public static void init() {
         try {
-            container = new Container("config.xml");
+            container = new Context("config.xml");
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
         }
@@ -43,14 +43,14 @@ public class ContainerTest {
 
     @Test
     public void testGetByName() throws Exception {
-        Car car = (Car) container.getByName("carBean");
+        Car car = (Car) container.getBeanByName("carBean");
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
     }
 
     @Test
     public void testGetByClass() throws Exception {
-        Car car = (Car) container.getByClass("arhangel.dim.container.beans.Car");
+        Car car = (Car) container.getBeanByClass("arhangel.dim.container.beans.Car");
         Assert.assertTrue(car != null);
         Assert.assertEquals(expectedCar, car);
     }

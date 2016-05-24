@@ -6,7 +6,34 @@ import java.util.Objects;
  * Простое текстовое сообщение
  */
 public class TextMessage extends Message {
+    private Long id;
+    private String senderLogin;
     private String text;
+    private Long chatId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSenderLogin() {
+        return senderLogin;
+    }
+
+    public void setSenderLogin(String senderLogin) {
+        this.senderLogin = senderLogin;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
 
     public String getText() {
         return text;
@@ -17,29 +44,44 @@ public class TextMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (this == other) {
+    public String toString() {
+        return "TextMessage{" +
+                "id=" + id +
+                ", senderLogin='" + senderLogin + '\'' +
+                ", text='" + text + '\'' +
+                ", chatId=" + chatId +
+                "} " + super.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (other == null || getClass() != other.getClass()) {
+        if (!(obj instanceof TextMessage)) {
             return false;
         }
-        if (!super.equals(other)) {
+
+        TextMessage that = (TextMessage) obj;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
         }
-        TextMessage message = (TextMessage) other;
-        return Objects.equals(text, message.text);
+        if (senderLogin != null ? !senderLogin.equals(that.senderLogin) : that.senderLogin != null) {
+            return false;
+        }
+        if (text != null ? !text.equals(that.text) : that.text != null) {
+            return false;
+        }
+        return chatId != null ? chatId.equals(that.chatId) : that.chatId == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), text);
-    }
-
-    @Override
-    public String toString() {
-        return "TextMessage{" +
-                "text='" + text + '\'' +
-                '}';
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (senderLogin != null ? senderLogin.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (chatId != null ? chatId.hashCode() : 0);
+        return result;
     }
 }
