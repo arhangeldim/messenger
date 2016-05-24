@@ -11,6 +11,7 @@ import arhangel.dim.core.net.Session;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -20,8 +21,19 @@ public class ChatCreateMessageCommand implements Command {
     @Override
     public void execute(Session session, Message msg) throws CommandException {
         ChatCreateMessage message = (ChatCreateMessage) msg;
+
         if (session.getUser() == null) {
             session.send(StatusMessage.logInFirstMessage());
+            return;
+        }
+        int uniqueSize = new HashSet<>(message.getUsers()).size();
+        if (message.getUsers().contains(session.getUser().getId()) ||
+                uniqueSize != message.getUsers().size() ||
+                uniqueSize < 2) {
+            StatusMessage response = new StatusMessage();
+            response.setText("invalid command parameters");
+            session.send(response);
+            return;
         }
         for (Long id: message.getUsers()) {
             User him = session.getServer().getUserStore().getUserById(id);

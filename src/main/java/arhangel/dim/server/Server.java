@@ -98,12 +98,6 @@ public class Server {
             Socket socket = serverSocket.accept();
             Session session = new Session(socket, this);
             service.submit(session);
-            try {
-                sleep(20 * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            stop();
         }
 
     }

@@ -25,6 +25,7 @@ public class CommandByMessage {
                 new ChatHistResultMessageCommand());
         messageToCommand.put(Type.MSG_CHAT_CREATE,
                 new ChatCreateMessageCommand());
+        messageToCommand.put(Type.MSG_INFO, new InfoMessageCommand());
     }
 
     public static Command getCommand(Type type) {

@@ -132,10 +132,9 @@ public class Client implements ConnectionHandler {
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
-                // TODO: реализация
                 LoginMessage loginMessage = new LoginMessage();
                 if (tokens.length < 3) {
-                    log.error("invalid input");
+                    log.error("Invalid input: " + line);
                 }
                 loginMessage.setLogin(tokens[1]);
                 loginMessage.setType(Type.MSG_LOGIN);
@@ -143,10 +142,48 @@ public class Client implements ConnectionHandler {
                 send(loginMessage);
                 break;
             case "/help":
-                // TODO: реализация
+                System.out.println("/help - показать список " +
+                        "команд и общий хэлп по месседжеру");
+                System.out.println("-----------------------------------------");
+                System.out.println("/login <логин_пользователя> <пароль>" +
+                        "\n" +
+                        "/login arhangeldim qwerty");
+                System.out.println("залогиниться (если логин не указан, " +
+                        "то авторизоваться)");
+                System.out.println("-----------------------------------------");
+                System.out.println("/info [id]");
+                System.out.println("получить всю информацию о пользователе, " +
+                        "без аргументов - о себе");
+                System.out.println("-----------------------------------------");
+                System.out.println("/chat_list");
+                System.out.println("получить список чатов " +
+                        "пользователя(только для залогиненных пользователей).");
+                System.out.println("-----------------------------------------");
+                System.out.println("/chat_create <user_id list>");
+                System.out.println("создать новый чат, список пользователей " +
+                        "приглашенных в чат (только для залогиненных " +
+                        "пользователей).");
+                System.out.println("/chat_create 1,2,3,4 - создать чат с " +
+                        "пользователями id=1, id=2, id=3, id=4");
+                System.out.println("/chat_create 3 - создать чат с " +
+                        "пользователем id=3, если такой чат уже существует," +
+                        " вернуть существующий");
+                System.out.println("-----------------------------------------");
+                System.out.println("/chat_history <chat_id>");
+                System.out.println("список сообщений из указанного чата " +
+                        "(только для залогиненных пользователей)");
+                System.out.println("-----------------------------------------");
+                System.out.println("/text <id> <message>");
+                System.out.println("отправить сообщение в заданный чат, чат " +
+                        "должен быть в списке чатов пользователя " +
+                        "(только для залогиненных пользователей)");
+                System.out.println("/text 3 Hello, it's pizza time!" +
+                        " - отправить " +
+                        "указанное сообщение в чат id=3");
+                System.out.println("-----------------------------------------");
+
                 break;
             case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
                 if (tokens.length < 2) {
                     log.error("invalid input");
                 }
@@ -165,27 +202,43 @@ public class Client implements ConnectionHandler {
                 send(msg);
                 break;
             case "/info":
+                InfoMessage infoMessage = new InfoMessage();
+                if (tokens.length > 1) {
+                    try {
+                        infoMessage.setUserId(Long.parseLong(tokens[1]));
+                    } catch (NumberFormatException e) {
+                        log.error("Invalid input: " + line);
+                    }
+                }
+                send(infoMessage);
                 break;
             case "/chat_hist":
                 if (tokens.length < 2) {
-                    log.error("invalid input");
+                    log.error("Invalid input: " + line);
                 }
                 ChatHistMessage chatHistMessage = new ChatHistMessage();
-                chatHistMessage.setChatId(Long.parseLong(tokens[1]));
+                try {
+                    chatHistMessage.setChatId(Long.parseLong(tokens[1]));
+                } catch (NumberFormatException e) {
+                    log.error("Invalid input: " + line);
+                }
                 send(chatHistMessage);
                 break;
             case "/chat_create":
                 if (tokens.length < 3) {
-                    log.error("invalid input");
+                    log.error("Invalid input: " + line);
                 }
                 ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
                 chatCreateMessage.setUsers(new ArrayList<>());
                 for (int i = 1; i < tokens.length; ++i) {
-                    chatCreateMessage.getUsers().add(Long.parseLong(tokens[i]));
+                    try {
+                        chatCreateMessage.getUsers().add(Long.parseLong(tokens[i]));
+                    } catch (NumberFormatException e) {
+                        log.error("Invalid input: " + line);
+                    }
                 }
                 send(chatCreateMessage);
                 break;
-            // TODO: implement another types from wiki
             default:
                 log.error("Invalid input: " + line);
         }

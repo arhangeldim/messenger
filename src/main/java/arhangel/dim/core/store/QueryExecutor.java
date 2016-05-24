@@ -1,16 +1,20 @@
 package arhangel.dim.core.store;
 
-import arhangel.dim.lections.jdbc.ResultHandler;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.function.Consumer;
 
 /**
  * Created by thefacetakt on 19.04.16.
  */
 class QueryExecutor {
-    static final String PG_ADRESS = "jdbc:postgresql://178.62.140.149:5432/"
-            + "thefacetakt";
+    static final String PG_ADRESS = "jdbc:postgresql://178.62.140.149:5432/" +
+            "thefacetakt";
     static final String USERNAME = "trackuser";
     static final String PASSWORD = "trackuser";
 

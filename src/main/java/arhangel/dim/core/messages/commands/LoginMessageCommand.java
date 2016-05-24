@@ -39,6 +39,7 @@ public class LoginMessageCommand implements Command {
                         .put(realUser.getId(), session);
                 session.setUser(realUser);
                 System.out.println("LOGIN SUCCESS");
+                session.send(StatusMessage.userInfo(session.getUser(), true));
             } catch (ClassCastException e) {
                 throw new CommandException("Wrong class", e);
             }
