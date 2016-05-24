@@ -96,6 +96,14 @@
             <artifactId>postgresql</artifactId>
             <version>9.4-1204-jdbc42</version>
         </dependency>
+        <!-- http://mvnrepository.com/artifact/io.netty/netty -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+            <version>3.10.5.Final</version>
+        </dependency>
+
+
     </dependencies>
 
 
