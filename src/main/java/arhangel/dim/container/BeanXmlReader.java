@@ -1,6 +1,5 @@
 package arhangel.dim.container;
 
-<<<<<<< HEAD
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +31,6 @@ public class BeanXmlReader {
     private static final String ATTR_REF = "ref";
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
-<<<<<<< HEAD
     private static final String TAG_GEAR = "gear";
     private static final String TAG_ENGINE = "engine";
 
@@ -56,10 +54,10 @@ public class BeanXmlReader {
                     Node bean = beans.item(i);
                     NamedNodeMap attributes = bean.getAttributes();
                     Node idAttrib = attributes.getNamedItem(ATTR_BEAN_ID);
-                   // System.out.printf(idAttrib.toString());
+                    // System.out.printf(idAttrib.toString());
                     Node classAttrib = attributes.getNamedItem(ATTR_BEAN_CLASS);
                     //System.out.printf(classAttrib.toString());
-                    NodeList properties = ((Element)bean).getElementsByTagName(TAG_PROPERTY);
+                    NodeList properties = ((Element) bean).getElementsByTagName(TAG_PROPERTY);
                     HashMap<String, Property> propertyHashMap = new HashMap<>();
                     //System.out.println(properties.getLength());
 
@@ -96,11 +94,4 @@ public class BeanXmlReader {
         }
         return graphWithoutEdges;
     }
-=======
-
-    public List<Bean> parseBeans(String pathToFile) {
-        return null;
-    }
-
->>>>>>> 5044e64aedcc627f70c5d919734be1e8583b899e
 }
