@@ -3,6 +3,7 @@ package arhangel.dim.lections.threads.queueu;
 import java.util.concurrent.BlockingQueue;
 import java.util.regex.Pattern;
 
+import arhangel.dim.MyBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ public class SearchWorker<T extends QueueItem> extends Thread {
     private static Logger log = LoggerFactory.getLogger(SearchWorker.class);
 
     // Очередь, откуда берутся таски
-    private java.util.concurrent.BlockingQueue<T> sourceQueue;
+    private MyBlockingQueue<T> sourceQueue;
 
     // Паттерн для поиска
     private Pattern pattern;
@@ -23,7 +24,7 @@ public class SearchWorker<T extends QueueItem> extends Thread {
     // метка, что больше в очередь не придет новых тасок
     private volatile boolean setNoTask;
 
-    public SearchWorker(BlockingQueue<T> sourceQueue, Pattern pattern) {
+    public SearchWorker(MyBlockingQueue<T> sourceQueue, Pattern pattern) {
         this.sourceQueue = sourceQueue;
         this.pattern = pattern;
     }
@@ -42,7 +43,7 @@ public class SearchWorker<T extends QueueItem> extends Thread {
                 }
                 if (task != null) {
                     if (Util.search(task.getData(), pattern)) {
-                        //System.out.println("Found in " + task.getPath());
+//                        System.out.println("Found in " + task.getPath());
                     }
                 }
             } catch (InterruptedException e) {

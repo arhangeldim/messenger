@@ -7,7 +7,6 @@ import java.util.Objects;
  * Базовый класс для всех сообщений
  */
 public abstract class Message implements Serializable {
-
     private Long id;
     private Long senderId;
     private Type type;
@@ -64,3 +63,4 @@ public abstract class Message implements Serializable {
                 '}';
     }
 }
+

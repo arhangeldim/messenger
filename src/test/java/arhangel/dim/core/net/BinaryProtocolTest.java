@@ -27,4 +27,25 @@ public class BinaryProtocolTest {
         Assert.assertEquals(message, other);
 
     }
+
+    @Test(expected = ProtocolException.class)
+    public void testDecode1() throws Exception {
+        Protocol protocol = new BinaryProtocol();
+        Message msg = protocol.decode(new byte[] {1, 2, 3, 4, 5});
+    }
+
+    @Test
+    public void testEncodeDecode() throws Exception {
+        Protocol protocol = new BinaryProtocol();
+        TextMessage message = new TextMessage();
+        message.setText("Hello");
+        message.setSenderId(1L);
+        message.setType(Type.MSG_TEXT);
+
+        byte[] data = protocol.encode(message);
+        Assert.assertTrue(data != null);
+
+        Message other = protocol.decode(data);
+        Assert.assertEquals(message, other);
+    }
 }

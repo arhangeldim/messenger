@@ -1,20 +1,39 @@
 package arhangel.dim.container;
 
+
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
  */
 public class Container {
-    private List<Bean> beans;
+    private List<BeanVertex> beans;
+    private Map<String, Object> objByName;
+    private Map<String, Object> objByClassName;
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
      * @throws InvalidConfigurationException неверный конфиг
      */
     public Container(String pathToConfig) throws InvalidConfigurationException {
+        try {
+            beans = (new BeanGraphBuilder()).buildFromXml(pathToConfig)
+                    .getTopSort();
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            throw new InvalidConfigurationException(e);
+        }
 
-        // вызываем BeanXmlReader
+        objByName = new HashMap<>();
+        objByClassName = new HashMap<>();
+        instantiateBeans();
     }
 
     /**
@@ -22,43 +41,73 @@ public class Container {
      *  Например, Car car = (Car) container.getByName("carBean")
      */
     public Object getByName(String name) {
-        return null;
+        return objByName.get(name);
     }
 
     /**
      * Вернуть объект по имени класса
-     * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
+     * Например, Car car = (Car) container
+     *                              .getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
-        return null;
+        return objByClassName.get(className);
     }
 
-    private void instantiateBean(Bean bean) {
+    private void instantiateBeans() throws InvalidConfigurationException {
+        for (BeanVertex beanVertex: beans) {
+            Bean bean = beanVertex.getBean();
+            String className = bean.getClassName();
+            try {
+                Class clazz = Class.forName(className);
+                Object ob;
+                ob = clazz.newInstance();
+                for (String name: bean.getProperties().keySet()) {
+                    Property property = bean.getProperties().get(name);
 
-        /*
-        // Примерный ход работы
+                    String methodName = "set" +
+                            name.substring(0, 1).toUpperCase() +
+                            name.substring(1);
 
-        String className = bean.getClassName();
-        Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
+                    Method method = null;
+                    for (Method tmpMethod: clazz.getDeclaredMethods()) {
+                        if (tmpMethod.getName().equals(methodName)) {
+                            method = tmpMethod;
+                            break;
+                        }
+                    }
+                    if (property.getType() == ValueType.REF) {
+                        Object parameter = getByName(property.getValue());
+                        method.invoke(ob, parameter);
+                    } else {
+                        String typeName = clazz.getDeclaredField(name)
+                                .getType().getName();
+                        switch (typeName) {
+                            case "int":
+                                method.invoke(ob,
+                                        new Integer(property.getValue()));
+                                break;
+                            case "java.lang.String":
+                                method.invoke(ob,
+                                        property.getValue());
+                                break;
+                            default:
+                                throw new InvalidConfigurationException(
+                                        "Bad types");
+                        }
+                    }
+                }
+                objByName.put(bean.getName(), ob);
+                objByClassName.put(bean.getClassName(), ob);
+            } catch (InstantiationException | IllegalAccessException |
+                    InvocationTargetException | ClassNotFoundException |
+                    NoSuchFieldException e) {
+                throw new InvalidConfigurationException(e);
+            }
 
-
-        for (String name : bean.getProperties().keySet()) {
-            // ищем поле с таким именен внутри класса
-            // учитывая приватные
-            Field field = clazz.getDeclaredField(name);
-            // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
-
-            // Делаем приватные поля доступными
-            field.setAccessible(true);
-
-            // Далее определяем тип поля и заполняем его
-            // Если поле - примитив, то все просто
-            // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
-
-            */
-
+        }
     }
 
+    public static void main(String[] args) {
+
+    }
 }
