@@ -1,28 +1,42 @@
 package arhangel.dim.container;
 
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
+ * Created by olegchuikin on 18/03/16.
  */
 public class Container {
     private List<Bean> beans;
 
+    private Map<String, Object> objects;
+
     /**
      * Если не получается считать конфиг, то бросьте исключение
-     * @throws InvalidConfigurationException неверный конфиг
+     *
+     * @throws BeanXmlReader.CycleReferenceException - неверный конфиг
      */
-    public Container(String pathToConfig) throws InvalidConfigurationException {
+    public Container(String pathToConfig) throws InvalidConfigurationException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        this.beans = new BeanXmlReader().parseBeans(pathToConfig);
 
-        // вызываем BeanXmlReader
+        objects = new HashMap<>();
+
+        for (Bean bean : beans) {
+            objects.put(bean.getName(), convertBeanToObject(bean));
+        }
     }
 
     /**
-     *  Вернуть объект по имени бина из конфига
-     *  Например, Car car = (Car) container.getByName("carBean")
+     * Вернуть объект по имени бина из конфига
+     * Например, Car car = (Car) container.getByName("carBean")
      */
-    public Object getByName(String name) {
-        return null;
+    public Object getByName(String name) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+        return objects.get(name);
     }
 
     /**
@@ -30,35 +44,67 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
     public Object getByClass(String className) {
+
+        for (Object o : objects.values()) {
+            if (o.getClass().getName().equals(className)) {
+                return o;
+            }
+        }
+
         return null;
     }
 
-    private void instantiateBean(Bean bean) {
+    private Object convertBeanToObject(Bean bean) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
 
-        /*
-        // Примерный ход работы
+        Class clazz = Class.forName(bean.getClassName());
+        Object result = clazz.newInstance();
 
-        String className = bean.getClassName();
-        Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
+        Collection<Property> properties = bean.getProperties().values();
 
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().startsWith("set")) {
+                String methodName = method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4);
+                Property property = findPropertyByName(properties, methodName);
+                if (property != null) {
+                    if (property.getType().equals(ValueType.REF)) {
+                        method.invoke(result, getByName(property.getValue()));
+                    } else {
+                        Object arg = parseArgument(method.getParameterTypes()[0], property.getValue());
+                        method.invoke(result, arg);
+                    }
+                }
+            }
+        }
 
-        for (String name : bean.getProperties().keySet()) {
-            // ищем поле с таким именен внутри класса
-            // учитывая приватные
-            Field field = clazz.getDeclaredField(name);
-            // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
+        return result;
+    }
 
-            // Делаем приватные поля доступными
-            field.setAccessible(true);
+    private Property findPropertyByName(Collection<Property> properties, String name) {
+        for (Property property : properties) {
+            if (property.getName().equals(name)) {
+                return property;
+            }
+        }
+        return null;
+    }
 
-            // Далее определяем тип поля и заполняем его
-            // Если поле - примитив, то все просто
-            // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
-
-            */
-
+    private Object parseArgument(Class clazz, String value) {
+        if (clazz.equals(int.class)) {
+            return Integer.parseInt(value);
+        }
+        if (clazz.equals(long.class)) {
+            return Long.parseLong(value);
+        }
+        if (clazz.equals(double.class)) {
+            Double.parseDouble(value);
+        }
+        if (clazz.equals(float.class)) {
+            Float.parseFloat(value);
+        }
+        if (clazz.equals(String.class)) {
+            return value;
+        }
+        return null;
     }
 
 }

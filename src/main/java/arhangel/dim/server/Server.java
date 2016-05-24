@@ -1,21 +1,19 @@
 package arhangel.dim.server;
 
-import arhangel.dim.core.net.Protocol;
+import arhangel.dim.core.store.dao.DaoFactory;
+import arhangel.dim.session.SessionsManager;
 
 /**
- * Основной класс для сервера сообщений
+ * Created by olegchuikin on 28/04/16.
  */
-public class Server {
+public interface Server {
 
-    public static final int DEFAULT_MAX_CONNECT = 16;
+    void start();
 
-    // Засетить из конфига
-    private int port;
-    private Protocol protocol;
-    private int maxConnection = DEFAULT_MAX_CONNECT;
+    void stop();
 
-    public void stop() {
-        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
-    }
+    DaoFactory getDbFactory();
+
+    SessionsManager getSessionsManager();
 
 }

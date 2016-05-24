@@ -9,6 +9,8 @@ import arhangel.dim.container.beans.Car;
 import arhangel.dim.container.beans.Engine;
 import arhangel.dim.container.beans.Gear;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  *
  */
@@ -21,7 +23,7 @@ public class ContainerTest {
     private static Engine expectedEngine;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
         try {
             container = new Container("config.xml");
         } catch (InvalidConfigurationException e) {

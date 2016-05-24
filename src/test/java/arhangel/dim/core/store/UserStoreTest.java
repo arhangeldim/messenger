@@ -10,16 +10,16 @@ import arhangel.dim.container.Container;
  */
 public class UserStoreTest {
 
-    static UserStore store;
+//    static UserStore store;
 
     @BeforeClass
     public static void init() {
-        try {
-            Container container = new Container("server.xml");
-            store = (UserStore) container.getByName("userStore");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Container container = new Container("server.xml");
+//            store = (UserStore) container.getByName("userStore");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Test
