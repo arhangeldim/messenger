@@ -82,6 +82,9 @@ public class PostgresChatsDao extends BaseJdbcDao<Chat, Long> implements ChatDao
     @Override
     public Chat getByPk(Long key) throws PersistException {
         Chat chat = super.getByPk(key);
+        if (chat == null) {
+            return null;
+        }
         GenericDao<User, Long> userDao = daoFactory.getDao(User.class);
 
         chat.setParticipants(getParticipantsOfChatWithId(chat.getId()));

@@ -46,8 +46,8 @@ public class NioServer implements Server {
 
     public static final String address = "127.0.0.1";
 
-    public static final long MAX_CHANNEL_MEMORY_SIZE = 400000000L;
-    public static final long MAX_TOTAL_MEMORY_SIZE = 2000000000L;
+    public static final long MAX_CHANNEL_MEMORY_SIZE = 400_000_000L;
+    public static final long MAX_TOTAL_MEMORY_SIZE = 2_000_000_000L;
     public static final long KEEP_ALIVE_TIME = 60;
     public static final int WORKING_THREADS_COUNT = 4;
 

@@ -37,7 +37,7 @@ public class HighLoadTest {
 
         Thread.sleep(5000);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             Thread.sleep(10);
             new Thread(new Runnable() {
                 @Override

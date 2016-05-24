@@ -7,6 +7,8 @@ import org.jboss.netty.channel.Channels;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Created by olegchuikin on 23/04/16.
  */
@@ -17,7 +19,7 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
 
     private NioServer server;
 
-    private Long pipeLineId = 0L;
+    private AtomicLong pipeLineId = new AtomicLong(0L);
 
     public ClientPipelineFactory(NioServer server) {
         this.server = server;
@@ -25,10 +27,10 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        pipeLineId++;
+        pipeLineId.getAndIncrement();
         log.info("Create new Pipeline with ID: " + pipeLineId);
-        PacketFrameDecoder decoder = new PacketFrameDecoder(server.getProtocol(), pipeLineId);
-        PacketFrameEncoder encoder = new PacketFrameEncoder(server.getProtocol(), pipeLineId);
-        return Channels.pipeline(decoder, encoder, new ClientHandler(server, pipeLineId));
+        PacketFrameDecoder decoder = new PacketFrameDecoder(server.getProtocol(), pipeLineId.get());
+        PacketFrameEncoder encoder = new PacketFrameEncoder(server.getProtocol(), pipeLineId.get());
+        return Channels.pipeline(decoder, encoder, new ClientHandler(server, pipeLineId.get()));
     }
 }
