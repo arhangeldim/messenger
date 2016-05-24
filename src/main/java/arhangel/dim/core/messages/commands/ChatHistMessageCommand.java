@@ -17,21 +17,13 @@ public class ChatHistMessageCommand implements Command {
     @Override
     public void execute(Session session, Message msg) throws CommandException {
         if (session.getUser() == null) {
-            try {
-                session.send(StatusMessage.logInFirstMessage());
-            } catch (ProtocolException | IOException e) {
-                throw new CommandException(e);
-            }
+            session.send(StatusMessage.logInFirstMessage());
         }
         ChatHistMessage message = (ChatHistMessage) msg;
         Chat chat = session.getServer().getMessageStore()
                 .getChatById(message.getChatId());
         if (!chat.getUsers().contains(session.getUser().getId())) {
-            try {
-                session.send(StatusMessage.wrongChatMessage());
-            } catch (ProtocolException | IOException e) {
-                throw new CommandException(e);
-            }
+            session.send(StatusMessage.wrongChatMessage());
         }
         List<Long> msgIds = session.getServer().getMessageStore()
                 .getMessagesFromChat(message.getChatId());
@@ -44,10 +36,8 @@ public class ChatHistMessageCommand implements Command {
                     .getUserById(currentMessage.getSenderId());
             result.add(new TextClientMessage(currentMessage, user.getName()));
         }
-        try {
-            session.send(new ChatHistResultMessage(result));
-        } catch (ProtocolException | IOException e) {
-            throw new CommandException(e);
-        }
+
+        session.send(new ChatHistResultMessage(result));
+
     }
 }

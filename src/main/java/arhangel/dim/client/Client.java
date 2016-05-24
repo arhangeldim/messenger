@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.container.Container;
+import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.messages.*;
 import arhangel.dim.core.messages.commands.CommandException;
 import arhangel.dim.core.net.BinaryProtocol;
@@ -123,11 +126,17 @@ public class Client implements ConnectionHandler {
     public void processInput(String line) throws IOException, ProtocolException {
         String[] tokens = line.split(" ");
         log.info("Tokens: {}", Arrays.toString(tokens));
+        if (tokens.length == 0) {
+            log.error("invalid input");
+        }
         String cmdType = tokens[0];
         switch (cmdType) {
             case "/login":
                 // TODO: реализация
                 LoginMessage loginMessage = new LoginMessage();
+                if (tokens.length < 3) {
+                    log.error("invalid input");
+                }
                 loginMessage.setLogin(tokens[1]);
                 loginMessage.setType(Type.MSG_LOGIN);
                 loginMessage.setPassword(tokens[2]);
@@ -138,9 +147,17 @@ public class Client implements ConnectionHandler {
                 break;
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
+                if (tokens.length < 2) {
+                    log.error("invalid input");
+                }
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setChatId(Long.parseLong(tokens[1]));
-                sendMessage.setText(tokens[2]);
+                StringBuilder builder = new StringBuilder();
+                for (int i = 2; i < tokens.length; ++i) {
+                    builder.append(tokens[i]);
+                    builder.append(" ");
+                }
+                sendMessage.setText(builder.toString());
                 send(sendMessage);
                 break;
             case "/chat_list":
@@ -150,9 +167,23 @@ public class Client implements ConnectionHandler {
             case "/info":
                 break;
             case "/chat_hist":
+                if (tokens.length < 2) {
+                    log.error("invalid input");
+                }
                 ChatHistMessage chatHistMessage = new ChatHistMessage();
                 chatHistMessage.setChatId(Long.parseLong(tokens[1]));
                 send(chatHistMessage);
+                break;
+            case "/chat_create":
+                if (tokens.length < 3) {
+                    log.error("invalid input");
+                }
+                ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
+                chatCreateMessage.setUsers(new ArrayList<>());
+                for (int i = 1; i < tokens.length; ++i) {
+                    chatCreateMessage.getUsers().add(Long.parseLong(tokens[i]));
+                }
+                send(chatCreateMessage);
                 break;
             // TODO: implement another types from wiki
             default:
@@ -176,19 +207,15 @@ public class Client implements ConnectionHandler {
     }
 
     public static void main(String[] args) throws Exception {
-
-        Client client = new Client();
-        client.setHost("localhost");
-        client.setPort(19000);
-        client.setProtocol(new BinaryProtocol());
-        // Пользуемся механизмом контейнера
-//        try {
-//            Container context = new Container("client.xml");
-//            client = (Client) context.getByName("client");
-//        } catch (InvalidConfigurationException e) {
-//            log.error("Failed to create client", e);
-//            return;
-//        }
+        Client client = null;
+        try {
+            Container context = new Container("client.xml");
+            client = (Client) context.getByName("client");
+            System.out.println(client);
+        } catch (InvalidConfigurationException e) {
+            log.error("Failed to create client", e);
+            return;
+        }
         try {
             client.initSocket();
 

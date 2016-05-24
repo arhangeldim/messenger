@@ -15,11 +15,9 @@ public class ChatListMessageCommand implements Command {
     @Override
     public void execute(Session session, Message msg) throws CommandException {
         if (session.getUser() == null) {
-            try {
-                session.send(StatusMessage.logInFirstMessage());
-            } catch (ProtocolException | IOException e) {
-                e.printStackTrace();
-            }
+
+            session.send(StatusMessage.logInFirstMessage());
+
         } else {
             msg.setSenderId(session.getUser().getId());
 
@@ -27,11 +25,9 @@ public class ChatListMessageCommand implements Command {
                     .getChatsByUserId(session.getUser().getId());
             ChatListResultMessage response = new ChatListResultMessage();
             response.setChats(chatList);
-            try {
-                session.send(response);
-            } catch (ProtocolException | IOException e) {
-                throw new CommandException(e);
-            }
+
+            session.send(response);
+
         }
     }
 }

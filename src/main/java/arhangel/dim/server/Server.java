@@ -1,5 +1,7 @@
 package arhangel.dim.server;
 
+import arhangel.dim.container.Container;
+import arhangel.dim.container.InvalidConfigurationException;
 import arhangel.dim.core.net.BinaryProtocol;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.Session;
@@ -7,16 +9,19 @@ import arhangel.dim.core.store.MessageStore;
 import arhangel.dim.core.store.PgMessageStore;
 import arhangel.dim.core.store.PgUserStore;
 import arhangel.dim.core.store.UserStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Основной класс для сервера сообщений
@@ -25,8 +30,22 @@ public class Server {
 
     public static final int DEFAULT_MAX_CONNECT = 16;
 
+    public static Logger getLog() {
+        return log;
+    }
+
+    private static Logger log = LoggerFactory.getLogger(Server.class);
+
     // Засетить из конфига
     private int port;
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    private boolean finished = false;
+
+
 
     private MessageStore messageStore;
     private UserStore userStore;
@@ -43,6 +62,15 @@ public class Server {
 
     public Protocol getProtocol() {
         return protocol;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setProtocol(Protocol protocol) {
+
+        this.protocol = protocol;
     }
 
     private Protocol protocol;
@@ -70,16 +98,34 @@ public class Server {
             Socket socket = serverSocket.accept();
             Session session = new Session(socket, this);
             service.submit(session);
+            try {
+                sleep(20 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            stop();
         }
 
     }
 
     public void stop() {
-        // TODO: закрыть все сетевые подключения, остановить потоки-обработчики, закрыть ресурсы, если есть.
+        finished = true;
+        try {
+            service.awaitTermination(2, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws IOException {
-        Server server = new Server();
+        Server server = null;
+        try {
+            Container context = new Container("server.xml");
+            server = (Server) context.getByName("server");
+        } catch (InvalidConfigurationException e) {
+            log.error("Failed to create client", e);
+            return;
+        }
         server.start();
     }
 

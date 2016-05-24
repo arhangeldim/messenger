@@ -68,24 +68,39 @@ public class Container {
                             name.substring(0, 1).toUpperCase() +
                             name.substring(1);
 
-
+                    Method method = null;
+                    for (Method tmpMethod: clazz.getDeclaredMethods()) {
+                        if (tmpMethod.getName().equals(methodName)) {
+                            method = tmpMethod;
+                            break;
+                        }
+                    }
                     if (property.getType() == ValueType.REF) {
                         Object parameter = getByName(property.getValue());
-                        Method method = clazz.getMethod(methodName,
-                                parameter.getClass()    );
-
                         method.invoke(ob, parameter);
                     } else {
-                        Method method = clazz.getMethod(methodName,
-                                int.class);
-                        method.invoke(ob, new Integer(property.getValue()));
+                        String typeName = clazz.getDeclaredField(name)
+                                .getType().getName();
+                        switch (typeName) {
+                            case "int":
+                                method.invoke(ob,
+                                        new Integer(property.getValue()));
+                                break;
+                            case "java.lang.String":
+                                method.invoke(ob,
+                                        property.getValue());
+                                break;
+                            default:
+                                throw new InvalidConfigurationException(
+                                        "Bad types");
+                        }
                     }
-                    objByName.put(bean.getName(), ob);
-                    objByClassName.put(bean.getClassName(), ob);
                 }
+                objByName.put(bean.getName(), ob);
+                objByClassName.put(bean.getClassName(), ob);
             } catch (InstantiationException | IllegalAccessException |
                     InvocationTargetException | ClassNotFoundException |
-                    NoSuchMethodException e) {
+                    NoSuchFieldException e) {
                 throw new InvalidConfigurationException(e);
             }
 

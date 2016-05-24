@@ -1,6 +1,7 @@
 package arhangel.dim.core.messages.commands;
 
 import arhangel.dim.core.Chat;
+import arhangel.dim.core.User;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.messages.TextClientMessage;
@@ -19,11 +20,9 @@ public class TextMessageCommand implements Command {
     public void execute(Session session, Message msg)
             throws CommandException {
         if (session.getUser() == null) {
-            try {
-                session.send(StatusMessage.logInFirstMessage());
-            } catch (ProtocolException | IOException e) {
-                e.printStackTrace();
-            }
+
+            session.send(StatusMessage.logInFirstMessage());
+
         } else {
             msg.setSenderId(session.getUser().getId());
 
@@ -32,11 +31,9 @@ public class TextMessageCommand implements Command {
             Chat chat = session.getServer().getMessageStore()
                     .getChatById(textMessage.getChatId());
             if (!chat.getUsers().contains(session.getUser().getId())) {
-                try {
-                    session.send(StatusMessage.wrongChatMessage());
-                } catch (ProtocolException | IOException e) {
-                    throw new CommandException(e);
-                }
+
+                session.send(StatusMessage.wrongChatMessage());
+
             }
 
             session.getServer().getMessageStore()
@@ -46,14 +43,9 @@ public class TextMessageCommand implements Command {
                 TextClientMessage outMessage
                         = new TextClientMessage(textMessage,
                         session.getUser().getName());
-                if (session.getServer().getActiveUsers().containsKey(userId)) {
-                    try {
-                        session.getServer().getActiveUsers().get(userId)
-                                .send(outMessage);
-                        //NPE
-                    } catch (ProtocolException | IOException e) {
-                        e.printStackTrace();
-                    }
+                Session cur = session.getServer().getActiveUsers().get(userId);
+                if (cur != null) {
+                    cur.send(outMessage);
                 }
             }
         }

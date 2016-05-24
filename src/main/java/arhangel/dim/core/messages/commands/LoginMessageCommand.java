@@ -20,11 +20,7 @@ public class LoginMessageCommand implements Command {
         if (session.getUser() != null) {
             TextMessage sendMessage = new StatusMessage();
             sendMessage.setText("already logged in");
-            try {
-                session.send(sendMessage);
-            } catch (ProtocolException | IOException e) {
-                throw new CommandException(e);
-            }
+            session.send(sendMessage);
         } else {
 
             try {

@@ -103,8 +103,8 @@ public class PgMessageStore implements MessageStore {
         Object[] args = {messageId};
         try {
             executor.execQuery("SELECT CHAT_ID, USER_ID, CONTENT, TIME"
-                                + " FROM MESSAGES "
-                                + "WHERE ID = ?", args, rs -> {
+                    + " FROM MESSAGES "
+                    + "WHERE ID = ?", args, rs -> {
                 try {
                     //if !rs.next()
                     rs.next();
@@ -146,10 +146,21 @@ public class PgMessageStore implements MessageStore {
         Object[] args = {chatId, userId};
         try {
             executor.execQuery("INSERT INTO CHAT_USER(CHAT_ID, USER_ID)"
-                    + "VALUES (?, ?, ?)", args, rs -> {} );
+                    + "VALUES (?, ?)", args, rs -> {
+            });
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Long addChat() {
+        Object[] args = {};
+        try {
+            return executor.execUpdate("INSERT INTO CHATS DEFAULT VALUES", args);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public PgMessageStore() {

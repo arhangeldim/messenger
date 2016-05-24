@@ -49,33 +49,42 @@ public class Session implements ConnectionHandler, Runnable {
         return server;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
-    }
-
     private Server server;
 
     @Override
-    public void send(Message msg) throws ProtocolException, IOException {
-        out.write(server.getProtocol().encode(msg));
-        out.flush();
-        // TODO: Отправить клиенту сообщение
+    public void send(Message msg) {
+        try {
+            out.write(server.getProtocol().encode(msg));
+            out.flush();
+        } catch (IOException | ProtocolException e) {
+            Server.getLog().error(e.getMessage());
+        }
+
     }
 
     @Override
     public void onMessage(Message msg) {
-        System.out.println(msg);
+        Server.getLog().debug(msg.toString());
         try {
             CommandByMessage.getCommand(msg.getType()).execute(this, msg);
         } catch (CommandException e) {
-            e.printStackTrace();
+            Server.getLog().error(e.getMessage());
         }
-        // TODO: Пришло некое сообщение от клиента, его нужно обработать
     }
 
     @Override
     public void close() {
-        // TODO: закрыть in/out каналы и сокет. Освободить другие ресурсы, если необходимо
+        if (user != null) {
+            getServer().getActiveUsers().remove(user.getId());
+        }
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            Server.getLog().error(e.getMessage());
+        }
+        Server.getLog().debug("End of session");
     }
 
     public Session(Socket socket, Server server) {
@@ -86,7 +95,7 @@ public class Session implements ConnectionHandler, Runnable {
             in = socket.getInputStream();
             out = socket.getOutputStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            Server.getLog().error(e.getMessage());
         }
     }
 
@@ -95,11 +104,17 @@ public class Session implements ConnectionHandler, Runnable {
         byte [] binMessage = new byte[MAX_MESSAGE_SIZE];
         while (true) {
             try {
-                in.read(binMessage);
+                int result = in.read(binMessage);
+                if (result == -1 || server.isFinished()) {
+                    close();
+                    break;
+                }
                 Message message = server.getProtocol().decode(binMessage);
                 onMessage(message);
             } catch (IOException | ProtocolException e) {
-                e.printStackTrace();
+                Server.getLog().error(e.getMessage());
+                close();
+                break;
             }
         }
     }
