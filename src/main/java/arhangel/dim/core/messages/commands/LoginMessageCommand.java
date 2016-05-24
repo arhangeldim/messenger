@@ -16,7 +16,6 @@ import java.io.IOException;
 public class LoginMessageCommand implements Command {
     @Override
     public void execute(Session session, Message msg) throws CommandException {
-        System.out.println("LOGIN");
         if (session.getUser() != null) {
             TextMessage sendMessage = new StatusMessage();
             sendMessage.setText("already logged in");
@@ -29,11 +28,16 @@ public class LoginMessageCommand implements Command {
                 session.getUser().setName(loginMessage.getLogin());
                 session.getUser().setPassword(loginMessage.getPassword());
                 User realUser = session.getServer().getUserStore()
-                        .getUser(loginMessage.getLogin(),
-                                loginMessage.getPassword());
+                        .getUser(loginMessage.getLogin());
                 if (realUser == null) {
                     realUser = session.getServer().getUserStore()
                             .addUser(session.getUser());
+                } else if (!realUser.getPassword().equals(loginMessage
+                        .getPassword())) {
+                    StatusMessage response = new StatusMessage();
+                    response.setText("Invalid password");
+                    session.send(response);
+                    return;
                 }
                 session.getServer().getActiveUsers()
                         .put(realUser.getId(), session);

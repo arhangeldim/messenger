@@ -1,6 +1,6 @@
-2016-05-24 15:27:59 INFO  StringProtocol:53 - encoded: MSG_TEXT;1;Hello;
-2016-05-24 15:27:59 INFO  StringProtocol:22 - decoded: MSG_TEXT;1;Hello;
-2016-05-24 15:28:00 ERROR BinaryProtocol:26 - failed to decode
+2016-05-24 18:57:20 INFO  StringProtocol:53 - encoded: MSG_TEXT;1;Hello;
+2016-05-24 18:57:20 INFO  StringProtocol:22 - decoded: MSG_TEXT;1;Hello;
+2016-05-24 18:57:20 ERROR BinaryProtocol:26 - failed to decode
 java.io.StreamCorruptedException: invalid stream header: 01020304
 	at java.io.ObjectInputStream.readStreamHeader(ObjectInputStream.java:806)
 	at java.io.ObjectInputStream.<init>(ObjectInputStream.java:299)

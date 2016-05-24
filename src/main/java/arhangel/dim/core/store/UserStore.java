@@ -23,7 +23,7 @@ public interface UserStore {
      * Получить пользователя по логину/паролю
      * return null if user not found
      */
-    User getUser(String login, String pass);
+    User getUser(String login);
 
     /**
      *

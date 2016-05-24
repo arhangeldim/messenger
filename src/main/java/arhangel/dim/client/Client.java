@@ -108,7 +108,6 @@ public class Client implements ConnectionHandler {
                     }
                 } catch (Exception e) {
                     log.error("Failed to process connection: {}", e);
-                    e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
             }
@@ -265,19 +264,27 @@ public class Client implements ConnectionHandler {
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
         log.info(msg.toString());
-        out.write(protocol.encode(msg));
+        if (!closed) {
+            out.write(protocol.encode(msg));
+        }
         out.flush(); // принудительно проталкиваем буфер с данными
     }
+
+
+    private boolean closed = false;
 
     @Override
     public void close() {
         socketThread.interrupt();
         mainThread.interrupt();
-        try {
-            in.close();
-            out.close();
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        if (!closed) {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+            closed = true;
         }
     }
 

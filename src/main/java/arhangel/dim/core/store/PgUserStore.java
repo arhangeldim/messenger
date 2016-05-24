@@ -39,17 +39,17 @@ public class PgUserStore implements UserStore {
     }
 
     @Override
-    public User getUser(String login, String pass) {
+    public User getUser(String login) {
         final User[] result = {new User()};
         result[0].setName(login);
-        result[0].setPassword(pass);
-        Object[] args = {login, pass};
+        Object[] args = {login};
         try {
-            executor.execQuery("SELECT ID FROM USERS WHERE LOGIN=? AND PASSWORD=?",
+            executor.execQuery("SELECT ID, PASSWORD FROM USERS WHERE LOGIN=?",
                     args, rs -> {
                         try {
                             if (rs.next()) {
                                 result[0].setId(rs.getLong("ID"));
+                                result[0].setPassword(rs.getString("PASSWORD"));
                             } else {
                                 result[0] = null;
                             }

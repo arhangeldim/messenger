@@ -29,7 +29,7 @@ public class ChatCreateMessageCommand implements Command {
         int uniqueSize = new HashSet<>(message.getUsers()).size();
         if (message.getUsers().contains(session.getUser().getId()) ||
                 uniqueSize != message.getUsers().size() ||
-                uniqueSize < 2) {
+                uniqueSize < 1) {
             StatusMessage response = new StatusMessage();
             response.setText("invalid command parameters");
             session.send(response);
