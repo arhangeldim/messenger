@@ -5,9 +5,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistoryMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.RegisterMessage;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,8 +164,54 @@ public class Client implements ConnectionHandler {
                 loginMessage.setSecret(tokens[2]);
                 send(loginMessage);
                 break;
+            case "/info":
+                if (tokens.length > 2) {
+                    System.out.println("Expected less than 2 parameters");
+                    return;
+                } else {
+                    InfoMessage infoMessage = new InfoMessage();
+                    infoMessage.setType(Type.MSG_INFO);
+                    if (tokens.length == 2) {
+                        infoMessage.setLogin(tokens[1]);
+                    } else {
+                        infoMessage.setLogin(null);
+                    }
+                    send(infoMessage);
+                }
+                break;
             case "/help":
                 // TODO: реализация
+                break;
+            case "/chat_create":
+                if (tokens.length < 2) {
+                    System.out.println("Expected at least 1 parameter");
+                    return;
+                }
+                ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
+                chatCreateMessage.setType(Type.MSG_CHAT_CREATE);
+                Set<String> users = new HashSet<>();
+                users.addAll(Arrays.asList(tokens).subList(1, tokens.length));
+                chatCreateMessage.setUsers(users);
+                send(chatCreateMessage);
+                break;
+            case "/chat_list":
+                ChatListMessage chatListMessage = new ChatListMessage();
+                chatListMessage.setType(Type.MSG_CHAT_LIST);
+                send(chatListMessage);
+                break;
+            case "/chat_history":
+                if (tokens.length != 2) {
+                    System.out.println("Expected 1 argument");
+                }
+                ChatHistoryMessage chatHistoryMessage = new ChatHistoryMessage();
+                chatHistoryMessage.setType(Type.MSG_CHAT_HIST);
+                try {
+                    chatHistoryMessage.setChatId(parseLong(tokens[1]));
+                } catch (Exception e) {
+                    System.out.println("Expected number");
+                    return;
+                }
+                send(chatHistoryMessage);
                 break;
             case "/text":
                 if (tokens.length != 3) {

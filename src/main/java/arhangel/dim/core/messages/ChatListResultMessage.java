@@ -1,15 +1,15 @@
 package arhangel.dim.core.messages;
 
-import java.util.List;
+import java.util.Set;
 
 public class ChatListResultMessage extends Message {
-    private List<Long> chatIds;
+    private Set<Long> chatIds;
 
-    public List<Long> getChatIds() {
+    public Set<Long> getChatIds() {
         return chatIds;
     }
 
-    public void setChatIds(List<Long> chatIds) {
+    public void setChatIds(Set<Long> chatIds) {
         this.chatIds = chatIds;
     }
 

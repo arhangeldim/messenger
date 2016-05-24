@@ -1,6 +1,10 @@
 package arhangel.dim.core.net;
 
 import arhangel.dim.core.User;
+import arhangel.dim.core.messages.ChatCreateCommand;
+import arhangel.dim.core.messages.ChatHistoryCommand;
+import arhangel.dim.core.messages.ChatListCommand;
+import arhangel.dim.core.messages.InfoCommand;
 import arhangel.dim.core.messages.LoginCommand;
 import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.RegisterCommand;
@@ -83,9 +87,42 @@ public class Session implements ConnectionHandler {
                 }
                 break;
             case MSG_TEXT:
+                msg.setSenderId(user.getId());
                 TextCommand textCommand = new TextCommand();
                 try {
                     textCommand.execute(this, msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case MSG_INFO:
+                InfoCommand infoCommand = new InfoCommand();
+                try {
+                    infoCommand.execute(this, msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case MSG_CHAT_CREATE:
+                ChatCreateCommand chatCreateCommand = new ChatCreateCommand();
+                try {
+                    chatCreateCommand.execute(this, msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case MSG_CHAT_LIST:
+                ChatListCommand chatListCommand = new ChatListCommand();
+                try {
+                    chatListCommand.execute(this, msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case MSG_CHAT_HIST:
+                ChatHistoryCommand chatHistoryCommand = new ChatHistoryCommand();
+                try {
+                    chatHistoryCommand.execute(this, msg);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

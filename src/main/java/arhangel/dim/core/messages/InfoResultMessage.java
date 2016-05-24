@@ -1,11 +1,11 @@
 package arhangel.dim.core.messages;
 
-import java.util.List;
+import java.util.Set;
 
 public class InfoResultMessage extends Message {
     private Long userId;
     private String login;
-    private List<Long> chatIds;
+    private Set<Long> chatIds;
 
     public Long getUserId() {
         return userId;
@@ -23,11 +23,11 @@ public class InfoResultMessage extends Message {
         this.login = login;
     }
 
-    public List<Long> getChatIds() {
+    public Set<Long> getChatIds() {
         return chatIds;
     }
 
-    public void setChatIds(List<Long> chatIds) {
+    public void setChatIds(Set<Long> chatIds) {
         this.chatIds = chatIds;
     }
 

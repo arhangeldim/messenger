@@ -1,7 +1,6 @@
 package arhangel.dim.core.store;
 
 import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.Message;
 import arhangel.dim.core.messages.TextMessage;
 
 import java.sql.Connection;
@@ -11,7 +10,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class PostgresqlMessageDao implements MessageStore {
         log.info("[init] Initializing message dao...");
         Connection connection = parentFactory.getConnection();
         connection.prepareStatement("CREATE TABLE IF NOT EXISTS chats (" +
-                "id BIGINT PRIMARY KEY NOT NULL," +
+                "id BIGSERIAL PRIMARY KEY," +
                 "users BIGINT[]" +
                 ");").execute();
         connection.prepareStatement("CREATE TABLE IF NOT EXISTS messages (" +
@@ -60,9 +61,9 @@ public class PostgresqlMessageDao implements MessageStore {
     }
 
     @Override
-    public List<Long> getChatsByUserId(Long userId) {
+    public Set<Long> getChatsByUserId(Long userId) {
         log.info("[getChatsByUserId] Getting chats with user {}", userId);
-        List<Long> chatList = new ArrayList<>();
+        Set<Long> chatList = new HashSet<>();
         Connection connection = null;
         try {
             connection = parentFactory.getConnection();
@@ -107,7 +108,7 @@ public class PostgresqlMessageDao implements MessageStore {
 
             if (result.next()) {
                 Chat chat = new Chat(result.getLong("id"),
-                        new ArrayList<>(Arrays.asList((Long[]) result.getArray("users").getArray())));
+                        new HashSet<>(Arrays.asList((Long[]) result.getArray("users").getArray())));
                 log.info("[getUserById] Got chat {}", chat.getId());
                 return chat;
             }
@@ -204,8 +205,8 @@ public class PostgresqlMessageDao implements MessageStore {
     }
 
     @Override
-    public TextMessage addMessage(Long chatId, TextMessage message) {
-        log.info("[addMessage] Adding message {} to chat {}", message.getText(), chatId);
+    public TextMessage addMessage(TextMessage message) {
+        log.info("[addMessage] Adding message {}", message);
         Connection connection = null;
         try {
             connection = parentFactory.getConnection();
@@ -224,7 +225,7 @@ public class PostgresqlMessageDao implements MessageStore {
                 log.info("[addMessage] Successfully added message {}", message.getId());
                 return message;
             }
-            log.info("[addMessage] Didn't add message {}", message.getText());
+            log.info("[addMessage] Didn't add message {}", message);
             return null;
         } catch (Exception e) {
             log.error("[addMessage] Couldn't add message", e);
@@ -269,5 +270,42 @@ public class PostgresqlMessageDao implements MessageStore {
                 }
             }
         }
+    }
+
+    @Override
+    public Chat addChat(Chat chat) {
+        log.info("[addChat] Adding chat {}", chat);
+        Connection connection = null;
+        try {
+            connection = parentFactory.getConnection();
+            PreparedStatement createStatement = connection.prepareStatement(
+                    "INSERT INTO chats (users) VALUES (?);",
+                    Statement.RETURN_GENERATED_KEYS);
+            createStatement.setArray(1, connection.createArrayOf("bigint", chat.getUserIds().toArray()));
+
+            int affectedRows = createStatement.executeUpdate();
+            ResultSet generatedKeys = createStatement.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                chat.setId(generatedKeys.getLong(1));
+                log.info("[addChat] Successfully created chat {}", chat.getId());
+                return chat;
+            }
+            log.info("[addChat] Didn't create chat");
+            return null;
+        } catch (Exception e) {
+            log.error("[addChat] Couldn't create chat", e);
+            //e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    log.error("[addChat] Couldn't close connection", e);
+                    //e.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 }

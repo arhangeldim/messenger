@@ -1,17 +1,18 @@
 package arhangel.dim.core;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * А над этим классом надо еще поработать
  */
 public class Chat {
     private Long id;
-    private List<Long> userIds;
+    private Set<Long> userIds;
 
     public Chat(){}
 
-    public Chat(Long id, List<Long> userIds) {
+    public Chat(Long id, Set<Long> userIds) {
         this.id = id;
         this.userIds = userIds;
     }
@@ -24,11 +25,11 @@ public class Chat {
         this.id = id;
     }
 
-    public List<Long> getUserIds() {
+    public Set<Long> getUserIds() {
         return userIds;
     }
 
-    public void setUserIds(List<Long> userIds) {
+    public void setUserIds(Set<Long> userIds) {
         this.userIds = userIds;
     }
 }

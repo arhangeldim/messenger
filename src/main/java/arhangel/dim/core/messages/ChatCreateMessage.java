@@ -1,15 +1,15 @@
 package arhangel.dim.core.messages;
 
-import java.util.List;
+import java.util.Set;
 
 public class ChatCreateMessage extends Message {
-    private List<String> users;
+    private Set<String> users;
 
-    public List<String> getUsers() {
+    public Set<String> getUsers() {
         return users;
     }
 
-    public void setUsers(List<String> users) {
+    public void setUsers(Set<String> users) {
         this.users = users;
     }
 
