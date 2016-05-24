@@ -67,8 +67,7 @@ public class NioServer implements Server {
         try {
             dbFactory = new PostgresDaoFactory(dbUrl, dbLogin, dbPassword);
         } catch (PersistException e) {
-            System.out.println("You should set dbUrl, dbLogin, dbPassword settings!");
-//            e.printStackTrace();
+            log.error("You should set dbUrl, dbLogin, dbPassword settings!", e);
             return;
         }
 

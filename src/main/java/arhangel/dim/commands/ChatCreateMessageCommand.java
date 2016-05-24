@@ -40,15 +40,11 @@ public class ChatCreateMessageCommand implements Command {
                 return;
             }
 
-            // TODO
-//            MessageStore messageStore = null;//server.getDbFactory().getMessageStore();
-
             ChatDao chatDao = (ChatDao) server.getDbFactory().getDao(Chat.class);
 
             List<Long> participants = ((ChatCreateMessage) message).getUserIds();
             if (participants.size() == 1) {
                 log.info("1 partitioner");
-//                List<Long> chatsByUser = messageStore.getChatsByUserId(session.getUser().getId());
                 List<Chat> chatsByUser = chatDao.getChatsByAdmin(session.getUser());
                 if (chatsByUser != null) {
                     for (Chat chat : chatsByUser) {
