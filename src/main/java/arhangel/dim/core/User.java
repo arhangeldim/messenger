@@ -6,6 +6,7 @@ package arhangel.dim.core;
 public class User {
     private Long id;
     private String name;
+    private String pass;
 
     public Long getId() {
         return id;
@@ -21,5 +22,13 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
     }
 }
