@@ -73,7 +73,7 @@ public class Test {
 
     static int one = 0;
     static int two = 0;
-    
+
     static class Stupid implements Runnable {
         @Override
         public void run() {
