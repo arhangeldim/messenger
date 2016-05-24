@@ -17,15 +17,18 @@ public class ClientPipelineFactory implements ChannelPipelineFactory {
 
     private NioServer server;
 
+    private Long pipeLineId = 0L;
+
     public ClientPipelineFactory(NioServer server) {
         this.server = server;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        log.info("getPipeLine");
-        PacketFrameDecoder decoder = new PacketFrameDecoder(server.getProtocol());
-        PacketFrameEncoder encoder = new PacketFrameEncoder(server.getProtocol());
-        return Channels.pipeline(decoder, encoder, new ClientHandler(decoder, encoder, server));
+        pipeLineId++;
+        log.info("Create new Pipeline with ID: " + pipeLineId);
+        PacketFrameDecoder decoder = new PacketFrameDecoder(server.getProtocol(), pipeLineId);
+        PacketFrameEncoder encoder = new PacketFrameEncoder(server.getProtocol(), pipeLineId);
+        return Channels.pipeline(decoder, encoder, new ClientHandler(server, pipeLineId));
     }
 }

@@ -130,7 +130,7 @@ public class Client implements ConnectionHandler {
                         onMessage(msg);
                     }
                 } catch (Exception e) {
-                    log.error("Failed to process connection: {}", e);
+                    log.error("Failed to process connection: {}");
                     Thread.currentThread().interrupt();
                 }
             }
@@ -392,7 +392,6 @@ public class Client implements ConnectionHandler {
 
     public static void main(String[] args) throws Exception {
         Client client = null;
-        // Пользуемся механизмом контейнера
         try {
             Container context = new Container("client.xml");
             client = (Client) context.getByName("client");

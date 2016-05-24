@@ -23,22 +23,21 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     static Logger log = LoggerFactory.getLogger(ClientHandler.class);
 
     private NioServer server;
-    private PacketFrameDecoder decoder;
-    private PacketFrameEncoder encoder;
 
     private Session session;
     private Channel channel;
 
-    public ClientHandler(PacketFrameDecoder decoder, PacketFrameEncoder encoder, NioServer server) {
-        this.decoder = decoder;
-        this.encoder = encoder;
+    private Long pipeLineId;
+
+    public ClientHandler(NioServer server, Long pipeLineId) {
         this.server = server;
+        this.pipeLineId = pipeLineId;
     }
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
         super.channelConnected(ctx, event);
-        log.info("channel connected");
+        log.info("channel connected (pipeline " + pipeLineId + ")");
 
         this.channel = event.getChannel();
         session = new NioSession(event.getChannel(), server);
@@ -58,25 +57,23 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
         super.channelDisconnected(ctx, event);
         server.getSessionsManager().removeSession(session);
-        log.info("channel disconnected");
+        log.info(String.format("channel disconnected (pipeline %d)", pipeLineId));
     }
 
     @Override
     public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent event) throws Exception {
         super.channelClosed(ctx, event);
-        log.info("channel closed");
+        log.info(String.format("channel closed (pipeline %d)", pipeLineId));
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent event) throws Exception {
         super.messageReceived(ctx, event);
 
-
         if (event.getChannel().isOpen()) {
             Message message = (Message) event.getMessage();
-            log.info("Message receved", message);
+            log.info(String.format("Message received by pipeline %d: %s", pipeLineId, message.toString()));
             session.onMessage(message);
-
         }
 
     }
@@ -85,8 +82,6 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent event) throws Exception {
         super.exceptionCaught(ctx, event);
         ctx.getChannel().close();
-
-        log.info("exception caught");
 
     }
 }
