@@ -9,6 +9,7 @@ import arhangel.dim.core.net.ProtocolException;
 import arhangel.dim.core.net.Session;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 /**
  * Created by thefacetakt on 23.05.16.
@@ -27,11 +28,18 @@ public class TextMessageCommand implements Command {
             msg.setSenderId(session.getUser().getId());
 
             TextMessage textMessage = (TextMessage) msg;
-
+            textMessage.setTimestamp(LocalDateTime.now());
             Chat chat = session.getServer().getMessageStore()
                     .getChatById(textMessage.getChatId());
+            if (!chat.getUsers().contains(session.getUser().getId())) {
+                try {
+                    session.send(StatusMessage.wrongChatMessage());
+                } catch (ProtocolException | IOException e) {
+                    throw new CommandException(e);
+                }
+            }
 
-            msg = session.getServer().getMessageStore()
+            session.getServer().getMessageStore()
                     .addMessage(textMessage.getChatId(), msg);
 
             for (Long userId: chat.getUsers()) {

@@ -23,7 +23,6 @@ public class ChatListMessageCommand implements Command {
         } else {
             msg.setSenderId(session.getUser().getId());
 
-            TextMessage textMessage = (TextMessage) msg;
             List<Long> chatList = session.getServer().getMessageStore()
                     .getChatsByUserId(session.getUser().getId());
             ChatListResultMessage response = new ChatListResultMessage();

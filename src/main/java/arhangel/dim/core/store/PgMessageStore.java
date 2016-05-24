@@ -19,8 +19,9 @@ public class PgMessageStore implements MessageStore {
     @Override
     public List<Long> getChatsByUserId(Long userId) {
         final ArrayList<ArrayList<Long>> result
-                = new ArrayList<>(1);
-        result.set(0, new ArrayList<>());
+                = new ArrayList<>();
+
+        result.add(new ArrayList<>());
 
         Object[] args = {userId};
         try {
@@ -102,7 +103,7 @@ public class PgMessageStore implements MessageStore {
         Object[] args = {messageId};
         try {
             executor.execQuery("SELECT CHAT_ID, USER_ID, CONTENT, TIME"
-                                + " FROM MESSAGES"
+                                + " FROM MESSAGES "
                                 + "WHERE ID = ?", args, rs -> {
                 try {
                     //if !rs.next()
@@ -110,6 +111,8 @@ public class PgMessageStore implements MessageStore {
                     result[0].setChatId(rs.getLong("CHAT_ID"));
                     result[0].setSenderId(rs.getLong("USER_ID"));
                     result[0].setText(rs.getString("CONTENT"));
+                    result[0].setTimestamp(rs.getTimestamp("TIME")
+                            .toLocalDateTime());
                 } catch (SQLException e) {
                     e.printStackTrace();
                     result[0] = null;

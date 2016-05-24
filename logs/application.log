@@ -1,9 +1,11 @@
-2016-05-23 17:53:22 INFO  Client:88 - Starting listener thread...
-2016-05-23 17:53:30 INFO  Client:124 - Tokens: [/login, user, password]
-2016-05-23 17:53:30 INFO  Client:158 - LoginMessage{login='user', p2016-05-23 17:53:56 INFO  Client:115 - Message received: TextClientMessage{textMessage=TextMessage{text='hello'}senderLogin='user'}
-2016-05-23 17:54:15 INFO  Client:124 - Tokens: [/text, 1, hello]
-2016-05-23 17:54:15 INFO  Client:158 - TextMessage{text='hello'}
-2016-05-23 17:54:16 INFO  Client:115 - Message received: TextClientMessage{textMessage=TextMessage{text='hello'}senderLogin='a'}
-2016-05-23 17:58:07 INFO  Client:124 - Tokens: [/login, a, b]
-2016-05-23 17:58:07 INFO  Client:158 - LoginMessage{login='a', password='b'}
-2016-05-23 17:58:07 INFO  Client:115 - Message received: TextMessage{text='already logged in'}
+2016-05-24 03:58:29 INFO  Client:85 - Starting listener thread...
+2016-05-24 03:58:32 INFO  Client:125 - Tokens: [/login, a, b]
+2016-05-24 03:58:32 INFO  Client:168 - LoginMessage{login='a', password='b'}
+2016-05-24 03:58:37 INFO  Client:125 - Tokens: [/chat_hist, 1]
+2016-05-24 03:58:37 INFO  Client:168 - Message{id=null, senderId=null, type=MSG_CHAT_HIST}
+2016-05-24 03:58:57 INFO  Client:125 - Tokens: [/chat_hist, 2]
+2016-05-24 03:58:57 INFO  Client:168 - Message{id=null, senderId=null, type=MSG_CHAT_HIST}
+2016-05-24 03:59:31 INFO  Client:125 - Tokens: [/chat_list]
+2016-05-24 03:59:31 INFO  Client:168 - ChatListMessage{}
+2016-05-24 03:59:45 INFO  Client:125 - Tokens: [/text, 1, again]
+2016-05-24 03:59:45 INFO  Client:168 - TextMessage{text='again'}

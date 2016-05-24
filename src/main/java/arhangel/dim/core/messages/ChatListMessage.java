@@ -11,4 +11,8 @@ public class ChatListMessage extends Message {
         return "ChatListMessage{" +
                 '}';
     }
+
+    public ChatListMessage() {
+        setType(Type.MSG_CHAT_LIST);
+    }
 }

@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.commands.CommandException;
 import arhangel.dim.core.net.BinaryProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import arhangel.dim.container.Container;
-import arhangel.dim.container.InvalidConfigurationException;
+import arhangel.dim.core.messages.commands.CommandByMessage;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -109,7 +109,11 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void onMessage(Message msg) {
-        log.info("Message received: {}", msg);
+        try {
+            CommandByMessage.getCommand(msg.getType()).execute(null, msg);
+        } catch (CommandException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -135,7 +139,6 @@ public class Client implements ConnectionHandler {
             case "/text":
                 // FIXME: пример реализации для простого текстового сообщения
                 TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
                 sendMessage.setChatId(Long.parseLong(tokens[1]));
                 sendMessage.setText(tokens[2]);
                 send(sendMessage);
@@ -145,9 +148,13 @@ public class Client implements ConnectionHandler {
                 send(msg);
                 break;
             case "/info":
-
+                break;
+            case "/chat_hist":
+                ChatHistMessage chatHistMessage = new ChatHistMessage();
+                chatHistMessage.setChatId(Long.parseLong(tokens[1]));
+                send(chatHistMessage);
+                break;
             // TODO: implement another types from wiki
-
             default:
                 log.error("Invalid input: " + line);
         }

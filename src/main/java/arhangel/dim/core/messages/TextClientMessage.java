@@ -4,7 +4,12 @@ package arhangel.dim.core.messages;
  * Created by thefacetakt on 23.05.16.
  */
 public class TextClientMessage extends TextMessage {
+    public String getSenderLogin() {
+        return senderLogin;
+    }
+
     private String senderLogin;
+
     public TextClientMessage(TextMessage msg, String login) {
         setChatId(msg.getChatId());
         setType(Type.MSG_TEXT_CLIENT);
@@ -12,7 +17,7 @@ public class TextClientMessage extends TextMessage {
         setId(msg.getId());
         setSenderId(msg.getSenderId());
         senderLogin = login;
-        setTimestamp(getTimestamp());
+        setTimestamp(msg.getTimestamp());
     }
 
     @Override

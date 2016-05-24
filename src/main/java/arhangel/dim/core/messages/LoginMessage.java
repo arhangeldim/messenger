@@ -47,4 +47,8 @@ public class LoginMessage extends Message {
                 ", password='" + password + '\'' +
                 '}';
     }
+
+    public LoginMessage() {
+        setType(Type.MSG_LOGIN);
+    }
 }

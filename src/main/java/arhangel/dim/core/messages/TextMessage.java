@@ -66,6 +66,5 @@ public class TextMessage extends Message {
 
     public TextMessage() {
         setType(Type.MSG_TEXT);
-        timestamp = LocalDateTime.now();
     }
 }

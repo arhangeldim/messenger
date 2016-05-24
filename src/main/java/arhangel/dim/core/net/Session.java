@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
-import arhangel.dim.core.Chat;
+
+
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
-import arhangel.dim.core.messages.commands.*;
-import arhangel.dim.core.store.MessageStore;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.commands.CommandByMessage;
+import arhangel.dim.core.messages.commands.CommandException;
 import arhangel.dim.server.Server;
 
 /**
@@ -21,15 +19,6 @@ import arhangel.dim.server.Server;
  * - сокеты на чтение/запись данных в канал пользователя
  */
 public class Session implements ConnectionHandler, Runnable {
-
-    private static HashMap<Type, Command> messageToCommand;
-
-    static {
-        messageToCommand = new HashMap<>();
-        messageToCommand.put(Type.MSG_LOGIN, new LoginMessageCommand());
-        messageToCommand.put(Type.MSG_TEXT, new TextMessageCommand());
-        messageToCommand.put(Type.MSG_CHAT_LIST, new ChatListMessageCommand());
-    }
 
     /**
      * Пользователь сессии, пока не прошел логин, user == null
@@ -68,9 +57,6 @@ public class Session implements ConnectionHandler, Runnable {
 
     @Override
     public void send(Message msg) throws ProtocolException, IOException {
-        if (user == null) {
-            return;
-        }
         out.write(server.getProtocol().encode(msg));
         out.flush();
         // TODO: Отправить клиенту сообщение
@@ -80,7 +66,7 @@ public class Session implements ConnectionHandler, Runnable {
     public void onMessage(Message msg) {
         System.out.println(msg);
         try {
-            messageToCommand.get(msg.getType()).execute(this, msg);
+            CommandByMessage.getCommand(msg.getType()).execute(this, msg);
         } catch (CommandException e) {
             e.printStackTrace();
         }

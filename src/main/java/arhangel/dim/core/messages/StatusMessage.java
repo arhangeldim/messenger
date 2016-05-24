@@ -16,4 +16,10 @@ public class StatusMessage extends TextMessage {
         return sendMessage;
     }
 
+    public static StatusMessage wrongChatMessage() {
+        StatusMessage sendMessage = new StatusMessage();
+        sendMessage.setText("Wrong chat");
+        return sendMessage;
+    }
+
 }
