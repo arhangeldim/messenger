@@ -10,7 +10,14 @@ import java.util.Scanner;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.*;
+import arhangel.dim.core.messages.ChatCreateMessage;
+import arhangel.dim.core.messages.ChatHistMessage;
+import arhangel.dim.core.messages.ChatListMessage;
+import arhangel.dim.core.messages.InfoMessage;
+import arhangel.dim.core.messages.LoginMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.TextMessage;
+import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.messages.commands.CommandException;
 import arhangel.dim.core.net.BinaryProtocol;
 import org.slf4j.Logger;
@@ -44,6 +51,7 @@ public class Client implements ConnectionHandler {
      * Тред "слушает" сокет на наличие входящих сообщений от сервера
      */
     private Thread socketThread;
+    private static Thread mainThread;
 
     /**
      * С каждым сокетом связано 2 канала in/out
@@ -96,11 +104,19 @@ public class Client implements ConnectionHandler {
                         Message msg = protocol.decode(Arrays.copyOf(buf, read));
                         onMessage(msg);
                     }
+                    else if (read == -1) {
+                        close();
+                    }
                 } catch (Exception e) {
                     log.error("Failed to process connection: {}", e);
                     e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
+            }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
             }
         });
 
@@ -225,7 +241,7 @@ public class Client implements ConnectionHandler {
                 send(chatHistMessage);
                 break;
             case "/chat_create":
-                if (tokens.length < 3) {
+                if (tokens.length < 2) {
                     log.error("Invalid input: " + line);
                 }
                 ChatCreateMessage chatCreateMessage = new ChatCreateMessage();
@@ -256,10 +272,18 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+        socketThread.interrupt();
+        mainThread.interrupt();
+        try {
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     public static void main(String[] args) throws Exception {
+        mainThread = Thread.currentThread();
         Client client = null;
         try {
             Container context = new Container("client.xml");
@@ -271,11 +295,10 @@ public class Client implements ConnectionHandler {
         }
         try {
             client.initSocket();
-
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
             System.out.println("$");
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 String input = scanner.nextLine();
                 if ("q".equals(input)) {
                     return;

@@ -16,7 +16,7 @@ import javax.swing.WindowConstants;
 
 public class Sandbox {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         JFrame frame = buildFrame();
 
         frame.add(new ImagePanel());

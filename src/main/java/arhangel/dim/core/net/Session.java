@@ -84,7 +84,7 @@ public class Session implements ConnectionHandler, Runnable {
         } catch (IOException e) {
             Server.getLog().error(e.getMessage());
         }
-        Server.getLog().debug("End of session");
+        Server.getLog().info("End of session");
     }
 
     public Session(Socket socket, Server server) {

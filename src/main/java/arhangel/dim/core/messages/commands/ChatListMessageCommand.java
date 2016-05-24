@@ -1,11 +1,10 @@
 package arhangel.dim.core.messages.commands;
 
-import arhangel.dim.core.Chat;
-import arhangel.dim.core.messages.*;
-import arhangel.dim.core.net.ProtocolException;
+import arhangel.dim.core.messages.ChatListResultMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
 import arhangel.dim.core.net.Session;
 
-import java.io.IOException;
 import java.util.List;
 
 /**

@@ -2,11 +2,14 @@ package arhangel.dim.core.messages.commands;
 
 import arhangel.dim.core.Chat;
 import arhangel.dim.core.User;
-import arhangel.dim.core.messages.*;
-import arhangel.dim.core.net.ProtocolException;
+import arhangel.dim.core.messages.ChatHistMessage;
+import arhangel.dim.core.messages.ChatHistResultMessage;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.StatusMessage;
+import arhangel.dim.core.messages.TextClientMessage;
+import arhangel.dim.core.messages.TextMessage;
 import arhangel.dim.core.net.Session;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

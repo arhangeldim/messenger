@@ -14,8 +14,9 @@ public class PgUserStore implements UserStore {
     public User addUser(User user) {
         Object[] args = {user.getName(), user.getPassword()};
         try {
-            user.setId(executor.execUpdate("INSERT INTO USERS (login, password)"
-                    + "VALUES(?, ?)", args));
+            user.setId(executor.execUpdate("INSERT INTO USERS (login, " +
+                    "password)" +
+                    "VALUES(?, ?)", args));
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -27,8 +28,9 @@ public class PgUserStore implements UserStore {
     public User updateUser(User user) {
         Object[] args = {user.getName(), user.getPassword()};
         try {
-            executor.execQuery("UPDATE USERS SET LOGIN=?, PASSWORD=? WHERE ID=?",
-                    args, rs -> {} );
+            executor.execQuery("UPDATE USERS SET LOGIN=?, " +
+                            "PASSWORD=? WHERE ID=?",
+                    args, rs -> { } );
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -46,8 +48,11 @@ public class PgUserStore implements UserStore {
             executor.execQuery("SELECT ID FROM USERS WHERE LOGIN=? AND PASSWORD=?",
                     args, rs -> {
                         try {
-                            rs.next();
-                            result[0].setId(rs.getLong("ID"));
+                            if (rs.next()) {
+                                result[0].setId(rs.getLong("ID"));
+                            } else {
+                                result[0] = null;
+                            }
                         } catch (SQLException e) {
                             e.printStackTrace();
                             result[0] = null;
@@ -69,9 +74,12 @@ public class PgUserStore implements UserStore {
             executor.execQuery("SELECT LOGIN, PASSWORD FROM USERS WHERE ID=?",
                     args, rs -> {
                         try {
-                            rs.next();
-                            result[0].setPassword(rs.getString("PASSWORD"));
-                            result[0].setName(rs.getString("LOGIN"));
+                            if (rs.next()) {
+                                result[0].setPassword(rs.getString("PASSWORD"));
+                                result[0].setName(rs.getString("LOGIN"));
+                            } else {
+                                result[0] = null;
+                            }
                         } catch (SQLException e) {
                             e.printStackTrace();
                             result[0] = null;

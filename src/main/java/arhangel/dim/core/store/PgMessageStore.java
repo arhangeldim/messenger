@@ -27,17 +27,17 @@ public class PgMessageStore implements MessageStore {
         try {
             executor.execQuery("SELECT CHAT_ID from CHAT_USER " +
                             "where USER_ID = ?",
-                args,
-                rs -> {
-                    try {
-                        while (rs.next()) {
-                            result.get(0).add(rs.getLong("CHAT_ID"));
+                    args,
+                    rs -> {
+                        try {
+                            while (rs.next()) {
+                                result.get(0).add(rs.getLong("CHAT_ID"));
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            result.set(0, null);
                         }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        result.set(0, null);
-                    }
-                });
+                    });
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -52,17 +52,17 @@ public class PgMessageStore implements MessageStore {
         try {
             executor.execQuery("SELECT USER_ID from CHAT_USER" +
                             " where CHAT_ID = ?",
-                args,
-                rs -> {
-                    try {
-                        while (rs.next()) {
-                            result[0].getUsers().add(rs.getLong("USER_ID"));
+                    args,
+                    rs -> {
+                        try {
+                            while (rs.next()) {
+                                result[0].getUsers().add(rs.getLong("USER_ID"));
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            result[0] = null;
                         }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        result[0] = null;
-                    }
-                });
+                    });
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -77,17 +77,17 @@ public class PgMessageStore implements MessageStore {
         final boolean[] failed = {false};
         try {
             executor.execQuery("SELECT ID from MESSAGES where CHAT_ID = ?",
-                args,
-                rs -> {
-                    try {
-                        while (rs.next()) {
-                            result.add(rs.getLong("ID"));
+                    args,
+                    rs -> {
+                        try {
+                            while (rs.next()) {
+                                result.add(rs.getLong("ID"));
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            failed[0] = true;
                         }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        failed[0] = true;
-                    }
-                });
+                    });
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -108,18 +108,21 @@ public class PgMessageStore implements MessageStore {
                     " FROM MESSAGES " +
                     "WHERE ID = ?", args, rs -> {
                     try {
-                        //if !rs.next()
-                        rs.next();
-                        result[0].setChatId(rs.getLong("CHAT_ID"));
-                        result[0].setSenderId(rs.getLong("USER_ID"));
-                        result[0].setText(rs.getString("CONTENT"));
-                        result[0].setTimestamp(rs.getTimestamp("TIME")
-                                .toLocalDateTime());
+                        if (!rs.next()) {
+                            result[0] = null;
+                        } else {
+                            result[0].setChatId(rs.getLong("CHAT_ID"));
+                            result[0].setSenderId(rs.getLong("USER_ID"));
+                            result[0].setText(rs.getString("CONTENT"));
+                            result[0].setTimestamp(rs.getTimestamp("TIME")
+                                    .toLocalDateTime());
+                        }
                     } catch (SQLException e) {
                         e.printStackTrace();
                         result[0] = null;
                     }
-            });
+                }
+            );
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -131,7 +134,7 @@ public class PgMessageStore implements MessageStore {
     public Message addMessage(Long chatId, Message message) {
         TextMessage tm = (TextMessage) message;
         Object[] args = {tm.getChatId(), tm.getSenderId(), tm.getText(),
-                         Timestamp.valueOf(tm.getTimestamp())};
+                Timestamp.valueOf(tm.getTimestamp())};
         try {
             tm.setId(executor.execUpdate(
                     "INSERT INTO MESSAGES(CHAT_ID, USER_ID, CONTENT, TIME)" +
@@ -149,7 +152,8 @@ public class PgMessageStore implements MessageStore {
         try {
             executor.execQuery("INSERT INTO CHAT_USER(CHAT_ID, USER_ID)" +
                     "VALUES (?, ?)", args, rs -> {
-            });
+                }
+            );
         } catch (SQLException e) {
             e.printStackTrace();
         }

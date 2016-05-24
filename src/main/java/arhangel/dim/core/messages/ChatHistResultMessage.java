@@ -1,6 +1,5 @@
 package arhangel.dim.core.messages;
 
-import javax.xml.soap.Text;
 import java.util.List;
 
 /**

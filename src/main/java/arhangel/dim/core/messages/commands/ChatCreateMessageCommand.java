@@ -79,8 +79,8 @@ public class ChatCreateMessageCommand implements Command {
         firstMessage.setTimestamp(LocalDateTime.now());
         firstMessage.setSenderId(session.getUser().getId());
         firstMessage.setChatId(newChatId);
-        firstMessage.setText("User " + session.getUser().getName()
-                + " started chat #" + newChatId.toString());
+        firstMessage.setText("User " + session.getUser().getName() +
+                " started chat #" + newChatId.toString());
         CommandByMessage.getCommand(firstMessage.getType())
                 .execute(session, firstMessage);
     }
