@@ -1,0 +1,17 @@
+2016-06-21 17:22:03 INFO  Client:90 - Starting listener thread...
+2016-06-21 17:22:33 INFO  Client:146 - Message{id=null, senderId=null, type=MSG_CHAT_HIST}
+2016-06-21 17:22:33 INFO  Client:117 - Message received: Sign in please
+2016-06-21 17:22:40 INFO  Client:146 - Message{id=null, senderId=null, type=MSG_LOGIN}
+2016-06-21 17:22:40 INFO  Client:117 - Message received: Successfully signed in
+2016-06-21 17:22:46 INFO  Client:136 - Invalid Message
+2016-06-21 17:22:53 INFO  Client:146 - Message{id=null, senderId=null, type=MSG_CHAT_HIST}
+2016-06-21 17:22:53 INFO  Client:117 - Message received: Chat ID 2016-06-21 17:22:59 INFO  Server:109 - Incoming message
+2016-06-21 17:23:05 INFO  Server:109 - Incoming message
+2016-06-21 17:23:12 INFO  Server:109 - Incoming message
+2016-06-21 17:23:30 INFO  Server:94 - Session closed
+2016-06-21 17:23:32 INFO  Server:94 - Session closed
+sage{id=null, senderId=null, type=MSG_CHAT_HIST}
+2016-06-21 17:23:12 INFO  Client:117 - Message received: Chat ID = 5 history:
+qq
+qq
+odin

@@ -7,14 +7,15 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import arhangel.dim.container.CycleReferenceException;
+import arhangel.dim.core.messages.InvalidMessageException;
+import arhangel.dim.core.messages.Message;
+import arhangel.dim.core.messages.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import arhangel.dim.container.Container;
 import arhangel.dim.container.InvalidConfigurationException;
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
 import arhangel.dim.core.net.ConnectionHandler;
 import arhangel.dim.core.net.Protocol;
 import arhangel.dim.core.net.ProtocolException;
@@ -23,6 +24,9 @@ import arhangel.dim.core.net.ProtocolException;
  * Клиент для тестирования серверного приложения
  */
 public class Client implements ConnectionHandler {
+
+    private String help = "/login <name> <pass>\n/info [id]\n/chat_list\n/chat_create <id1> [<id2>] ...\n" +
+            "/text <id> <text>\n/chat_history";
 
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
@@ -33,6 +37,7 @@ public class Client implements ConnectionHandler {
      * Протокол, хост и порт инициализируются из конфига
      *
      * */
+    private ClientMessageFactory messageFactory = new ClientMessageFactory();
     private Protocol protocol;
     private int port;
     private String host;
@@ -110,6 +115,7 @@ public class Client implements ConnectionHandler {
     @Override
     public void onMessage(Message msg) {
         log.info("Message received: {}", msg);
+        System.out.println(msg);
     }
 
     /**
@@ -117,27 +123,18 @@ public class Client implements ConnectionHandler {
      * Формат строки можно посмотреть в вики проекта
      */
     public void processInput(String line) throws IOException, ProtocolException {
-        String[] tokens = line.split(" ");
-        log.info("Tokens: {}", Arrays.toString(tokens));
-        String cmdType = tokens[0];
-        switch (cmdType) {
-            case "/login":
-                // TODO: реализация
-                break;
-            case "/help":
-                // TODO: реализация
-                break;
-            case "/text":
-                // FIXME: пример реализации для простого текстового сообщения
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                sendMessage.setText(tokens[1]);
-                send(sendMessage);
-                break;
-            // TODO: implement another types from wiki
+        //TODO implement this method
+        try {
+            Message msg = messageFactory.createMessage(line);
+            if (msg.getType() == Type.MSG_HELP) {
+                System.out.println(help);
+            } else {
+                send(msg);
 
-            default:
-                log.error("Invalid input: " + line);
+            }
+        } catch (InvalidMessageException invalidMessage) {
+            log.info("Invalid Message");
+            System.out.println(help);
         }
     }
 
@@ -153,17 +150,23 @@ public class Client implements ConnectionHandler {
 
     @Override
     public void close() {
-        // TODO: написать реализацию. Закройте ресурсы и остановите поток-слушатель
+        socketThread.interrupt();
+        try {
+            in.close();
+            out.close();
+            socketThread.join();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) throws Exception {
-
+    public static void main(String[] args) {
         Client client = null;
         // Пользуемся механизмом контейнера
         try {
             Container context = new Container("client.xml");
             client = (Client) context.getByName("client");
-        } catch (InvalidConfigurationException e) {
+        } catch (InvalidConfigurationException | CycleReferenceException e) {
             log.error("Failed to create client", e);
             return;
         }

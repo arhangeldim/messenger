@@ -1,8 +1,6 @@
 package arhangel.dim.container.beans;
 
-/**
- *
- */
+
 public class Gear {
     private int count;
 

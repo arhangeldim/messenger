@@ -46,34 +46,77 @@ public class Container {
 
     private void instantiateBean(Bean bean) throws InvalidConfigurationException {
         String className = bean.getClassName();
-        Object ob;
+        Object ob = null;
         try {
             Class clazz = Class.forName(className);
             ob = clazz.newInstance();
             for (String name : bean.getProperties().keySet()) {
                 Property property = bean.getProperties().get(name);
                 String methodName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                Method setter = null;
+                for (Method method: clazz.getDeclaredMethods()) {
+                    if (method.getName().equals(methodName)) {
+                        setter = method;
+                    }
+                }
                 if (property.getType() == ValueType.REF) {
                     Object ref = getByName(property.getValue());
-                    Method method = clazz.getMethod(methodName, ref.getClass());
-                    method.invoke(ob, ref);
+                    setter.invoke(ob, ref);
                 } else {
-                    Method method = clazz.getMethod(methodName, int.class);
-                    method.invoke(ob, Integer.parseInt(property.getValue()));
+                    Field field = clazz.getDeclaredField(name);
+                    String value = property.getValue();
+                    switch (field.getType().getName()) {
+                        case "Boolean":
+                        case "boolean":
+                            setter.invoke(ob, Boolean.parseBoolean(value));
+                            break;
+                        case "byte":
+                        case "Byte":
+                            setter.invoke(ob, Byte.parseByte(value));
+                            break;
+                        case "int":
+                        case "Integer":
+                            setter.invoke(ob, Integer.parseInt(value));
+                            break;
+                        case "short":
+                        case "Short":
+                            setter.invoke(ob, Short.parseShort(value));
+                            break;
+                        case "long":
+                        case "Long":
+                            setter.invoke(ob, Long.parseLong(value));
+                            break;
+                        case "float":
+                        case "Float":
+                            setter.invoke(ob, Float.parseFloat(value));
+                            break;
+                        case "double":
+                        case "Double":
+                            setter.invoke(ob, Double.parseDouble(value));
+                            break;
+                        case "java.lang.String":
+                            setter.invoke(ob, value);
+                            break;
+                        default:
+                            throw new Exception("cannot set the field " + field.toString());
+                    };
                 }
             }
         } catch (InstantiationException e) {
             throw new InvalidConfigurationException("InstantiationException");
         } catch (InvocationTargetException e) {
             throw new InvalidConfigurationException("InvocationTargetException");
-        } catch (NoSuchMethodException e) {
-            throw new InvalidConfigurationException("NoSuchMethodException");
         } catch (IllegalAccessException e) {
             throw new InvalidConfigurationException("IllegalAccessException");
         } catch (ClassNotFoundException e) {
             System.out.println(bean.getClassName());
             throw new InvalidConfigurationException("ClassNotFoundException");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        //TODO refactor catches
         objByName.put(bean.getName(), ob);
         objByClassName.put(bean.getClassName(), ob);
 

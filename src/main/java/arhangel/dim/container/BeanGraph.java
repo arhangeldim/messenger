@@ -21,9 +21,7 @@ public class BeanGraph {
     }
 
     public BeanGraph(List<Bean> beans) {
-        for (Bean bean: beans) {
-            this.addVertex(bean);
-        }
+        beans.forEach(this::addVertex);
     }
 
     /**
