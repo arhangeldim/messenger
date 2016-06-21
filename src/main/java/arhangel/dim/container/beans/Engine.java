@@ -1,8 +1,6 @@
 package arhangel.dim.container.beans;
 
-/**
- *
- */
+
 public class Engine {
     private int power;
 

@@ -1,8 +1,6 @@
 package arhangel.dim.container.beans;
 
-/**
- *
- */
+
 public class Car {
     private Gear gear;
     private Engine engine;
