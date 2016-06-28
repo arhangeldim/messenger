@@ -53,102 +53,60 @@ public class Container {
         return objByClassName.get(className);
     }
 
-    private void instantiateBean(Bean bean) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private void instantiateBean(Bean bean) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvalidConfigurationException {
 
-        String className = bean.getClassName();
-        Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
 
-        for (String name : bean.getProperties().keySet()) {
-            try {
+        // Примерный ход работы
+
+        try {
+
+            String className = bean.getClassName();
+            Class clazz = Class.forName(className);
+            // ищем дефолтный конструктор
+            Object ob = clazz.newInstance();
+
+            for (String name : bean.getProperties().keySet()) {
+                // ищем поле с таким именен внутри класса
+                // учитывая приватные
                 Field field = clazz.getDeclaredField(name);
+                // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
+
+                // Делаем приватные поля доступными
                 field.setAccessible(true);
 
-                if (bean.getProperties().get(name).getType()
-                        .equals(ValueType.VAL)) {                       // Если поле - значение
-                    switch (field.getType().getName()) {
-                        case "int":
-                            field.set(ob, Integer.parseInt(bean.getProperties().get(name).getValue()));
+                // Далее определяем тип поля и заполняем его
+                // Если поле - примитив, то все просто
+                // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
+
+                ValueType type = bean.getProperties().get(name).getType();
+                if (type == ValueType.VAL) {
+
+                    String fieldType = field.getType().getSimpleName();
+                    switch (fieldType) {
+                        case "Integer": field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
                             break;
-                        case "float":
-                            field.set(ob, Float.parseFloat(bean.getProperties().get(name).getValue()));
-                            break;
-                        case "java.lang.String":
-                            field.set(ob, bean.getProperties().get(name).getValue());
-                            break;
-                        default:
+                        case "String": field.set(ob, bean.getProperties().get(name).toString());
                             break;
                     }
-                } else if (bean.getProperties().get(name).getType()
-                        .equals(ValueType.REF)) {                // Если поле - ссылка
-                    Object objToRef = objByClassName.get(bean.getProperties().get(name).getValue());
-                    field.set(ob, objToRef);
-                }
-            } catch (Exception e) {
-                e.getMessage();
-            }
-        }
-        objByClassName.put(clazz.getName(), ob);
-        objByName.put(bean.getName(), ob);
-    }
 
-//    private void instantiateBean(Bean bean) throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvalidConfigurationException {
-//
-//
-//        // Примерный ход работы
-//
-//        try {
-//
-//            String className = bean.getClassName();
-//            Class clazz = Class.forName(className);
-//            // ищем дефолтный конструктор
-//            Object ob = clazz.newInstance();
-//
-//            for (String name : bean.getProperties().keySet()) {
-//                // ищем поле с таким именен внутри класса
-//                // учитывая приватные
-//                Field field = clazz.getDeclaredField(name);
-//                // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
-//
-//                // Делаем приватные поля доступными
-//                field.setAccessible(true);
-//
-//                Method method = clazz.getDeclaredMethod("set" + name, );
-//
-//                // Далее определяем тип поля и заполняем его
-//                // Если поле - примитив, то все просто
-//                // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
-//
-//                ValueType type = bean.getProperties().get(name).getType();
-//                if (type == ValueType.VAL) {
-//
-//                    String fieldType = field.getType().getSimpleName();
-//                    switch (fieldType) {
-//                        case "Integer": field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
-//                            break;
-//                        case "String": field.set(ob, bean.getProperties().get(name).toString());
-//                            break;
-//                    }
-//
-//                } else {
-//
-//                    if (objByName.get(bean.getProperties().get(name).getValue()) == null) {
-//                        System.out.println("null");
-//                    }
-//                    field.set(ob, objByName.get(bean.getProperties().get(name).getValue()));
-//                }
-//
-//
-//            }
-//
-//            objByName.put(bean.getName(), ob);
-//            objByClassName.put(bean.getClassName(), ob);
-//        } catch (NoSuchFieldException e) {
-//            throw new InvalidConfigurationException("config.xml error: requested class does not exist");
-//        }
-//
-//
-//    }
+                } else {
+
+                    if (objByName.get(bean.getProperties().get(name).getValue()) == null) {
+                        System.out.println("null");
+                    }
+                    field.set(ob, objByName.get(bean.getProperties().get(name).getValue()));
+                }
+
+
+            }
+
+            objByName.put(bean.getName(), ob);
+            objByClassName.put(bean.getClassName(), ob);
+        } catch (NoSuchFieldException e) {
+            throw new InvalidConfigurationException("config.xml error: requested class does not exist");
+        }
+
+
+    }
 
 }
