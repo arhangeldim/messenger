@@ -7,6 +7,15 @@ import java.util.Objects;
  */
 public class TextMessage extends Message {
     private String text;
+    private Long chatId;
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
 
     public String getText() {
         return text;
@@ -14,6 +23,16 @@ public class TextMessage extends Message {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public TextMessage() {}
+
+    public TextMessage(Long id, Long senderId, Long chatId, String text) {
+        this.id = id;
+        this.senderId = senderId;
+        this.chatId = chatId;
+        this.text = text;
+        this.type = Type.MSG_TEXT;
     }
 
     @Override
@@ -39,7 +58,10 @@ public class TextMessage extends Message {
     @Override
     public String toString() {
         return "TextMessage{" +
-                "text='" + text + '\'' +
+                "id=" + id +
+                ", senderId=" + senderId +
+                ", text='" + text +
+                ", chatId=" + chatId +
                 '}';
     }
 }

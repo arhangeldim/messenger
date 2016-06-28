@@ -13,7 +13,7 @@ import org.junit.Assert;
 
 /**
  *
- */
+*/
 public class BeanGraphTest {
 
     private BeanGraph graph;
@@ -58,3 +58,4 @@ public class BeanGraphTest {
         Assert.assertEquals(4, graph.size());
     }
 }
+

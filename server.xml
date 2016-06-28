@@ -2,9 +2,9 @@
 
     <bean id="protocol" class="arhangel.dim.core.net.StringProtocol"/>
 
-    <bean id="client" class="arhangel.dim.client.Client">
+    <bean id="server" class="arhangel.dim.server.Server">
         <property name="port" val="19000"/>
-        <property name="host" val="localhost"/>
+        <!--<property name="host" val="localhost"/>-->
         <property name="protocol" ref="protocol"/>
     </bean>
 

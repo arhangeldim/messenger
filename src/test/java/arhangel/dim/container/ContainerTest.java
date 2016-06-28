@@ -21,10 +21,12 @@ public class ContainerTest {
     private static Engine expectedEngine;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws IllegalAccessException, ClassNotFoundException, InstantiationException {
         try {
             container = new Container("config.xml");
         } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+        } catch (CycleReferenceException e) {
             e.printStackTrace();
         }
         Assert.assertTrue(container != null);
