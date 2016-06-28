@@ -87,6 +87,8 @@ public class Container {
                             break;
                         case "String": field.set(ob, bean.getProperties().get(name).toString());
                             break;
+                        default:
+                            break;
                     }
 
                 } else {
