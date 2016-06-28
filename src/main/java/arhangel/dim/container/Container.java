@@ -83,7 +83,7 @@ public class Container {
 
                     String fieldType = field.getType().getSimpleName();
                     switch (fieldType) {
-                        case "Integer": field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
+                        case "int": field.set(ob, Integer.valueOf(bean.getProperties().get(name).getValue()));
                             break;
                         case "String": field.set(ob, bean.getProperties().get(name).toString());
                             break;
