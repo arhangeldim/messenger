@@ -8,9 +8,9 @@ import java.util.Objects;
  */
 public abstract class Message implements Serializable {
 
-    private Long id;
-    private Long senderId;
-    private Type type;
+    protected Long id;
+    protected Long senderId;
+    protected Type type;
 
     public Long getId() {
         return id;
@@ -34,6 +34,13 @@ public abstract class Message implements Serializable {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public Message(){}
+
+    public Message(Long id, Long senderId) {
+        this.id = id;
+        this.senderId = senderId;
     }
 
     @Override
