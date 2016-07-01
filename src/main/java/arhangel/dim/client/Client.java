@@ -100,6 +100,7 @@ public class Client implements ConnectionHandler {
             }
 
             initSocket();
+            return;
         }
 
         /**
@@ -114,9 +115,8 @@ public class Client implements ConnectionHandler {
                     int read = in.read(buf);
 
                     if (read > 0) {
-                        // По сети передается поток байт, его нужно раскодировать с помощью протокола
+                        log.info("< New Message received >");
                         Message msg = protocol.decode(Arrays.copyOf(buf, read));
-                        log.info("Decoded message:" + msg);
                         onMessage(msg);
                     }
                 } catch (Exception e) {
@@ -134,12 +134,11 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void onMessage(Message msg) {
-        log.info("Message received: {}", msg);
-
         switch (msg.getType()) {
             case MSG_STATUS:
                 StatusMessage msgStatus = (StatusMessage) msg;
                 log.info(msgStatus.getStatus());
+                System.out.println(msgStatus.getStatus());
                 break;
             case MSG_CHAT_LIST_RESULT:
                 ListChatResultMessage msgChatListResult = (ListChatResultMessage) msg;
@@ -150,16 +149,21 @@ public class Client implements ConnectionHandler {
                             .map(Object::toString)
                             .collect(Collectors.toList())));
                 }
+                System.out.println("Ваши активные чаты: " + String.join(",", msgChatListResult.getChatIds().stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList())));
                 break;
             case MSG_INFO:
                 InfoMessage infoMessage = (InfoMessage) msg;
-                log.info("User: " + infoMessage.getUserId() + ".");
+                log.info(infoMessage.getInfo());
                 break;
             case MSG_TEXT:
                 log.info(msg.toString());
+                System.out.println(msg.toString());
                 break;
             default:
                 log.error("Данный тип сообщений не поддерживается");
+                System.err.println("Полученный тип сообщений не поддерживается");
                 break;
         }
     }
@@ -206,12 +210,12 @@ public class Client implements ConnectionHandler {
                 break;
             case "/info":
                 InfoMessage infoMessage = new InfoMessage();
-                if (tokens.length == 1) {
-                    infoMessage.setArg(false);
-                } else {
-                    infoMessage.setArg(true);
+                if (tokens.length > 1) {
                     infoMessage.setUserId(Long.parseLong(tokens[1]));
+                } else {
+                    infoMessage.setUserId(-1);
                 }
+                infoMessage.setInfo(null);
                 send(infoMessage);
                 break;
             case "/chat_create":
@@ -238,7 +242,7 @@ public class Client implements ConnectionHandler {
      */
     @Override
     public void send(Message msg) throws IOException, ProtocolException {
-        log.info("send to server: " + msg.toString());
+        log.info("< Sending new message >");
         out.write(protocol.encode(msg));
         out.flush();
     }
