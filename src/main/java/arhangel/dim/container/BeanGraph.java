@@ -1,9 +1,13 @@
 package arhangel.dim.container;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import arhangel.dim.container.exceptions.CycleReferenceException;
+
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
+
+import static java.util.Collections.reverse;
 
 /**
  *
@@ -11,53 +15,53 @@ import java.util.Map;
 public class BeanGraph {
     // Граф представлен в виде списка связности для каждой вершины
     private Map<BeanVertex, List<BeanVertex>> vertices = new HashMap<>();
-
-    public Map<BeanVertex, List<BeanVertex>> getVertexMap() {
-        return vertices;
-    }
+    private Map<String, BeanVertex> vertexByName = new HashMap<>();
 
     /**
      * Добавить вершину в граф
-     *
      * @param value - объект, привязанный к вершине
      */
     public BeanVertex addVertex(Bean value) {
         BeanVertex newVertex = new BeanVertex(value);
-        vertices.put(newVertex, new ArrayList<>());
+
+        vertices.put(newVertex, new ArrayList<BeanVertex>());
+        vertexByName.put(value.getName(), newVertex);
+
         return newVertex;
-    }
-
-    public void updateGraphLinks() {
-        for (BeanVertex currentBeanVertex : vertices.keySet()) {
-
-            if (currentBeanVertex.getBean().getProperties() == null) {
-                continue;
-            }
-            for (BeanVertex destinationBeanVertex : vertices.keySet()) {
-                if (destinationBeanVertex.getBean().getProperties() == null ||
-                        destinationBeanVertex.equals(currentBeanVertex)) {
-                    continue;
-                }
-
-                for (Property currentProperty : destinationBeanVertex.getBean().getProperties().values()) {
-                    if ((currentProperty.getType() == ValueType.REF) &&
-                            currentProperty.getValue().equals(currentBeanVertex.getBean().getName())) {
-                        addEdge(destinationBeanVertex, currentBeanVertex);
-                    }
-                }
-            }
-        }
     }
 
     /**
      * Соединить вершины ребром
-     *
      * @param from из какой вершины
-     * @param to   в какую вершину
+     * @param to в какую вершину
      */
-    public void addEdge(BeanVertex from, BeanVertex to) {
-        if (!vertices.get(from).contains(to)) {
-            vertices.get(from).add(to);
+    public void addEdge(BeanVertex from ,BeanVertex to) {
+        List<BeanVertex> incidentVertices = vertices.get(from);
+        incidentVertices.add(to);
+    }
+
+    public BeanGraph() {}
+
+    public BeanGraph(List<Bean> beans) {
+        // adding all the vertices
+        for (Bean bean : beans) {
+            addVertex(bean);
+        }
+
+        // adding edges between vertices
+        for (Bean bean : beans) {
+            BeanVertex from = vertexByName.get(bean.getName());
+
+            HashMap<String, Property> properties = (HashMap<String, Property>) bean.getProperties();
+            for (Property property : properties.values()) {
+
+                if (property.getType() == ValueType.VAL) {
+                    continue;
+                }
+
+                BeanVertex to = vertexByName.get(property.getName());
+                addEdge(from, to);
+            }
         }
     }
 
@@ -65,8 +69,8 @@ public class BeanGraph {
      * Проверяем, связаны ли вершины
      */
     public boolean isConnected(BeanVertex v1, BeanVertex v2) {
-        return vertices.get(v1).contains(v2);
-
+        List<BeanVertex> incidentVertices = vertices.get(v1);
+        return incidentVertices.contains(v2);
     }
 
     /**
@@ -83,80 +87,52 @@ public class BeanGraph {
         return vertices.size();
     }
 
-
-    //Фичи для графов:
-    private Map<BeanVertex, Boolean> used = new HashMap<BeanVertex, Boolean>();
-    private Map<BeanVertex, Boolean> left = new HashMap<BeanVertex, Boolean>();
-    private List<BeanVertex> sortedVertexes = new ArrayList<BeanVertex>();
-
-    public List<BeanVertex> getSortedVertexes() throws InvalidConfigurationException {
-
-
-        if (isCorrect()) {
-            return topSort();
-        } else {
-            throw new InvalidConfigurationException("Ошибка конфигурации: Граф загрузки цикличен!");
-        }
+    private enum VertexType {
+        NOT_PROCESSED, // dfs в вершину еще не заходил
+        STARTED_PROCESSING, // dfs зашел в вершину
+        FINISHED_PROCESSING // dfs вышел из вершины
     }
 
-    public boolean isCorrect() {
-        for (BeanVertex beanVertex : vertices.keySet()) {
-            used.put(beanVertex, false);
-            left.put(beanVertex, false);
-        }
+    /**
+     * Проверить граф на наличие циклов
+     */
+    private boolean isCircle(BeanVertex vertex, List<BeanVertex> sortedVertices,
+                             Map<BeanVertex, VertexType> usedVertices) {
+        usedVertices.put(vertex, VertexType.STARTED_PROCESSING);
 
-        for (BeanVertex beanVertex : vertices.keySet()) {
-            if (!used.get(beanVertex)) {
-                if (dfsCheck(beanVertex)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return true;
-
-    }
-
-
-    private boolean dfsCheck(BeanVertex beanVertex) {
-        used.put(beanVertex, true);
-        for (BeanVertex next : getLinked(beanVertex)) {
-            if (used.get(next) && !left.get(next)) {
-                return true;
-            }
-            if (!used.get(next) && dfsCheck(next)) {
+        for (BeanVertex incidentVertex : vertices.get(vertex)) {
+            if (usedVertices.get(incidentVertex).equals(VertexType.NOT_PROCESSED)) {
+                isCircle(incidentVertex, sortedVertices, usedVertices);
+            } else if (usedVertices.get(incidentVertex).equals(VertexType.STARTED_PROCESSING)) {
                 return true;
             }
         }
-        left.put(beanVertex, true);
+        sortedVertices.add(vertex);
+        usedVertices.put(vertex, VertexType.FINISHED_PROCESSING);
         return false;
     }
 
+    /**
+     * Отсортировать вершины графа в топологическом порядке
+     */
+    public List<BeanVertex> sortTopologically() throws CycleReferenceException {
+        Map<BeanVertex, VertexType> usedVertices = new HashMap<>();
+        for (BeanVertex vertex : vertices.keySet()) {
+            usedVertices.put(vertex, VertexType.NOT_PROCESSED);
+        }
+        List<BeanVertex> sortedVertices = new ArrayList<>();
 
-    private void dfs(BeanVertex beanVertex) {
-        used.put(beanVertex, true);
-        for (BeanVertex nextBean : getLinked(beanVertex)) {
-            if (!used.get(nextBean)) {
-                dfs(nextBean);
+        for (BeanVertex vertex : vertices.keySet()) {
+            if (!usedVertices.get(vertex).equals(0)) {
+                continue;
             }
-        }
-        sortedVertexes.add(beanVertex);
-    }
 
-
-    public List<BeanVertex> topSort() {
-        sortedVertexes.clear();
-        used.clear();
-        for (BeanVertex beanVertex : vertices.keySet()) {
-            used.put(beanVertex, false);
-        }
-        for (BeanVertex beanVertex : vertices.keySet()) {
-            if (!used.get(beanVertex)) {
-                dfs(beanVertex);
+            boolean foundCircle = isCircle(vertex, sortedVertices, usedVertices);
+            if (foundCircle) {
+                throw new CycleReferenceException("circle reference found");
             }
+
         }
-
-        return sortedVertexes;
+        return sortedVertices;
     }
-
 }

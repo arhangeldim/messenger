@@ -1,27 +1,23 @@
 package arhangel.dim.container;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
+import arhangel.dim.container.exceptions.InvalidConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-/**
- * Created by spec45as on 3/22/2016.
- */
 public class BeanXmlReader {
-
     private static final String TAG_BEAN = "bean";
     private static final String TAG_PROPERTY = "property";
     private static final String ATTR_NAME = "name";
@@ -30,66 +26,55 @@ public class BeanXmlReader {
     private static final String ATTR_BEAN_ID = "id";
     private static final String ATTR_BEAN_CLASS = "class";
 
-    public BeanXmlReader() {
-    }
-
-    public Document loadXmlFile(String name) throws IOException, ParserConfigurationException, SAXException {
-        return loadXmlFile(new FileInputStream(name));
-    }
-
-    public Document loadXmlFile(InputStream is) throws IOException, ParserConfigurationException, SAXException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-    }
-
     public List<Bean> parseBeans(String pathToFile) throws InvalidConfigurationException {
-        Document document = null;
-        List<Bean> allBeans = new ArrayList<Bean>();
         try {
-            document = loadXmlFile(pathToFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new InvalidConfigurationException(String.format("XML file not found: %s", pathToFile));
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-            throw new InvalidConfigurationException(String.format("XML parser configuration error on: %s", pathToFile));
-        } catch (SAXException e) {
-            e.printStackTrace();
-            throw new InvalidConfigurationException(String.format("XML file SAX parsing error: %s", pathToFile));
-        }
+            File xmlFile = new File(pathToFile);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dbBuilder = dbFactory.newDocumentBuilder();
+            Document document = dbBuilder.parse(xmlFile);
 
-        document.getDocumentElement().normalize();
-        NodeList nodeList = document.getElementsByTagName(TAG_BEAN);
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (Node.ELEMENT_NODE == node.getNodeType()) {
-                Element beanElement = (Element) node;
-                String beanId = beanElement.getAttribute(ATTR_BEAN_ID);
-                String beanClass = beanElement.getAttribute(ATTR_BEAN_CLASS);
-                NodeList allProperties = beanElement.getElementsByTagName(TAG_PROPERTY);
+            NodeList beanNodeList = document.getElementsByTagName(TAG_BEAN);
+            List<Bean> beanList = new ArrayList<Bean>();
+            for (int i = 0; i < beanNodeList.getLength(); i++) {
+                Node beanNode = beanNodeList.item(i);
 
-                Map<String, Property> propertiesMap = new HashMap<String, Property>();
-                for (int j = 0; j < allProperties.getLength(); j++) {
-                    Element currentProperty = (Element) allProperties.item(j);
-                    String propertyAtrName = currentProperty.getAttribute(ATTR_NAME);
-                    String propertyAtrValue = currentProperty.getAttribute(ATTR_VALUE);
+                if (beanNode.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
 
-                    ValueType propertyValueType = ValueType.VAL;
-                    if (propertyAtrValue.equals("")) {
-                        propertyValueType = ValueType.REF;
-                        propertyAtrValue = currentProperty.getAttribute(ATTR_REF);
+                Element beanElement = (Element) beanNode;
+
+                String id = beanElement.getAttribute(ATTR_BEAN_ID);
+                String clazz = beanElement.getAttribute(ATTR_BEAN_CLASS);
+
+                NodeList propertyList = beanElement.getElementsByTagName(TAG_PROPERTY);
+                HashMap<String, Property> properties = new HashMap<String, Property>();
+                for (int j = 0; j < propertyList.getLength(); j++) {
+                    Node propertyNode = propertyList.item(j);
+
+                    if (propertyNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
                     }
 
-                    Property newProperty = new Property(propertyAtrName, propertyAtrValue, propertyValueType);
-                    propertiesMap.put(propertyAtrName, newProperty);
+                    Element propertyElement = (Element) propertyNode;
 
+                    String name = propertyElement.getAttribute(ATTR_NAME);
+                    String refValue = propertyElement.getAttribute(ATTR_REF);
+
+                    ValueType ref = refValue.equals("") ? ValueType.VAL : ValueType.REF;
+                    String val = refValue.equals("") ? propertyElement.getAttribute(ATTR_VALUE) : refValue;
+
+                    Property property = new Property(name, val, ref);
+                    properties.put(name, property);
                 }
-                Bean newBean = new Bean(beanId, beanClass, propertiesMap);
-                allBeans.add(newBean);
+                Bean bean = new Bean(id, clazz, properties);
+                beanList.add(bean);
             }
 
+            return beanList;
 
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            throw new InvalidConfigurationException("invalid config file format");
         }
-
-        return allBeans;
     }
 }
