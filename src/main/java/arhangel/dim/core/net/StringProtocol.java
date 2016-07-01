@@ -1,11 +1,13 @@
 package arhangel.dim.core.net;
 
+import arhangel.dim.core.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import arhangel.dim.core.messages.Message;
-import arhangel.dim.core.messages.TextMessage;
-import arhangel.dim.core.messages.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Простейший протокол передачи данных
@@ -19,16 +21,63 @@ public class StringProtocol implements Protocol {
     @Override
     public Message decode(byte[] bytes) throws ProtocolException {
         String str = new String(bytes);
-        log.info("decoded: {}", str);
+        log.info("DECODED MESSAGE: {}", str);
         String[] tokens = str.split(DELIMITER);
         Type type = Type.valueOf(tokens[0]);
         switch (type) {
             case MSG_TEXT:
                 TextMessage textMsg = new TextMessage();
                 textMsg.setSenderId(parseLong(tokens[1]));
-                textMsg.setText(tokens[2]);
-                textMsg.setType(type);
+                textMsg.setChatId(parseLong(tokens[2]));
+                textMsg.setText(tokens[3]);
                 return textMsg;
+            case MSG_INFO:
+                InfoMessage infoMessage = new InfoMessage();
+                infoMessage.setSenderId(parseLong(tokens[1]));
+                infoMessage.setUserId(parseLong(tokens[2]));
+                infoMessage.setInfo(tokens[3]);
+                return infoMessage;
+            case MSG_STATUS:
+                StatusMessage statusMessage = new StatusMessage();
+                statusMessage.setSenderId(parseLong(tokens[1]));
+                statusMessage.setStatus(tokens[2]);
+                return statusMessage;
+            case MSG_LOGIN:
+                LoginMessage loginMessage = new LoginMessage();
+                loginMessage.setSenderId(parseLong(tokens[1]));
+                loginMessage.setLogin(tokens[2]);
+                loginMessage.setPassword(tokens[3]);
+                return loginMessage;
+            case MSG_CHAT_LIST:
+                ListChatMessage listChatMessage = new ListChatMessage();
+                listChatMessage.setSenderId(parseLong(tokens[1]));
+                return listChatMessage;
+            case MSG_CHAT_CREATE:
+                CreateChatMessage chatCreateMessage = new CreateChatMessage();
+                chatCreateMessage.setSenderId(parseLong(tokens[1]));
+                String[] userIdsStr = tokens[2].split(",");
+                List<Long> userIds = new ArrayList<Long>();
+                for (int i = 0; i < userIdsStr.length; ++i) {
+                    userIds.add(Long.parseLong(userIdsStr[i]));
+                }
+                chatCreateMessage.setUsersIds(userIds);
+                return chatCreateMessage;
+            case MSG_CHAT_LIST_RESULT:
+                ListChatResultMessage chatListResultMessage = new ListChatResultMessage();
+                chatListResultMessage.setSenderId(parseLong(tokens[1]));
+                if (tokens.length >= 3) {
+                    chatListResultMessage.setChatIds(Arrays.asList(tokens[2].split(",")).stream()
+                            .map(this::parseLong)
+                            .collect(Collectors.toList()));
+                }
+                return chatListResultMessage;
+            case MSG_CHAT_HIST_RESULT:
+                HistChatResultMessage chatHistResultMessage = new HistChatResultMessage();
+                chatHistResultMessage.setSenderId(parseLong(tokens[1]));
+                if (tokens.length >= 3) {
+                    chatHistResultMessage.setHistory(tokens[2]);
+                }
+                return chatHistResultMessage;
             default:
                 throw new ProtocolException("Invalid type: " + type);
         }
@@ -43,14 +92,56 @@ public class StringProtocol implements Protocol {
             case MSG_TEXT:
                 TextMessage sendMessage = (TextMessage) msg;
                 builder.append(String.valueOf(sendMessage.getSenderId())).append(DELIMITER);
+                builder.append(sendMessage.getChatId()).append(DELIMITER);
                 builder.append(sendMessage.getText()).append(DELIMITER);
+                break;
+            case MSG_LOGIN:
+                LoginMessage loginMessage = (LoginMessage) msg;
+                builder.append(String.valueOf(loginMessage.getSenderId())).append(DELIMITER);
+                builder.append(loginMessage.getLogin()).append(DELIMITER);
+                builder.append(loginMessage.getPassword()).append(DELIMITER);
+                break;
+            case MSG_CHAT_CREATE:
+                CreateChatMessage chatCreateMessage = (CreateChatMessage) msg;
+                List<Long> userIds = chatCreateMessage.getUsersIds();
+                List<String> userIdsStr = new ArrayList<>();
+                for (int i = 0; i < userIds.size(); ++i) {
+                    userIdsStr.add(String.valueOf(userIds.get(i)));
+                }
+                builder.append(String.valueOf(chatCreateMessage.getSenderId())).append(DELIMITER);
+                builder.append(String.join(",",
+                        userIdsStr)).append(DELIMITER);
+                break;
+            case MSG_STATUS:
+                StatusMessage statusMessage = (StatusMessage) msg;
+                builder.append(String.valueOf(statusMessage.getSenderId())).append(DELIMITER);
+                builder.append(statusMessage.getStatus()).append(DELIMITER);
+                break;
+            case MSG_CHAT_LIST_RESULT:
+                ListChatResultMessage listChatResultMessage = (ListChatResultMessage) msg;
+                builder.append(String.valueOf(listChatResultMessage.getSenderId())).append(DELIMITER);
+                builder.append(String.join(",",
+                        listChatResultMessage.getChatIds().stream()
+                                .map(Object::toString)
+                                .collect(Collectors.toList()))).append(DELIMITER);
+                break;
+            case MSG_INFO:
+                InfoMessage infoMessage = (InfoMessage) msg;
+                builder.append(String.valueOf(infoMessage.getSenderId())).append(DELIMITER);
+                builder.append(infoMessage.getUserId()).append(DELIMITER);
+                builder.append(infoMessage.getInfo()).append(DELIMITER);
+                break;
+            case MSG_CHAT_LIST:
+                ListChatMessage listChatMessage = new ListChatMessage();
+                builder.append(String.valueOf(listChatMessage.getSenderId())).append(DELIMITER);
+                builder.append(listChatMessage.getChatsList()).append(DELIMITER);
                 break;
             default:
                 throw new ProtocolException("Invalid type: " + type);
 
 
         }
-        log.info("encoded: {}", builder.toString());
+        log.info("ENCODED MESSAGE: {}", builder.toString());
         return builder.toString().getBytes();
     }
 
