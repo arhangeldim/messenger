@@ -20,7 +20,7 @@ public class BeanGraphTest {
     private List<BeanVertex> vertices;
 
     @Before
-    public void initTest() {
+    public void initTest() throws Exception {
         graph = new BeanGraph();
         BeanVertex v0 = graph.addVertex(new Bean("0", null, null));
         BeanVertex v1 = graph.addVertex(new Bean("1", null, null));
