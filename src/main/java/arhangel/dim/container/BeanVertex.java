@@ -17,4 +17,11 @@ public class BeanVertex {
     public void setBean(Bean bean) {
         this.bean = bean;
     }
+
+    @Override
+    public String toString() {
+        return "BeanVertex{" +
+                "bean=" + bean +
+                '}';
+    }
 }
