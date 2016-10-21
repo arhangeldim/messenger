@@ -108,7 +108,7 @@ public class BeanXmlReader {
     }
 
     public static void main(String[] args) {
-        List<Bean> list = new BeanXmlReader().parseBeans("C:\\temp\\java\\mailru\\messenger\\config.xml");
+        List<Bean> list = new BeanXmlReader().parseBeans("C:\\temp\\java\\mailru\\messenger\\config1.xml");
         list.forEach(System.out::println);
     }
 
