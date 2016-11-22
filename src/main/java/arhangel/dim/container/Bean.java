@@ -6,15 +6,42 @@ import java.util.Map;
  * Представляет тег bean из конфига
  */
 public class Bean {
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        Bean bean = (Bean) other;
+
+        return name.equals(bean.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 
     private String name; // Уникально имя бина
     private String className; // Класс бина
     private Map<String, Property> properties; // Набор полей бина ИмяПоля-Значение
+    private Object instance;
 
     public Bean(String name, String className, Map<String, Property> properties) {
         this.name = name;
         this.className = className;
         this.properties = properties;
+    }
+
+    public void setInstance(Object instance) {
+        this.instance = instance;
+    }
+
+    public Object getInstance() {
+        return instance;
     }
 
     public Map<String, Property> getProperties() {

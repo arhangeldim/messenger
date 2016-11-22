@@ -1,6 +1,10 @@
 package arhangel.dim.container;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Используйте ваш xml reader чтобы прочитать конфиг и получить список бинов
@@ -10,55 +14,104 @@ public class Container {
 
     /**
      * Если не получается считать конфиг, то бросьте исключение
+     *
      * @throws InvalidConfigurationException неверный конфиг
      */
     public Container(String pathToConfig) throws InvalidConfigurationException {
 
         // вызываем BeanXmlReader
+        BeanXmlReader xmlReader = new BeanXmlReader();
+        beans = xmlReader.sortBeans(xmlReader.parseBeans(pathToConfig));
     }
 
     /**
-     *  Вернуть объект по имени бина из конфига
-     *  Например, Car car = (Car) container.getByName("carBean")
+     * Вернуть объект по имени бина из конфига
+     * Например, Car car = (Car) container.getByName("carBean")
      */
-    public Object getByName(String name) {
-        return null;
+    public Object getByName(String name) throws Exception {
+        List<Bean> list = beans.stream().filter(bean -> bean.getName().equals(name)).collect(Collectors.toList());
+        if (list.size() == 0) {
+            return null;
+        }
+        return instantiateBean(list.get(0));
     }
 
     /**
      * Вернуть объект по имени класса
      * Например, Car car = (Car) container.getByClass("arhangel.dim.container.Car")
      */
-    public Object getByClass(String className) {
-        return null;
+    public Object getByClass(String className) throws Exception {
+        List<Bean> list = beans
+                .stream()
+                .filter(bean -> bean.getClassName().equals(className))
+                .collect(Collectors.toList());
+        if (list.size() == 0) {
+            return null;
+        }
+        return instantiateBean(list.get(0));
     }
 
-    private void instantiateBean(Bean bean) {
+    private Object instantiateBean(Bean bean) throws Exception {
 
-        /*
-        // Примерный ход работы
+        if (bean.getInstance() != null) {
+            return bean.getInstance();
+        }
 
         String className = bean.getClassName();
         Class clazz = Class.forName(className);
-        // ищем дефолтный конструктор
-        Object ob = clazz.newInstance();
 
+        Object obj = clazz.newInstance();
 
         for (String name : bean.getProperties().keySet()) {
-            // ищем поле с таким именен внутри класса
-            // учитывая приватные
             Field field = clazz.getDeclaredField(name);
-            // проверяем, если такого поля нет, то кидаем InvalidConfigurationException с описание ошибки
 
-            // Делаем приватные поля доступными
-            field.setAccessible(true);
+            List<Method> methodList = Arrays.stream(clazz.getMethods())
+                    .filter(method
+                            -> method.getName()
+                            .equals("set" + name.substring(0, 1).toUpperCase() + name.substring(1)))
+                    .collect(Collectors.toList());
 
-            // Далее определяем тип поля и заполняем его
-            // Если поле - примитив, то все просто
-            // Если поле ссылка, то эта ссылка должа была быть инициализирована ранее
+            if (methodList.size() == 0) {
+                throw new Exception();
+            }
+            
+            Method setter = methodList.get(0);
 
-            */
-
+            if (bean.getProperties().get(name).getType().equals(ValueType.REF)) {
+                setter.invoke(obj, getByName(bean.getProperties().get(name).getValue()));
+            } else {
+                setter.invoke(obj, toObject(field.getType(), bean.getProperties().get(name).getValue()));
+            }
+        }
+        bean.setInstance(obj);
+        return obj;
     }
 
+    private Object toObject(Class clazz, String value) {
+        if (Integer.TYPE == clazz) {
+            return Integer.parseInt(value);
+        }
+        if (Boolean.TYPE == clazz) {
+            return Boolean.parseBoolean(value);
+        }
+        if (Byte.TYPE == clazz) {
+            return Byte.parseByte(value);
+        }
+        if (Short.TYPE == clazz) {
+            return Short.parseShort(value);
+        }
+        if (Long.TYPE == clazz) {
+            return Long.parseLong(value);
+        }
+        if (Float.TYPE == clazz) {
+            return Float.parseFloat(value);
+        }
+        if (Double.TYPE == clazz) {
+            return Double.parseDouble(value);
+        }
+        if (Character.TYPE == clazz) {
+            return value.charAt(0);
+        }
+        return value;
+    }
 }
